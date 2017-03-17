@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>ci_mvc_reate</title>
+</head>
+<style>
+	.center-text{
+		text-align: center;
+	}
+	.center-block{
+		margin: 0 auto;
+	}
+	.container{
+		width: 960px;
+		margin: 0 auto;
+	}
+</style>
+<body>
+	<div class="center-text">
+		<h1>step 2:生成mvc文件</h1>
+		<form action="ci_mvc_create.php">
+			<p>使用./create_config.json的配置生成mvc文件</p>
+			<table class="center-block">
+				<tr><td colspan="2">配置文件生成位置</td></tr>
+				<tr>
+					<td>model文件夹</td>
+					<td><input name="m_folder" type="text" value="../application/models"><span style="color: red">*会替换掉文件夹中的同名文件</span></td>
+				</tr>
+				<tr>
+					<td>view文件夹</td>
+					<td><input name="v_folder" type="text" value="../views"><span style="color: red">*会替换掉文件夹中的同名文件</span></td>
+				</tr>
+				<tr>
+					<td>controller文件夹</td>
+					<td><input name="c_folder" type="text" value="../application/controllers"><span style="color: red">*会替换掉文件夹中的同名文件</span></td>
+				</tr>
+				<tr>
+					<td>子view文件夹</td>
+					<td><input name="v_child_folder" type="text" value="back"><span style="color: red">*会替换掉文件夹中的同名文件</span></td>
+				</tr>
+				<tr>
+					<td>子controller文件夹</td>
+					<td><input name="c_child_folder" type="text" value="back"><span style="color: red">*会替换掉文件夹中的同名文件</span></td>
+				</tr>
+				<tr>
+					<td colspan="2"><input type="submit" value="生成"></td>
+				</tr>
+				<tr>
+					<td colspan="2"><a href="index.html"><small>返回上一步重新生成配置文件</small></a></td>
+				</tr>
+			</table>
+			<input name="step" type="text" value="2" style="display: none">
+		</form>
+	</div>
+	<div class="container">
+		<h2>配置说明：</h2>
+		<ul>
+			<li>
+				<h3>【表名】(map):</h3>
+				<ul>
+					<li>
+						<h4>tbl_comment:【表显示的名字】,</h4>
+					</li>
+					<li>
+						<h4>id(map-表主键（删除修改时用）):</h4>
+						<ul>
+							<li>field:【id的字段名】,</li>
+							<li>comment:【id显示的名字】,</li>
+						</ul>
+					</li>
+					<li>
+						<h4>col(list-表需要的列（添加查询用）):</h4>
+						<ul>
+							<li>
+								<h5>(map-需要的每一列):</h5>
+								<ul>
+									<li>field:【列的字段名】,</li>
+									<li>comment:【列显示的名字】,</li>
+								</ul>
+							</li>
+						</ul>
+					</li>
+					<li>
+						<h4>join(map-外连接的表，多对多配置两个连接的表就行连接):</h4>
+						<ul>
+							<li>
+								<h5>【表名】(map):</h5>
+								<ul>
+									<li>pri_field:【主表连接的字段名称】,</li>
+									<li>join_field:【连接表连接的字段名称】,</li>
+									<li>comment:【主表连接的字段显示的名称（添加，修改时的label名）】,</li>
+									<li>join_show_field【连接表在添加，修改时select中显示的字段】,</li>
+									<li>
+										<h4>col(list-连接的列):</h4>
+										<ul>
+											<li>
+												<h5>(map-连接的每一列):</h5>
+												<ul>
+													<li>field:【列的字段名】,</li>
+													<li>comment:【列显示的名字】,</li>
+												</ul>
+											</li>
+										</ul>
+									</li>
+								</ul>
+							</li>
+						</ul>
+					</li>
+				</ul>
+			</li>
+		</ul>
+	</div>
+</body>
+</html>

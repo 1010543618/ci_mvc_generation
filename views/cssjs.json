@@ -1,0 +1,48 @@
+{
+	"back/home.html" : {
+		"css" : [
+			"<?php echo base_url('views/back/vendors/bootstrap/dist/css/bootstrap.min.css')?>",
+			"<?php echo base_url('views/back/vendors/font-awesome/css/font-awesome.min.css')?>",
+			"<?php echo base_url('views/back/build/css/custom.min.css')?>"
+		],
+		"js" : [
+			"<?php echo base_url('views/back/vendors/jquery/dist/jquery.min.js')?>",
+			"<?php echo base_url('views/back/vendors/bootstrap/dist/js/bootstrap.min.js')?>"
+		]
+	},
+	"back" : {
+		"css" : [
+			"<?php echo base_url('views/back/vendors/bootstrap/dist/css/bootstrap.min.css')?>",
+			"<?php echo base_url('views/back/vendors/font-awesome/css/font-awesome.min.css')?>",
+			"<?php echo base_url('views/back/vendors/datatables.net-bs/css/dataTables.bootstrap.min.css')?>",
+			"<?php echo base_url('views/back/vendors/datatables.net-buttons-bs/css/buttons.bootstrap.min.css')?>",
+			"<?php echo base_url('views/back/vendors/datatables.net-fixedheader-bs/css/fixedHeader.bootstrap.min.css')?>",
+			"<?php echo base_url('views/back/vendors/datatables.net-responsive-bs/css/responsive.bootstrap.min.css')?>",
+			"<?php echo base_url('views/back/vendors/datatables.net-scroller-bs/css/scroller.bootstrap.min.css')?>",
+			"<?php echo base_url('views/back/build/css/custom.min.css')?>",
+			
+			"http://cdn.bootcss.com/jquery-confirm/3.1.0/jquery-confirm.min.css"
+		],
+		"js" : [    
+		    "<?php echo base_url('views/back/vendors/jquery/dist/jquery.min.js')?>",
+		    "<?php echo base_url('views/back/vendors/bootstrap/dist/js/bootstrap.min.js')?>",
+		    "<?php echo base_url('views/back/vendors/datatables.net/js/jquery.dataTables.min.js')?>",
+		    "<?php echo base_url('views/back/vendors/datatables.net-bs/js/dataTables.bootstrap.min.js')?>",
+		    "<?php echo base_url('views/back/vendors/datatables.net-buttons/js/dataTables.buttons.min.js')?>",
+		    "<?php echo base_url('views/back/vendors/datatables.net-buttons-bs/js/buttons.bootstrap.min.js')?>",
+		    "<?php echo base_url('views/back/vendors/datatables.net-buttons/js/buttons.flash.min.js')?>",
+		    "<?php echo base_url('views/back/vendors/datatables.net-buttons/js/buttons.html5.min.js')?>",
+		    "<?php echo base_url('views/back/vendors/datatables.net-buttons/js/buttons.print.min.js')?>",
+		    "<?php echo base_url('views/back/vendors/datatables.net-fixedheader/js/dataTables.fixedHeader.min.js')?>",
+		    "<?php echo base_url('views/back/vendors/datatables.net-keytable/js/dataTables.keyTable.min.js')?>",
+		    "<?php echo base_url('views/back/vendors/datatables.net-responsive/js/dataTables.responsive.min.js')?>",
+		    "<?php echo base_url('views/back/vendors/datatables.net-responsive-bs/js/responsive.bootstrap.js')?>",
+		    "<?php echo base_url('views/back/vendors/datatables.net-scroller/js/dataTables.scroller.min.js')?>",
+		    "<?php echo base_url('views/back/vendors/parsleyjs/dist/parsley.min.js')?>",
+
+		    "http://cdn.bootcss.com/jquery-confirm/3.1.0/jquery-confirm.min.js",
+		    "http://cdn.bootcss.com/datatables/1.10.13/js/jquery.dataTables.js"	
+		    
+		]
+	}
+}

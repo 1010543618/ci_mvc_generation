@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>ci_mvc_reate</title>
+</head>
+<style>
+	.center-text{
+		text-align: center;
+	}
+	.center-block{
+		margin: 0 auto;
+	}
+</style>
+<body>
+	<div class="center-text">
+		<h1>step 1:创建配置文件</h1>
+		<form action="ci_mvc_create.php">
+			<table class="center-block">
+				<tr>
+					<td colspan="2">数据库配置</td>
+				</tr>
+				<tr>
+					<td>主&nbsp;&nbsp;&nbsp;机</td>
+					<td><input name="host" type="text" value="localhost"></td>
+				</tr>
+				<tr>
+					<td>用户名</td>
+					<td><input name="user" type="text" value="root"></td>
+				</tr>
+				<tr>
+					<td>密&nbsp;&nbsp;&nbsp;码</td>
+					<td><input name="pwd" type="text" value="123456"></td>
+				</tr>
+				<tr>
+					<td>数据库</td>
+					<td><input name="db" type="text"></td>
+				</tr>
+				<tr>
+					<td>表(用","隔开,不填代表所有表)</td>
+					<td><input name="tables" type="text"><span></span></td>
+				</tr>
+				<tr>
+					<td colspan="2"><input type="submit" value="创建配置文件"></td>	
+				</tr>
+				<tr>
+					<td colspan="2"><a href="index2.html"><small>已经创建过配置文件直接进入下一步</small></a></td>
+				</tr>
+			</table>
+			<input name="step" type="text" value="1" style="display: none">
+		</form>
+	</div>
+</body>
+</html>
