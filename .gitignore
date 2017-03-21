@@ -15,7 +15,7 @@
 
 #mvc_generation
 /mvc_generation/config.json
-
+/mvc_generation/config_back.json
 
 .DS_Store
 

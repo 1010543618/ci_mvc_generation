@@ -55,7 +55,7 @@ class MY_Controller extends CI_Controller {
     {
         // 获取id
         $id = array($this->bean['id'] => $this->input->post($this->bean['id'], TRUE));
-        if ($this->department_model->delete($id)) {
+        if ($this->{$this->model_name}->delete($id)) {
             $result['status'] = true;
         }else{
             $result['status'] = false;

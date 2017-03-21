@@ -23,10 +23,11 @@
           <thead>
             <tr>
               <th>序号</th>
-<?php foreach ($bean['col'] as $key => $column): ?>
+<?php /*----------生成表格头----------*/?>
+<?php foreach ($bean['col'] as $key => $column): //主表字段?>
               <th><?php echo $column['comment']?></th>
-<?php endforeach ?>
-<?php if (isset($bean['join'])): ?>
+<?php endforeach //end主表字段?>
+<?php if (isset($bean['join'])): //连接表字段?>
 <?php   foreach ($bean['join'] as $join_table): ?>
 <?php     if (isset($join_table['col'])): ?>
 <?php       foreach ($join_table['col'] as $column): ?>
@@ -34,7 +35,8 @@
 <?php       endforeach ?>
 <?php     endif ?>
 <?php   endforeach ?>
-<?php endif ?>
+<?php endif //end连接表字段?>
+<?php /*----------/生成表格头----------*/?>
               <th>修改</th>
               <th>删除</th>
             </tr>
@@ -45,34 +47,45 @@
 
         <!-- add -->
         <form id="js-add-form" data-parsley-validate style="display: none">
-<?php foreach ($bean['col'] as $key => $column): ?>
+<?php /*----------生成添加表单----------*/?>
+<?php foreach ($bean['col'] as $key => $column): //主表字段?>
           <label><?php echo $column['comment']?></label>
           <input name="<?php echo $column['field']?>" type="text" class="form-control"/>
-<?php endforeach ?>
-<?php if (isset($bean['join'])): ?>
+<?php endforeach //end主表字段?>
+<?php if (isset($bean['join'])): //连接表字段?>
 <?php   foreach ($bean['join'] as $join_table_name => $join_table): ?>
           <label><?php echo $join_table['comment']?></label>
+<?php     if ($join_table['form_type'] == 'muticheck'): //连接表字段类型是muticheck?>
+          <div class="row js-checkbox-<?php echo $join_table_name?>"></div>
+<?php     else: //连接表字段类型是其他?>
           <select name="<?php echo $join_table['pri_field']?>" class="js-select-<?php echo $join_table_name?> form-control"></select>
+<?php     endif ?>
 <?php   endforeach ?>
-<?php endif ?>
+<?php endif //end连接表字段?>
+<?php /*----------/生成添加表单----------*/?>
           <br/>
           <span class="btn btn-primary">添加<?php echo $bean['tbl_comment']?></span>
         </form>
         <!-- /add -->
 
         <!-- edit -->
-
         <form id="js-edit-form" data-parsley-validate style="display: none">
-<?php foreach ($bean['col'] as $key => $column): ?>
+<?php /*----------生成修改表单----------*/?>
+<?php foreach ($bean['col'] as $key => $column): //主表字段?>
           <label><?php echo $column['comment']?></label>
           <input name="<?php echo $column['field']?>" type="text" class="form-control"/>
 <?php endforeach ?>
 <?php if (isset($bean['join'])): ?>
-<?php   foreach ($bean['join'] as $join_table_name => $join_table): ?>
+<?php   foreach ($bean['join'] as $join_table_name => $join_table): //连接表字段?>
           <label><?php echo $join_table['comment']?></label>
+<?php     if ($join_table['form_type'] == 'muticheck'): //连接表字段类型是muticheck?>
+          <div class="row js-checkbox-<?php echo $join_table_name?>"></div>
+<?php     else: //连接表字段类型是其他?>
           <select name="<?php echo $join_table['pri_field']?>" class="js-select-<?php echo $join_table_name?> form-control"></select>
+<?php     endif ?>
 <?php   endforeach ?>
-<?php endif ?>
+<?php endif //end连接表字段?>
+<?php /*----------生成修改表单----------*/?>
           <input name="<?php echo $bean['id']['field']?>" type="text" style="display: none" />
           <br/>
           <span class="btn btn-primary">修改<?php echo $bean['tbl_comment']?></span>
@@ -177,13 +190,13 @@
     };
 
     var init_dialog = function($edit_form){
-<?php foreach ($bean['col'] as $key => $column): ?>
+<?php foreach ($bean['col'] as $key => $column): //初始化主表默认值?>
       $edit_form.find(":input[name='<?php echo $column['field']?>']").val(data['<?php echo $column['field']?>']);
 <?php endforeach ?>
-<?php if (isset($bean['join'])): ?>
-  <?php foreach ($bean['join'] as $join_table_name => $join_table): ?>
+<?php if (isset($bean['join'])): //初始化连接表默认值?>
+<?php   foreach ($bean['join'] as $join_table_name => $join_table): ?>
       $edit_form.find(":input[name='<?php echo $join_table['pri_field']?>']").val(data['<?php echo $join_table['pri_field']?>']);
-  <?php endforeach ?>
+<?php   endforeach ?>
 <?php endif ?>
       $edit_form.find(":input[name='<?php echo $bean['id']['field']?>']").val(data['<?php echo $bean['id']['field']?>']);
       $/*.listen*/('parsley:field:validate', function() {
@@ -209,9 +222,23 @@
               edit_dialog.setContent(data['message']);
             }
           });
-        }
+        }       
         validate_form();
       });
+<?php if (isset($bean['join'])): ?>
+<?php   foreach ($bean['join'] as $join_table_name => $join_table): ?>
+      $edit_form.find('.js-checkbox-<?php echo $join_table_name?> input').each(function(){
+          var self = $(this),
+              label = self.next(),
+              label_text = label.text();
+          label.remove();
+          self.iCheck({
+            checkboxClass: 'icheckbox_line-green',
+            insert: '<div class="icheck_line-icon"></div>' + label_text
+          });
+      });
+<?php   endforeach ?>
+<?php endif ?> 
     }
 
     var edit_dialog = $.dialog({
@@ -238,12 +265,11 @@
       }
     };
     
-
-    var init_dialog = function(add_form){
+    var init_dialog = function($add_form){
       $/*.listen*/('parsley:field:validate', function() {
         validate_form();
       });
-      add_form.find('.btn').on('click', function() {
+      $add_form.find('.btn').on('click', function() {
         if ($('#add-form').parsley().validate()) {
           var post_data = new Object();
 <?php foreach ($bean['col'] as $key => $column): ?>
@@ -263,7 +289,21 @@
             }
           })
         }
-      })
+      });
+<?php if (isset($bean['join'])): ?>
+<?php   foreach ($bean['join'] as $join_table_name => $join_table): ?>
+     $add_form.find('.js-checkbox-<?php echo $join_table_name?> input').each(function(){
+          var self = $(this),
+              label = self.next(),
+              label_text = label.text();
+          label.remove();
+          self.iCheck({
+            checkboxClass: 'icheckbox_line-green',
+            insert: '<div class="icheck_line-icon"></div>' + label_text
+          });
+      });
+<?php   endforeach ?>
+<?php endif ?>
     }
 
     var add_dialog = $.dialog({
@@ -276,8 +316,6 @@
         }
     });
   }
-
-
 
   function del_confirm(data){
     var del_confirm = $.confirm({
@@ -304,21 +342,31 @@
     });
   }
 
+<?php /*----------初始化添加，修改表单（对在表单中选择用的外链表数据初始化）----------*/?>
 <?php if (isset($bean['join'])): ?>
   function init_add_edit_form(){
     $.post("<?php echo "<?=site_url('back/{$bean_name}/get_form_data')?>"?>", {}, function(data,status){
       if (data['status'] == true) {
 <?php   foreach ($bean['join'] as $join_table_name => $join_table): ?>
+<?php     if ($join_table['form_type'] == 'muticheck'): ?>
+          var $<?php echo $join_table_name?> = $('.js-checkbox-<?php echo $join_table_name?>');
+          $(data.<?php echo $join_table_name?>).each(function(){
+            var checkbox_str = '<div class="col-md-4"><input name="<?php echo $join_table['pri_field'] ?>[]" type="checkbox" value="'+this.<?php echo $join_table['join_field'] ?>+'" />'+'<label>'+this.<?php echo $join_table['join_show_field'] ?>+'</label></div>';
+            $<?php echo $join_table_name?>.append(checkbox_str);
+          });
+<?php     else: ?>
           var $<?php echo $join_table_name?> = $('.js-select-<?php echo $join_table_name?>');
           $(data.<?php echo $join_table_name ?>).each(function(){
             var option_str = '<option value="'+this.<?php echo $join_table['join_field'] ?>+'">'+this.<?php echo $join_table['join_show_field'] ?>+'</option>'
             $<?php echo $join_table_name?>.append(option_str);
           });
+<?php     endif ?>       
 <?php   endforeach ?>
       }
     });
   }
 <?php endif ?>
+<?php /*----------/初始化添加，修改表单（对在表单中选择用的外链表数据初始化）----------*/?>
 
   window.onload = function(){
     init_table();
