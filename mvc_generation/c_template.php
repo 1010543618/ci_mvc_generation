@@ -49,7 +49,7 @@ class <?php echo $controller_name ?> extends MY_Controller {
 	$multichoice = null;
 	if(isset($bean['join'])){
 		foreach ($bean['join'] as $join_table_name => $join_table) {
-			if ($join_table['form_type'] == 'multichoice') {
+			if (isset($join_table['form_type']) && $join_table['form_type'] == 'multichoice') {
 				$multichoice[] = $join_table['pri_field'];
 			}
 		}

@@ -55,7 +55,7 @@
 <?php if (isset($bean['join'])): //连接表字段?>
 <?php   foreach ($bean['join'] as $join_table_name => $join_table): ?>
           <label><?php echo $join_table['comment']?></label>
-<?php     if ($join_table['form_type'] == 'multichoice'): //连接表字段类型是multichoice?>
+<?php     if (isset($join_table['form_type']) && $join_table['form_type'] == 'multichoice'): //连接表字段类型是multichoice?>
           <div class="row js-checkbox-<?php echo $join_table_name?>"></div>
 <?php     else: //连接表字段类型是其他?>
           <select name="<?php echo $join_table['pri_field']?>" class="js-select-<?php echo $join_table_name?> form-control"></select>
@@ -78,7 +78,7 @@
 <?php if (isset($bean['join'])): ?>
 <?php   foreach ($bean['join'] as $join_table_name => $join_table): //连接表字段?>
           <label><?php echo $join_table['comment']?></label>
-<?php     if ($join_table['form_type'] == 'multichoice'): //连接表字段类型是multichoice?>
+<?php     if (isset($join_table['form_type']) && $join_table['form_type'] == 'multichoice'): //连接表字段类型是multichoice?>
           <div class="row js-checkbox-<?php echo $join_table_name?>"></div>
 <?php     else: //连接表字段类型是其他?>
           <select name="<?php echo $join_table['pri_field']?>" class="js-select-<?php echo $join_table_name?> form-control"></select>
@@ -112,7 +112,22 @@
 <?php endforeach ?>
 <?php if (isset($bean['join'])): ?>
 <?php   foreach ($bean['join'] as $join_table): ?>
-<?php     if (isset($join_table['col'])): ?>
+<?php     if (isset($join_table['form_type']) && $join_table['form_type'] == 'multichoice'): //连接表字段类型是multichoice?>
+<?php       foreach ($join_table['col'] as $column): ?>
+          {
+            "data":"<?php echo $column['field']?>",
+            "render": function(data) {
+              var data = data ? data.split(',') : '';
+              var div = '';
+              $(data).each(function(){
+                div += '<span class="label label-primary">'+this+'</span>';
+              });
+              
+              return div;
+            }
+          },
+<?php       endforeach ?>
+<?php     else: //连接表字段类型是其他?>
 <?php       foreach ($join_table['col'] as $column): ?>
           {"data":"<?php echo $column['field']?>" },
 <?php       endforeach ?>
@@ -334,7 +349,7 @@
     $.post("<?php echo "<?=site_url('back/{$bean_name}/get_form_data')?>"?>", {}, function(data,status){
       if (data['status'] == true) {
 <?php   foreach ($bean['join'] as $join_table_name => $join_table): ?>
-<?php     if ($join_table['form_type'] == 'multichoice'): ?>
+<?php     if (isset($join_table['form_type']) && $join_table['form_type'] == 'multichoice'): ?>
           var $<?php echo $join_table_name?> = $('.js-checkbox-<?php echo $join_table_name?>');
           $(data.<?php echo $join_table_name?>).each(function(){
             var checkbox_str = '<div class="col-md-4"><input name="<?php echo $join_table['pri_field'] ?>[]" type="checkbox" value="'+this.<?php echo $join_table['join_field'] ?>+'" />'+'<label>'+this.<?php echo $join_table['join_show_field'] ?>+'</label></div>';

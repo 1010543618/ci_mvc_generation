@@ -9,21 +9,26 @@ class <?php echo $model_name?> extends MY_Model {
 		$select .= ",$bean_name.{$col['field']}";
 	}
 	foreach ($bean['join'] as $join_table_name => $join_table) {
-		if ($join_table['form_type'] == 'multichoice') {
+		if (isset($join_table['form_type']) && $join_table['form_type'] == 'multichoice') {
 			//multichoice的select和join
 			$select .= ",$bean_name.{$join_table['pri_field']}";
+			$child_join_select = array();
 			foreach ($join_table['col'] as $join_col) {
-				$select .= ",group_concat($join_table_name.{$join_col['field']}) as {$join_col['field']}";
+				$select .= ",GROUP_CONCAT($join_table_name.{$join_col['field']}) AS {$join_col['field']}";
+				$child_join_select[] = "GROUP_CONCAT($join_table_name.{$join_col['field']}) AS {$join_col['field']}";
 			}
+			$child_join_select_str = implode(',', $child_join_select);
 			//注意FIND_IN_SET(要找的字符串,被寻找的字符串)
-			$join .= "join('$join_table_name', 'FIND_IN_SET($join_table_name.{$join_table['join_field']},$bean_name.{$join_table['pri_field']}) != 0', 'left')->";
+			//通过子查询查找出来连接表要查找的字段合并起来（不这样group_concat多表连接时字段会重复）
+			$child_join_table = "'(SELECT {$bean['id']['field']}, $child_join_select_str FROM $bean_name left join $join_table_name ON FIND_IN_SET($join_table_name.{$join_table['join_field']},$bean_name.{$join_table['pri_field']}) != 0 GROUP BY {$bean['id']['field']}) AS $join_table_name'";
+			$join .= "JOIN($child_join_table, '$bean_name.{$bean['id']['field']}=$join_table_name.{$bean['id']['field']}', 'left')->";
 		}else{
 			//其他的select和join
 			$select .= ",$bean_name.{$join_table['pri_field']}";
 			foreach ($join_table['col'] as $join_col) {
 				$select .= ",$join_table_name.{$join_col['field']}";
 			}
-			$join .= "join('$join_table_name', '$bean_name.{$join_table['pri_field']} = $join_table_name.{$join_table['join_field']}', 'left')->";
+			$join .= "JOIN('$join_table_name', '$bean_name.{$join_table['pri_field']} = $join_table_name.{$join_table['join_field']}', 'left')->";
 		}
 		
 	}
