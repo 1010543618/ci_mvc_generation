@@ -55,7 +55,7 @@
 <?php if (isset($bean['join'])): //连接表字段?>
 <?php   foreach ($bean['join'] as $join_table_name => $join_table): ?>
           <label><?php echo $join_table['comment']?></label>
-<?php     if ($join_table['form_type'] == 'muticheck'): //连接表字段类型是muticheck?>
+<?php     if ($join_table['form_type'] == 'multichoice'): //连接表字段类型是multichoice?>
           <div class="row js-checkbox-<?php echo $join_table_name?>"></div>
 <?php     else: //连接表字段类型是其他?>
           <select name="<?php echo $join_table['pri_field']?>" class="js-select-<?php echo $join_table_name?> form-control"></select>
@@ -78,7 +78,7 @@
 <?php if (isset($bean['join'])): ?>
 <?php   foreach ($bean['join'] as $join_table_name => $join_table): //连接表字段?>
           <label><?php echo $join_table['comment']?></label>
-<?php     if ($join_table['form_type'] == 'muticheck'): //连接表字段类型是muticheck?>
+<?php     if ($join_table['form_type'] == 'multichoice'): //连接表字段类型是multichoice?>
           <div class="row js-checkbox-<?php echo $join_table_name?>"></div>
 <?php     else: //连接表字段类型是其他?>
           <select name="<?php echo $join_table['pri_field']?>" class="js-select-<?php echo $join_table_name?> form-control"></select>
@@ -178,7 +178,6 @@
   function edit_dialog(data){
     data = data.replace(/&quot;/g, '"');
     data = JSON.parse(data);
-    console.log(data);
     var validate_form = function() {
       if (true === $('#edit-form').parsley().isValid()) {
         $('.bs-callout-info').removeClass('hidden');
@@ -204,16 +203,7 @@
       });
       $('#edit-form .btn').on('click', function() {
         if ($('#edit-form').parsley().validate()) {
-          var post_data = new Object();
-<?php foreach ($bean['col'] as $key => $column): ?>
-          post_data['<?php echo $column['field']?>'] = $("#edit-form :input[name='<?php echo $column['field']?>']").val();
-<?php endforeach ?>
-<?php if (isset($bean['join'])): ?>
-<?php   foreach ($bean['join'] as $join_table_name => $join_table): ?>
-          post_data['<?php echo $join_table['pri_field']?>'] = $("#edit-form :input[name='<?php echo $join_table['pri_field']?>']").val();
-<?php   endforeach ?>
-<?php endif ?>
-          post_data['<?php echo $bean['id']['field']?>'] = $("#edit-form :input[name='<?php echo $bean['id']['field']?>']").val();
+          var post_data = $('#edit-form').serialize();
           $.post("<?php echo "<?=site_url('back/{$bean_name}/update')?>"?>", post_data, function(data){
             if (data['status'] == true) {
               DEP_TABLE.ajax.reload( null, false );
@@ -227,15 +217,19 @@
       });
 <?php if (isset($bean['join'])): ?>
 <?php   foreach ($bean['join'] as $join_table_name => $join_table): ?>
+      var checked_<?php echo $join_table['pri_field']?>_array = data['<?php echo $join_table['pri_field']?>'].split(',');
       $edit_form.find('.js-checkbox-<?php echo $join_table_name?> input').each(function(){
-          var self = $(this),
-              label = self.next(),
-              label_text = label.text();
-          label.remove();
-          self.iCheck({
-            checkboxClass: 'icheckbox_line-green',
-            insert: '<div class="icheck_line-icon"></div>' + label_text
-          });
+        var self = $(this),
+            label = self.next(),
+            label_text = label.text();
+        if ($.inArray(self.val(), checked_<?php echo $join_table['pri_field']?>_array) != -1) {
+          self.prop('checked',true);
+        };
+        label.remove();
+        self.iCheck({
+          checkboxClass: 'icheckbox_line-green',
+          insert: '<div class="icheck_line-icon"></div>' + label_text
+        });
       });
 <?php   endforeach ?>
 <?php endif ?> 
@@ -271,15 +265,7 @@
       });
       $add_form.find('.btn').on('click', function() {
         if ($('#add-form').parsley().validate()) {
-          var post_data = new Object();
-<?php foreach ($bean['col'] as $key => $column): ?>
-          post_data['<?php echo $column['field']?>'] = $("#add-form :input[name='<?php echo $column['field']?>']").val();
-<?php endforeach ?>
-<?php if (isset($bean['join'])): ?>
-<?php   foreach ($bean['join'] as $join_table_name => $join_table): ?>
-          post_data['<?php echo $join_table['pri_field']?>'] = $("#add-form :input[name='<?php echo $join_table['pri_field']?>']").val();
-<?php   endforeach ?>
-<?php endif ?>
+          var post_data = new $('#add-form').serialize();
           $.post("<?php echo "<?=site_url('back/{$bean_name}/insert')?>"?>", post_data, function(data){
             if (data['status'] == true) {
               DEP_TABLE.ajax.reload( null, false );
@@ -348,7 +334,7 @@
     $.post("<?php echo "<?=site_url('back/{$bean_name}/get_form_data')?>"?>", {}, function(data,status){
       if (data['status'] == true) {
 <?php   foreach ($bean['join'] as $join_table_name => $join_table): ?>
-<?php     if ($join_table['form_type'] == 'muticheck'): ?>
+<?php     if ($join_table['form_type'] == 'multichoice'): ?>
           var $<?php echo $join_table_name?> = $('.js-checkbox-<?php echo $join_table_name?>');
           $(data.<?php echo $join_table_name?>).each(function(){
             var checkbox_str = '<div class="col-md-4"><input name="<?php echo $join_table['pri_field'] ?>[]" type="checkbox" value="'+this.<?php echo $join_table['join_field'] ?>+'" />'+'<label>'+this.<?php echo $join_table['join_show_field'] ?>+'</label></div>';
