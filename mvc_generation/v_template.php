@@ -216,7 +216,8 @@
       $/*.listen*/('parsley:field:validate', function() {
         validate_form();
       });
-      $('#edit-form .btn').on('click', function() {
+      $edit_form.find(".btn").on('click', function() {
+        //parsley()和serialize()不能用$edit_form（是div节点）必须用$('#edit-form')
         if ($('#edit-form').parsley().validate()) {
           var post_data = $('#edit-form').serialize();
           $.post("<?php echo "<?=site_url('back/{$bean_name}/update')?>"?>", post_data, function(data){
@@ -279,6 +280,7 @@
         validate_form();
       });
       $add_form.find('.btn').on('click', function() {
+        //parsley()和serialize()不能用$add_form（是div节点）必须用$('#add-form')
         if ($('#add-form').parsley().validate()) {
           var post_data = new $('#add-form').serialize();
           $.post("<?php echo "<?=site_url('back/{$bean_name}/insert')?>"?>", post_data, function(data){
@@ -293,15 +295,15 @@
       });
 <?php if (isset($bean['join'])): ?>
 <?php   foreach ($bean['join'] as $join_table_name => $join_table): ?>
-     $add_form.find('.js-checkbox-<?php echo $join_table_name?> input').each(function(){
-          var self = $(this),
-              label = self.next(),
-              label_text = label.text();
-          label.remove();
-          self.iCheck({
-            checkboxClass: 'icheckbox_line-green',
-            insert: '<div class="icheck_line-icon"></div>' + label_text
-          });
+    $add_form.find('.js-checkbox-<?php echo $join_table_name?> input').each(function(){
+      var self = $(this),
+          label = self.next(),
+          label_text = label.text();
+        label.remove();
+        self.iCheck({
+          checkboxClass: 'icheckbox_line-green',
+          insert: '<div class="icheck_line-icon"></div>' + label_text
+        });
       });
 <?php   endforeach ?>
 <?php endif ?>
