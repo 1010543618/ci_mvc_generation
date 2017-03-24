@@ -42,6 +42,9 @@
 		    "<?php echo base_url('views/back/vendors/datatables.net-scroller/js/dataTables.scroller.min.js')?>",
 		    "<?php echo base_url('views/back/vendors/parsleyjs/dist/parsley.min.js')?>",
 
+
+		    "<?php echo base_url('views/back/vendors/ueditor/ueditor.config.js')?>",
+		    "<?php echo base_url('views/back/vendors/ueditor/ueditor.all.min.js')?>",
 			"http://cdn.bootcss.com/iCheck/1.0.2/icheck.min.js",
 		    "http://cdn.bootcss.com/jquery-confirm/3.1.0/jquery-confirm.min.js",
 		    "http://cdn.bootcss.com/datatables/1.10.13/js/jquery.dataTables.js"	

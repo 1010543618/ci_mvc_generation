@@ -231,8 +231,21 @@
         }       
         validate_form();
       });
+<?php /*----------初始化富文本编辑器----------*/?>
+<?php foreach ($bean['col'] as $key => $column): //主表字段?>
+<?php   if ($column['type'] == 'text'): ?>
+      $edit_form.find(":input[name='<?php echo $column['field'] ?>']").replaceWith(function(){return '<script id="ue-<?php echo $column['field'] ?>" name="<?php echo $column['field'] ?>" type="text/plain">'+$(this).val()+'<\/script>'});
+      var ue_width = $edit_form.width();
+      // jquery-confirm的zindex是8个9，UE要9个9在jquery-confirm上面
+      var ue = UE.getEditor('ue-<?php echo $column['field'] ?>',{initialFrameWidth:ue_width,zIndex:999999999});
+<?php   endif ?>
+<?php endforeach ?>
+<?php /*----------/初始化富文本编辑器----------*/?>
+
+<?php /*----------初始化multichoice----------*/?>
 <?php if (isset($bean['join'])): ?>
 <?php   foreach ($bean['join'] as $join_table_name => $join_table): ?>
+<?php     if (isset($join_table['form_type']) && $join_table['form_type'] == 'multichoice'): ?>
       var checked_<?php echo $join_table['pri_field']?>_array = data['<?php echo $join_table['pri_field']?>'].split(',');
       $edit_form.find('.js-checkbox-<?php echo $join_table_name?> input').each(function(){
         var self = $(this),
@@ -247,8 +260,10 @@
           insert: '<div class="icheck_line-icon"></div>' + label_text
         });
       });
+<?php     endif ?>
 <?php   endforeach ?>
-<?php endif ?> 
+<?php endif ?>
+<?php /*----------/初始化multichoice----------*/?>
     }
 
     var edit_dialog = $.dialog({
@@ -258,6 +273,13 @@
         },
         onContentReady: function(){
           init_dialog(edit_dialog.$content);
+        },
+        onDestroy: function(){
+<?php foreach ($bean['col'] as $key => $column): ?>
+<?php   if ($column['type'] == 'text'): ?>
+          UE.getEditor('ue-<?php echo $column['field'] ?>').destroy();
+<?php   endif ?>
+<?php endforeach ?>
         }
     });
   }
@@ -292,9 +314,22 @@
             }
           })
         }
+
       });
+<?php /*----------初始化富文本编辑器----------*/?>
+<?php foreach ($bean['col'] as $key => $column): //主表字段?>
+<?php   if ($column['type'] == 'text'): ?>
+      $add_form.find(":input[name='<?php echo $column['field'] ?>']").replaceWith('<script id="ue-<?php echo $column['field'] ?>" name="<?php echo $column['field'] ?>" type="text/plain"><\/script>');
+      var ue_width = $add_form.width();
+      // jquery-confirm的zindex是8个9，UE要9个9在jquery-confirm上面
+      var ue = UE.getEditor('ue-<?php echo $column['field'] ?>',{initialFrameWidth:ue_width,zIndex:999999999});
+<?php   endif ?>
+<?php endforeach ?>
+<?php /*----------/初始化富文本编辑器----------*/?>
+
 <?php if (isset($bean['join'])): ?>
 <?php   foreach ($bean['join'] as $join_table_name => $join_table): ?>
+<?php     if (isset($join_table['form_type']) && $join_table['form_type'] == 'multichoice'): ?>
     $add_form.find('.js-checkbox-<?php echo $join_table_name?> input').each(function(){
       var self = $(this),
           label = self.next(),
@@ -305,6 +340,7 @@
           insert: '<div class="icheck_line-icon"></div>' + label_text
         });
       });
+<?php     endif ?>
 <?php   endforeach ?>
 <?php endif ?>
     }
@@ -316,6 +352,13 @@
         },
         onContentReady: function(){
           init_dialog(add_dialog.$content);
+        },
+        onDestroy: function(){
+<?php foreach ($bean['col'] as $key => $column): ?>
+<?php   if ($column['type'] == 'text'): ?>
+          UE.getEditor('ue-<?php echo $column['field'] ?>').destroy();
+<?php   endif ?>
+<?php endforeach ?>
         }
     });
   }
