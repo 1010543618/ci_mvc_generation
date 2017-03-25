@@ -137,6 +137,10 @@
           { 
             "data": null,
             "render": function(data) {
+              //data的数据中有"要处理一下
+              $.each(data, function(index, value){
+                if(value != null) data[index] = value.replace(/"/g, '\\"');
+              });
               data = JSON.stringify(data);
               data = data.replace(/"/g, '&quot;');
               var editdiv = '<a class="edit green" onClick="edit_dialog(\''+data+'\')"><i class="fa fa-pencil bigger-130"></i>修改</a>';
@@ -237,7 +241,7 @@
       $edit_form.find(":input[name='<?php echo $column['field'] ?>']").replaceWith(function(){return '<script id="ue-<?php echo $column['field'] ?>" name="<?php echo $column['field'] ?>" type="text/plain">'+$(this).val()+'<\/script>'});
       var ue_width = $edit_form.width();
       // jquery-confirm的zindex是8个9，UE要9个9在jquery-confirm上面
-      var ue = UE.getEditor('ue-<?php echo $column['field'] ?>',{initialFrameWidth:ue_width,zIndex:999999999});
+      var ue = UE.getEditor('ue-<?php echo $column['field'] ?>',{initialFrameWidth:ue_width,zIndex:999999999,autoFloatEnabled:false});
 <?php   endif ?>
 <?php endforeach ?>
 <?php /*----------/初始化富文本编辑器----------*/?>
@@ -322,7 +326,7 @@
       $add_form.find(":input[name='<?php echo $column['field'] ?>']").replaceWith('<script id="ue-<?php echo $column['field'] ?>" name="<?php echo $column['field'] ?>" type="text/plain"><\/script>');
       var ue_width = $add_form.width();
       // jquery-confirm的zindex是8个9，UE要9个9在jquery-confirm上面
-      var ue = UE.getEditor('ue-<?php echo $column['field'] ?>',{initialFrameWidth:ue_width,zIndex:999999999});
+      var ue = UE.getEditor('ue-<?php echo $column['field'] ?>',{initialFrameWidth:ue_width,zIndex:999999999,autoFloatEnabled:false});
 <?php   endif ?>
 <?php endforeach ?>
 <?php /*----------/初始化富文本编辑器----------*/?>
