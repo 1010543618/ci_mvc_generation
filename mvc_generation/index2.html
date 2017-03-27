@@ -60,30 +60,30 @@
 				<h3>【表名】(map):</h3>
 				<ul>
 					<li>
-						<h4>tbl_comment:【表显示的名字】,</h4>
+						<h4>tbl_comment(*):【表显示的名字】,</h4>
 					</li>
 					<li>
-						<h4>id(map-表主键（删除修改时用）):</h4>
+						<h4>id(*)(map-表主键（删除修改时用）):</h4>
 						<ul>
-							<li>field:【id的字段名】,</li>
-							<li>comment:【id显示的名字】,</li>
+							<li>field(*):【id的字段名】,</li>
+							<li>comment(*):【id显示的名字】,</li>
 						</ul>
 					</li>
 					<li>
-						<h4>col(list-表需要的列（添加查询用）):</h4>
+						<h4>col(-)(list-表需要的列（添加查询用）):</h4>
 						<ul>
 							<li>
 								<h5>(map-需要的每一列):</h5>
 								<ul>
-									<li>field:【列的字段名】,</li>
-									<li>comment:【列显示的名字】,</li>
-									<li>type:【列的类型】（text将使用富文本编辑器）,</li>
+									<li>field(*):【列的字段名】,</li>
+									<li>comment(*):【列显示的名字】,</li>
+									<li>type(-):【列的类型】（默认是input，text将使用富文本编辑器）,</li>
 								</ul>
 							</li>
 						</ul>
 					</li>
 					<li>
-						<h4>join(map-外连接的表，多对多配置两个连接的表就行连接):</h4>
+						<h4>join(-)(map-外连接的表，多对多配置两个连接的表就行连接):</h4>
 						<ul>
 							<li>
 								<h5>【表名】(map):</h5>
