@@ -9,8 +9,8 @@ class Index extends MY_Controller {
 
 	public function index()
 	{
+		// $this->load->view('guide.html');
 		$this->loadViewhf('back/home.html');
 	}
 
-	
 }

@@ -9,14 +9,21 @@ if ($_GET) {
 				'host' => $_GET['host'],
 				'user' => $_GET['user'],
 				'password' => $_GET['pwd'],
-				'db' => $_GET['db'],
-				'tables' => $_GET['tables']
+				'db' => $_GET['db']
+				// 'tables' => $_GET['tables']
 				);
-			if(output_config_file()){
-				header("Location:index2.html");
+			if (has_null($config)) {
+				return_result('有必填项没填啊！', false);
 			}
+			// if(output_config_file()){
+			// 	header("Location:index2.html");
+			// }
+			return_result(get_database_tebles($config), true);
 			break;
 		case '2':
+
+			break;
+		case '3':
 			$config = array(
 				//mvc相对于当前目录的路径
 				'm_folder' => $_GET['m_folder'],
@@ -129,13 +136,38 @@ function output_config_file(){
 }
 
 /**
- * 获取数据库中表的信息
+ * 获取数据库中的全部表
  * @Author   zjf
  * @DateTime 2017-03-10
- * @return   Array[tablename][tableinfo]     据库中表的信息
+ * @param 	 Array $config 			数据库配置信息
+ * @return   Array[tables]     		数据库中的全部表
  */
-function get_tables_info(){
-	global $config;
+function get_database_tebles($config){
+	// 1.连接数据库
+	$conn = mysqli_connect($config['host'], $config['user'], $config['password']) or exit('连接数据库失败，请检查该配置是否能连接数据库');
+	mysqli_query($conn, 'SET NAMES utf8');
+	// 2.选择数据库
+	mysqli_query($conn, "use {$config['db']}") or exit('选择数据库失败，请检查是否有该数据库');
+	// 3.获取需要的表表(没有配置获取全部表)
+	$result = mysqli_query($conn, "show table status");
+	$i=0;
+	foreach (mysqli_fetch_all($result) as $value) {
+		#0表名，17表注释
+		$tables[$i]['tbl_name'] = $value[0];
+		$tables[$i]['tbl_comment'] = $value[17];
+		++$i;
+	}
+	return $tables;
+}
+
+/**
+ * 获取指定表字段
+ * @Author   zjf
+ * @DateTime 2017-03-10
+ * @param 	 Array $config 					 数据库配置信息
+ * @return   Array[tablename][tableinfo]     指定表字段
+ */
+function get_tables_info($config){
 	// 1.连接数据库
 	$conn = mysqli_connect($config['host'], $config['user'], $config['password']) or exit('连接数据库失败，请检查该配置是否能连接数据库');
 	mysqli_query($conn, 'SET NAMES utf8');
@@ -230,6 +262,25 @@ function replace_null(&$arr){
 	}
 }
 
+function has_null($config){
+	$is_has_null = false;
+	foreach ($config as $key => $value) {
+		if ($value == null){
+			$is_has_null = true;
+			break;
+		}
+	}
+	return $is_has_null;
+}
+
+function return_result($info, $status){
+	$result = array();
+	$result['info'] = $info;
+	$result['status'] = $status;
+	// header("Content-type: application/json");
+	echo json_encode($result);
+	die();
+}
 
 
 

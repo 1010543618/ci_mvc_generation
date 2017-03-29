@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <!-- Meta, title, CSS, favicons, etc. -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>自动生成向导</title>
+    <!-- Bootstrap -->
+    <!-- <link href="<?php echo base_url('views/back/vendors/bootstrap/dist/css/bootstrap.min.css')?>" rel="stylesheet"> -->
+    <link href="http://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <!-- <link href="<?php echo base_url('views/back/vendors/bootstrap/dist/css/font-awesome.min.css')?>" rel="stylesheet"> -->
+    <link href="http://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+
+    <link href="http://cdn.bootcss.com/iCheck/1.0.2/skins/line/green.css" rel="stylesheet">
+    <!-- Gentelella custom -->
+    <link href="./external/custom.css" rel="stylesheet">
+    <style>
+      .row{
+        margin: 0;
+      }
+      .padding-0{
+        padding: 0;
+      }
+    </style>
+  </head>
+  <body class="nav-md">
+    <div class="container body">
+        <!-- page content -->
+        <div class="row">
+          <div class="col-md-12 col-sm-12 col-xs-12 padding-0">
+            <div class="x_panel">
+              <div class="x_title">
+                <h2>自动生成向导<small>CI+Gentelella,写了一半的坑</small></h2>
+                <div class="clearfix"></div>
+              </div>
+              <div class="x_content">
+                <p>根据自己的环境进行配置.</p>
+                <div id="wizard" class="form_wizard wizard_horizontal">
+                  <ul class="wizard_steps">
+                    <li>
+                      <a href="#step-1">
+                        <span class="step_no">1</span>
+                        <span class="step_descr">
+                          Step 1<br />
+                            <small>配置数据库</small>
+                        </span>
+                      </a>
+                    </li>
+                    <li>
+                      <a href="#step-2">
+                        <span class="step_no">2</span>
+                        <span class="step_descr">
+                             Step 2<br />
+                            <small>选择要自动生成的表</small>
+                         </span>
+                      </a>
+                    </li>
+                    <li>
+                      <a href="#step-3">
+                        <span class="step_no">3</span>
+                        <span class="step_descr">
+                            Step 3<br />
+                            <small>修改配置文件</small>
+                        </span>
+                      </a>
+                    </li>
+                    <li>
+                      <a href="#step-4">
+                        <span class="step_no">4</span>
+                        <span class="step_descr">
+                            Step 4<br />
+                            <small>自动生成</small>
+                        </span>
+                      </a>
+                    </li>
+                  </ul>
+                  <div id="step-1">
+                    <form id="step-1-form" class="form-horizontal form-label-left">
+                      <div class="form-group">
+                        <label class="control-label col-md-3 col-sm-3 col-xs-12" for="first-name">主&nbsp;&nbsp;&nbsp;机&nbsp;<span class="required">*</span>
+                        </label>
+                        <div class="col-md-6 col-sm-6 col-xs-12">
+                          <input name="host" type="text" value="localhost" class="form-control col-md-7 col-xs-12">
+                        </div>
+                      </div>
+                      <div class="form-group">
+                        <label class="control-label col-md-3 col-sm-3 col-xs-12" for="last-name">用户名&nbsp;<span class="required">*</span>
+                        </label>
+                        <div class="col-md-6 col-sm-6 col-xs-12">
+                          <input name="user" type="text" value="root" class="form-control col-md-7 col-xs-12">
+                        </div>
+                      </div>
+                      <div class="form-group">
+                        <label for="middle-name" class="control-label col-md-3 col-sm-3 col-xs-12">密&nbsp;&nbsp;&nbsp;码&nbsp;<span class="required">*</span></label>
+                        <div class="col-md-6 col-sm-6 col-xs-12">
+                          <input name="pwd" type="text" value="123456" class="form-control col-md-7 col-xs-12">
+                        </div>
+                      </div>
+                      <div class="form-group">
+                        <label class="control-label col-md-3 col-sm-3 col-xs-12">数据库&nbsp;<span class="required">*</span></label>
+                        <div class="col-md-6 col-sm-6 col-xs-12">
+                            <input name="db" type="text" value="test" class="form-control col-md-7 col-xs-12">
+                        </div>
+                      </div>
+                      <input name="step" type="text" value="1" style="display: none;">
+                    </form>
+                  </div>
+                  <div id="step-2">
+                    <form id="step-2-form" class="form-horizontal form-label-left">
+                      <div class="form-group">
+                        <div class="col-md-offset-2 col-md-1">
+                          <div class="checkbox">
+                            <input id="select-all-tables" type="checkbox"> 
+                            <label>
+                              全选
+                            </label>
+                          </div>
+                        </div>
+                        <div id="tables-checkbox" class="col-md-6"></div>
+                      </div>
+                      <div class="form-group">
+                        <label class="control-label col-md-3 col-sm-3 col-xs-12" for="first-name">主&nbsp;&nbsp;&nbsp;机&nbsp;<span class="required">*</span>
+                        </label>
+                        <div class="col-md-6 col-sm-6 col-xs-12">
+                          <input name="host" type="text" value="" readonly class="form-control col-md-7 col-xs-12">
+                        </div>
+                      </div>
+                      <div class="form-group">
+                        <label class="control-label col-md-3 col-sm-3 col-xs-12" for="last-name">用户名&nbsp;<span class="required">*</span>
+                        </label>
+                        <div class="col-md-6 col-sm-6 col-xs-12">
+                          <input name="user" type="text" value="" readonly class="form-control col-md-7 col-xs-12">
+                        </div>
+                      </div>
+                      <div class="form-group">
+                        <label for="middle-name" class="control-label col-md-3 col-sm-3 col-xs-12">密&nbsp;&nbsp;&nbsp;码&nbsp;<span class="required">*</span></label>
+                        <div class="col-md-6 col-sm-6 col-xs-12">
+                          <input name="pwd" type="text" value="" readonly class="form-control col-md-7 col-xs-12">
+                        </div>
+                      </div>
+                      <div class="form-group">
+                        <label class="control-label col-md-3 col-sm-3 col-xs-12">数据库&nbsp;<span class="required">*</span></label>
+                        <div class="col-md-6 col-sm-6 col-xs-12">
+                            <input name="db" type="text" readonly class="form-control col-md-7 col-xs-12">
+                        </div>
+                      </div>
+                      <input name="step" type="text" value="2" style="display: none;">
+                    </form>
+                  </div>
+                  <div id="step-3">
+                    <h2 class="StepTitle">Step 3 Content</h2>
+                    <p>
+                      sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore
+                      eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+                    </p>
+                    <p>
+                      Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor
+                      in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+                    </p>
+                  </div>
+                  <div id="step-4">
+                    <h2 class="StepTitle">Step 4 Content</h2>
+                    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                      Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+                    </p>
+                    <p>
+                      Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor
+                      in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+                    </p>
+                    <p>
+                      Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor
+                      in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+                    </p>
+                  </div>
+                </div>
+                <!-- End SmartWizard Content -->
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- /page content -->
+    </div>
+
+    <!-- jQuery -->
+    <!-- <script src="<?php echo base_url('views/back/vendors/jquery/dist/jquery.min.js')?>"></script> -->
+    <script src="http://cdn.bootcss.com/jquery/2.2.4/jquery.min.js"></script>
+    <!-- Bootstrap -->
+    <!-- <script src="<?php echo base_url('views/back/vendors/bootstrap/dist/js/bootstrap.min.js')?>"></script> -->
+    <script src="http://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <!-- jQuery Smart Wizard -->
+    <!-- <script src="<?php echo base_url('views/back/vendors/jQuery-Smart-Wizard/js/jquery.smartWizard.js')?>"></script> -->
+    <script src="./external/jquery.smartWizard.js"></script>
+
+    <script src="http://cdn.bootcss.com/iCheck/1.0.2/icheck.min.js"></script>
+    <script>
+      function init_SmartWizard() {
+        if( typeof ($.fn.smartWizard) === 'undefined'){ return; }
+        console.log('init_SmartWizard');
+        $('#wizard').smartWizard({
+          labelNext: '下一步',
+          labelPrevious: '上一步',
+          labelFinish: '完成',
+          onLeaveStep: leaveStep,
+        });
+        $('.buttonNext').addClass('btn btn-success');
+        $('.buttonPrevious').addClass('btn btn-primary');
+        $('.buttonFinish').addClass('btn btn-default');
+      };
+      init_SmartWizard();
+
+      function leaveStep(stepnumber){
+        var isStepValid = false;
+        switch(stepnumber[0].rel){
+          case '1':
+            $.ajax({
+              'type': 'GET',
+              'async': false,
+              'dataType': 'json',
+              'data': $('#step-1-form').serialize(),
+              'url': './ci_mvc_create.php'
+            }).done(
+              function(data,status){
+                if(data['status'] == false){
+                  alert(data['info']);
+                }else{
+                  $.each(data['info'], function(){
+                    var div = '<div class="col-md-6"><div class="checkbox"><input name="tables[]" type="checkbox" value="'+this['tbl_name']+'"><label>'+this['tbl_name']+(this['tbl_comment'])+'</label></div></div>';
+                    $('#tables-checkbox').append(div);
+                  });
+                  $('#select-all-tables').each(function(){
+                    var self = $(this),
+                        label = self.next(),
+                        label_text = label.text();
+                    label.remove();
+                    self.iCheck({
+                      checkboxClass: 'icheckbox_line-green',
+                      insert: '<div class="icheck_line-icon"></div>' + label_text
+                    }).on('ifChecked', function(){
+                      console.log($('#tables-checkbox input'));
+                      $('#tables-checkbox .icheckbox_line-green').addClass('checked');
+                      $('#tables-checkbox input').prop('checked', true);
+                    }).on('ifUnchecked', function(){
+                      $('#tables-checkbox .icheckbox_line-green').removeClass('checked');
+                      $('#tables-checkbox input').prop('checked', false)
+                    });
+                  });
+                  $('#tables-checkbox input').each(function(){
+                    var self = $(this),
+                        label = self.next(),
+                        label_text = label.text();
+                    label.remove();
+                    self.iCheck({
+                      checkboxClass: 'icheckbox_line-green',
+                      insert: '<div class="icheck_line-icon"></div>' + label_text
+                    });
+                  });
+
+                  $("#step-2-form [name='host']").val($("#step-1-form [name='host']").val());
+                  $("#step-2-form [name='user']").val($("#step-1-form [name='user']").val());
+                  $("#step-2-form [name='pwd']").val($("#step-1-form [name='pwd']").val());
+                  $("#step-2-form [name='db']").val($("#step-1-form [name='db']").val());
+                  isStepValid = true;
+                }
+              }
+            ).fail(function(){
+              alert('无法连接到ci_mvc_create.php');
+            });
+            break;
+          case '2':
+            $.ajax({
+              'type': 'GET',
+              'async': false,
+              'dataType': 'json',
+              'data': $('#step-2-form').serialize(),
+              'url': './ci_mvc_create.php'
+            }).done(
+              function(data,status){
+                console.log(data,status);
+                if(data['status'] == false){
+                  alert(data['info']);
+                }else{
+                  $.each(data['info'], function(){
+                    var div = '<div class="col-md-6"><div class="checkbox"><input type="checkbox" value="'+this['tbl_name']+'"><label>'+this['tbl_name']+(this['tbl_comment'])+'</label></div></div>';
+                    $('#tables-checkbox').append(div);
+                  });
+                  $('#select-all-tables').each(function(){
+                    var self = $(this),
+                        label = self.next(),
+                        label_text = label.text();
+                    label.remove();
+                    self.iCheck({
+                      checkboxClass: 'icheckbox_line-green',
+                      insert: '<div class="icheck_line-icon"></div>' + label_text
+                    }).on('ifChecked', function(){
+                      console.log($('#tables-checkbox input'));
+                      $('#tables-checkbox .icheckbox_line-green').addClass('checked');
+                      $('#tables-checkbox input').prop('checked', true);
+                    }).on('ifUnchecked', function(){
+                      $('#tables-checkbox .icheckbox_line-green').removeClass('checked');
+                      $('#tables-checkbox input').prop('checked', false)
+                    });
+                  });
+                  $('#tables-checkbox input').each(function(){
+                    var self = $(this),
+                        label = self.next(),
+                        label_text = label.text();
+                    label.remove();
+                    self.iCheck({
+                      checkboxClass: 'icheckbox_line-green',
+                      insert: '<div class="icheck_line-icon"></div>' + label_text
+                    });
+                  });
+
+                  $("#step-2-form [name='host']").val($("#step-1-form [name='host']").val());
+                  $("#step-2-form [name='user']").val($("#step-1-form [name='user']").val());
+                  $("#step-2-form [name='pwd']").val($("#step-1-form [name='pwd']").val());
+                  $("#step-2-form [name='db']").val($("#step-1-form [name='db']").val());
+                  isStepValid = true;
+                }
+              }
+            ).fail(function(){
+              alert('无法连接到ci_mvc_create.php');
+            });
+            break;
+          case '3':
+          case '4':
+        }
+        return isStepValid;
+      }
+    </script>
+  </body>
+</html>
