@@ -15,14 +15,34 @@ if ($_GET) {
 			if (has_null($config)) {
 				return_result('有必填项没填啊！', false);
 			}
-			// if(output_config_file()){
-			// 	header("Location:index2.html");
-			// }
+
 			return_result(get_database_tebles($config), true);
 			break;
-		case '2':
 
+		case '2':
+			$config = array(
+				'host' => $_GET['host'],
+				'user' => $_GET['user'],
+				'password' => $_GET['pwd'],
+				'db' => $_GET['db'],
+				'tables' => isset($_GET['tables']) ? $_GET['tables'] : null
+				);
+			if ($config['tables'] == null) {
+				return_result('请至少选择一张表', false);
+			}
+			if (has_null($config)) {
+				return_result('有必填项没填啊！', false);
+			}
+			
+			$tables_bean = create_tables_bean($config);
+
+			// 将tables_bean输出到config
+			if (!file_put_contents('./config.json', $tables_bean))
+				return_result('创建配置文件失败', true);
+
+			return_result($tables_bean, true);
 			break;
+
 		case '3':
 			$config = array(
 				//mvc相对于当前目录的路径
@@ -109,55 +129,80 @@ function output_mvc_file(){
 }
 
 /**
- * 输出配置文件
+ * 创建表的bean
  * @Author   zjf
  * @DateTime 2017-03-10
- * @return   bool     是否输出成功
+ * @return   string     返回表对应的配置（json）字符串
  */
-function output_config_file(){
-	// 1。获取tables数组
-	$tables = get_tables_info();
+function create_tables_bean($config){
+	// 1。获取tables数组并处理成规定格式
+	$tables_source = get_tables_info($config);
+	$tables = array();
+	foreach ($tables_source as $table_name => $table_source) {
+		$tables[$table_name] = array();
+		$tables[$table_name]['tbl_comment'] = $table_source['tbl_comment'];
+		// 当前表是否有主键
+		$has_key = false;
+		foreach ($table_source['col'] as $column) {
+			if ($column['key'] == "PRI") {
+				// 主键
+				if ($has_key == true) {
+					return_result("配置文件中不能有两个主键",false);
+				}
+				$tables[$table_name]['id']['field'] = $column['field'];
+				$tables[$table_name]['id']['comment'] = $column['comment'];
+				$has_key = true;
+			}else {
+				// 普通字段
+				$col['field'] = $column['field'];
+				$col['comment'] = $column['comment'];
+				// type和validation
+				$left_bracket_pos = strpos($column['type'],'(');
+				$type = substr($column['type'], 0, $left_bracket_pos);
+				$type_bracket = substr($column['type'], $left_bracket_pos + 1, -1);
+				switch ($type) {
+					case 'int':
+						$col['type'] = 'text';
+						$col['validation'] = 'type="number" ';
+						$col['validation'] .= 'maxlength="'.$type_bracket.'" ';
+						$col['validation'] .= $column['is_nullable'] == 'NO' && $column['default'] === null ? 'required ' : '';
+						break;
+
+					case 'varchar':
+						$col['type'] = 'text';
+						$col['validation'] = 'maxlength="'.$type_bracket.'" ';
+						$col['validation'] .= $column['is_nullable'] == 'NO' && $column['default'] === null ? 'required ' : '';
+						break;
+
+					default:
+						$col['type'] = 'text';
+						$col['validation'] .= $column['is_nullable'] == 'NO' && $column['default'] === null ? 'required ' : '';
+						break;
+				}
+				$tables[$table_name]['col'][] = $col;
+			}
+		}
+	}
+
 	// 2。将tables数组转换为json字符串（不自动转换为unicode编码）
 	if (version_compare(PHP_VERSION,'5.4.0','<'))
-		$tables = preg_replace_callback("#\\\u([0-9a-f]{4})#i", function($matchs){return iconv('UCS-2BE','UTF-8',pack('H4', $matchs[1]));}, $tables);
+		$tables_json = preg_replace_callback("#\\\u([0-9a-f]{4})#i", function($matchs){return iconv('UCS-2BE','UTF-8',pack('H4', $matchs[1]));}, $tables);
 	else
-		$tables = json_encode($tables, JSON_UNESCAPED_UNICODE);
+		$tables_json = json_encode($tables, JSON_UNESCAPED_UNICODE);
 	// 3。现在tables是gbk编码，转换为utf8
 	// $tables = iconv('GB2312', 'UTF-8', $tables);
-	// 4。将table调整缩进
-	$tables = reindent_json($tables);
-	// 5。将table输出到文件
-	if (file_put_contents('./config.json', $tables)) {
-		return true;
-	}else{
-		return false;
-	}
-	
+	// 4。返回：调整缩进的table
+	return reindent_json($tables_json);
 }
 
 /**
- * 获取数据库中的全部表
+ * 读取配置文件
  * @Author   zjf
  * @DateTime 2017-03-10
- * @param 	 Array $config 			数据库配置信息
- * @return   Array[tables]     		数据库中的全部表
+ * @return   string     配置文件字符串
  */
-function get_database_tebles($config){
-	// 1.连接数据库
-	$conn = mysqli_connect($config['host'], $config['user'], $config['password']) or exit('连接数据库失败，请检查该配置是否能连接数据库');
-	mysqli_query($conn, 'SET NAMES utf8');
-	// 2.选择数据库
-	mysqli_query($conn, "use {$config['db']}") or exit('选择数据库失败，请检查是否有该数据库');
-	// 3.获取需要的表表(没有配置获取全部表)
-	$result = mysqli_query($conn, "show table status");
-	$i=0;
-	foreach (mysqli_fetch_all($result) as $value) {
-		#0表名，17表注释
-		$tables[$i]['tbl_name'] = $value[0];
-		$tables[$i]['tbl_comment'] = $value[17];
-		++$i;
-	}
-	return $tables;
+function read_config_file(){
+
 }
 
 /**
@@ -181,9 +226,8 @@ function get_tables_info($config){
 		$tables[$value[0]]['tbl_comment'] = $value[17];
 	}
 	if ($config['tables']) {
-		$require_tables = explode(',', $config['tables']);
 		foreach ($tables as $key => $value) {
-			if (!in_array($key, $require_tables)) {
+			if (!in_array($key, $config['tables'])) {
 				unset($tables[$key]);
 			}
 		}
@@ -208,16 +252,42 @@ function get_tables_info($config){
 			$col['default'] = $value[5];
 			$col['extra'] = $value[6];
 			$col['comment'] = $value[8];
-			if ($col['key'] == "PRI") {
-				$table['id'] = $col;
-			}elseif ($col['extra'] == "auto_increment") {
-				continue;
-			}else{
-				$table['col'][] = $col;
-			}
+
+			$table['col'][] = $col;
 		}
 	}
 	mysqli_close($conn);
+	return $tables;
+}
+
+
+/**
+ * 获取数据库中的全部表
+ * @Author   zjf
+ * @DateTime 2017-03-10
+ * @param 	 Array $config 			数据库配置信息
+ * @return   Array[tables]     		数据库中的全部表
+ */
+function get_database_tebles($config){
+	// 1.连接数据库
+	$conn = @mysqli_connect($config['host'], $config['user'], $config['password']);
+	if (!$conn) {
+		return_result('连接数据库失败，请检查该配置是否能连接数据库',false);
+	}
+	mysqli_query($conn, 'SET NAMES utf8');
+	// 2.选择数据库
+	if (!mysqli_query($conn, "use {$config['db']}")) {
+		return_result('选择数据库失败，请检查是否有该数据库',false);
+	}
+	// 3.获取需要的表表(没有配置获取全部表)
+	$result = mysqli_query($conn, "show table status");
+	$i=0;
+	foreach (mysqli_fetch_all($result) as $value) {
+		#0表名，17表注释
+		$tables[$i]['tbl_name'] = $value[0];
+		$tables[$i]['tbl_comment'] = $value[17];
+		++$i;
+	}
 	return $tables;
 }
 
@@ -281,6 +351,4 @@ function return_result($info, $status){
 	echo json_encode($result);
 	die();
 }
-
-
 
