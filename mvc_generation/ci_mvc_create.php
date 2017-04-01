@@ -43,8 +43,9 @@ if ($_GET) {
 			return_result($tables_bean, true);
 			break;
 
-		case '3':
+		case '3_4':
 			$config = array(
+				'generation_config' => $_GET['generation_config'],
 				//mvc相对于当前目录的路径
 				'm_folder' => $_GET['m_folder'],
 				//给v_folder，c_folder添加上子路径
@@ -54,9 +55,11 @@ if ($_GET) {
 				'v_child_folder' => $_GET['v_child_folder'] ? $_GET['v_child_folder'].'/' : '',
 				'c_child_folder' => $_GET['v_child_folder'] ? $_GET['c_child_folder'].'/' : ''
 				);
-			if(output_mvc_file()){
-				echo "生成mvc文件成功";
+			if (isset($_GET['is_save_config']) &&  $_GET['is_save_config'] == 'true') {
+				file_put_contents('./config.json', $config['generation_config']);
 			}
+			$info = output_mvc_file($config);
+			return_result($info, false);
 		default:
 			break;
 	}
@@ -68,18 +71,18 @@ if ($_GET) {
  * 输出mvc文件
  * @Author   zjf
  * @DateTime 2017-03-11
- * @return   bool     是否输出成功
+ * @param 	 Array $config 		配置信息
+ * @return   array     			输出的每个文件的信息
  */
-function output_mvc_file(){
-	global $config;
+function output_mvc_file($config){
 	//读配置文件
-	$beans = preg_replace('/[\n\t\r]/', '', file_get_contents('./config.json'));
+	$beans = preg_replace('/[\n\t\r]/', '', $config['generation_config']);
 	$beans = json_decode($beans, TRUE);
 	if ($beans == null) {
-		echo "配置文件格式有误，请检查配置文件是否符合json格式";die();
+		return_result("配置文件格式有误，请检查配置文件是否符合json格式",false);
 	}
-	//将空的名称替换
-	replace_null($beans);
+	//处理beans（填入初始值）
+	handle_beans($beans);
 	//循环生成
 	foreach ($beans as $bean_name => $bean) {
 		
@@ -132,6 +135,7 @@ function output_mvc_file(){
  * 创建表的bean
  * @Author   zjf
  * @DateTime 2017-03-10
+ * @param 	 Array $config 					  配置信息
  * @return   string     返回表对应的配置（json）字符串
  */
 function create_tables_bean($config){
@@ -223,7 +227,7 @@ function get_tables_info($config){
 	foreach (mysqli_fetch_all($result) as $value) {
 		#0表名，17表注释
 		$tables[$value[0]] = array();
-		$tables[$value[0]]['tbl_comment'] = $value[17];
+		$tables[$value[0]]['tbl_comment'] = $value[17] ? $value[17] : $value[0];
 	}
 	if ($config['tables']) {
 		foreach ($tables as $key => $value) {
@@ -315,20 +319,92 @@ function reindent_json($json){
 }
 
 /**
- * 将配置数组中的空名称替换为字符串null
+ * 检查bean是否完整
  * @Author   zjf
  * @DateTime 2017-03-15
- * @param    array     &$arr 要处理的数组
- * @return   null           没有返回值
+ * @param    array     $beans 要处理的数组
+ * @return   null            没有返回值
  */
-function replace_null(&$arr){
-	foreach ($arr as $key => &$value) {
-		if (($key == 'tbl_comment' || $key == 'comment') && $value == '') {
-			$value = 'null';
+function handle_beans($beans){
+	// var_dump($beans);die();
+	
+	foreach ($beans as $bean_name => &$bean) {
+		// var_dump(is_array($bean['id']));die();
+		// 最外层tbl_comment，id，col，join
+		if (!isset($bean['tbl_comment']) || !is_string($bean['tbl_comment'])) {
+			return_result($bean_name.'的tbl_comment未设置或不是字符串',false);
+		}elseif (!isset($bean['id']) || !is_array($bean['id'])) {
+			return_result($bean_name.'的id未设置或不是数组',false);
+		}elseif (!isset($bean['col']) || !is_array($bean['col'])) {
+			return_result($bean_name.'的col未设置或不是数组',false);
+		}elseif (!isset($bean['join']) || !is_array($bean['join'])) {
+			$bean['join'] = null;
 		}
-		if (is_array($value)) {
-			replace_null($value);
+
+		// id
+		if (!isset($bean['id']['field']) || !is_string($bean['id']['field'])) {
+			return_result($bean_name.'的id的field未设置或不是字符串',false);
 		}
+		if (!isset($bean['id']['comment']) || !is_string($bean['id']['comment'])) {
+			return_result($bean_name.'的id的comment未设置或不是字符串',false);
+		}
+		
+		//col
+		foreach ($col as $key => $column) {
+			if (!is_array($col[$key])) {
+				return_result($bean_name.'的col中的字段不是数组',false);
+			}
+			if (!isset($column['field']) || !is_string($column['field'])) {
+				return_result($bean_name.'的col中的字段的field未设置或不是字符串',false);
+			}
+			if (!isset($column['comment']) || !is_string($column['comment'])) {
+				return_result($bean_name.'的col中的字段的comment未设置或不是字符串',false);
+			}
+			if (!isset($column['type'])) {
+				$bean['column']['type'] = 'input';
+			}
+			if (!isset($column['validation'])) {
+				$column['validation'] = null;
+			}
+			if ($bean['column']['type'] == 'file' && !isset($column['file-path'])) {
+				$column['file-path'] = $bean_name;
+			}
+		}
+		
+		//join
+		foreach ($join as $join_name => $join_table) {
+			if (!is_array($col[$key])) {
+				return_result('连接表'.$join_name.'不是数组',false);
+			}
+			if (!isset($join_table['pri_field']) || !$join_table['pri_field'])) {
+				return_result('连接表'.$join_name.'中的pri_field未设置或不是字符串',false);
+			}
+			// if (!isset($join_table['pri_field']) || !$join_table['pri_field'])) {
+			// 	return_result('连接表'.$join_name.'中的pri_field未设置或不是字符串',false);
+			// }
+			// if (!isset($bean['column']['field']) || !is_string($bean['id']['field'])) {
+			// 	return_result($bean_name.'的col中的字段的field未设置或不是字符串',false);
+			// }
+			// if (!isset($bean['column']['comment']) || !is_string($bean['id']['comment'])) {
+			// 	return_result($bean_name.'的col中的字段的comment未设置或不是字符串',false);
+			// }
+			// if (!isset($bean['column']['type'])) {
+			// 	$bean['column']['type'] = 'input';
+			// }
+			// if (!isset($bean['column']['validation'])) {
+			// 	$bean['column']['validation'] = null;
+			// }
+			// if ($bean['column']['type'] == 'file' && !isset($bean['column']['file-path'])) {
+			// 	$bean['column']['file-path'] = $bean_name;
+			// }
+		}
+
+		// if (($key == 'tbl_comment' || $key == 'comment') && $value == '') {
+		// 	$value = 'null';
+		// }
+		// if (is_array($value)) {
+		// 	replace_null($value);
+		// }
 	}
 }
 

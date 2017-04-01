@@ -24,6 +24,10 @@
       .padding-0{
         padding: 0;
       }
+      #config-textarea{
+        width: 100%;
+        /*height: 500px;*/
+      }
     </style>
   </head>
   <body class="nav-md">
@@ -63,7 +67,7 @@
                         <span class="step_no">3</span>
                         <span class="step_descr">
                             Step 3<br />
-                            <small>修改配置文件</small>
+                            <small>选择生成位置</small>
                         </span>
                       </a>
                     </li>
@@ -72,6 +76,15 @@
                         <span class="step_no">4</span>
                         <span class="step_descr">
                             Step 4<br />
+                            <small>修改配置文件</small>
+                        </span>
+                      </a>
+                    </li>
+                    <li>
+                      <a href="#step-5">
+                        <span class="step_no">5</span>
+                        <span class="step_descr">
+                            Step 5<br />
                             <small>自动生成</small>
                         </span>
                       </a>
@@ -150,31 +163,135 @@
                       <input name="step" type="text" value="2" style="display: none;">
                     </form>
                   </div>
-                  <div id="step-3">
-                    <h2 class="StepTitle">Step 3 Content</h2>
-                    <p>
-                      sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore
-                      eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-                    </p>
-                    <p>
-                      Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor
-                      in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-                    </p>
-                  </div>
-                  <div id="step-4">
-                    <h2 class="StepTitle">Step 4 Content</h2>
-                    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-                      Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-                    </p>
-                    <p>
-                      Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor
-                      in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-                    </p>
-                    <p>
-                      Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor
-                      in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-                    </p>
-                  </div>
+                  <form id="step-3-4-form" action="" class="form-horizontal form-label-left">
+                    <div id="step-3">
+                      <h2 class="StepTitle text-center">选择生成位置</h2>
+                      <div class="form-group">
+                        <label class="control-label col-md-3 col-sm-3 col-xs-12" for="first-name">model文件夹<span class="required">*</span>
+                        </label>
+                        <div class="col-md-6 col-sm-6 col-xs-12">
+                          <input name="m_folder" type="text" value="../application/models" class="form-control col-md-7 col-xs-12">
+                        </div>
+                        <label class="col-md-3 col-sm-3 col-xs-12 text-left text-danger" for="last-name">*会替换掉文件夹中的同名文件</label>
+                      </div>
+                      <div class="form-group">
+                        <label class="control-label col-md-3 col-sm-3 col-xs-12" for="last-name">view文件夹<span class="required">*</span>
+                        </label>
+                        <div class="col-md-6 col-sm-6 col-xs-12">
+                          <input name="v_folder" type="text" value="../views" class="form-control col-md-7 col-xs-12">
+                        </div>
+                        <label class="col-md-3 col-sm-3 col-xs-12 text-left text-danger" for="last-name">*会替换掉文件夹中的同名文件</label>
+                      </div>
+                      <div class="form-group">
+                        <label for="middle-name" class="control-label col-md-3 col-sm-3 col-xs-12">controller文件夹<span class="required">*</span></label>
+                        <div class="col-md-6 col-sm-6 col-xs-12">
+                          <input name="c_folder" type="text" value="../application/controllers" class="form-control col-md-7 col-xs-12">
+                        </div>
+                        <label class="col-md-3 col-sm-3 col-xs-12 text-left text-danger" for="last-name">*会替换掉文件夹中的同名文件</label>
+                      </div>
+                      <div class="form-group">
+                        <label class="control-label col-md-3 col-sm-3 col-xs-12">子view文件夹<span class="required">*</span></label>
+                        <div class="col-md-6 col-sm-6 col-xs-12">
+                            <input name="v_child_folder" type="text" value="back" class="form-control col-md-7 col-xs-12">
+                        </div>
+                        <label class="col-md-3 col-sm-3 col-xs-12 text-left text-danger" for="last-name">*会替换掉文件夹中的同名文件</label>
+                      </div>
+                      <div class="form-group">
+                        <label class="control-label col-md-3 col-sm-3 col-xs-12">子controller文件夹<span class="required">*</span></label>
+                        <div class="col-md-6 col-sm-6 col-xs-12">
+                            <input name="c_child_folder" type="text" value="back" class="form-control col-md-7 col-xs-12">
+                        </div>
+                        <label class="col-md-3 col-sm-3 col-xs-12 text-left text-danger" for="last-name">*会替换掉文件夹中的同名文件</label>
+                      </div>
+                      <input name="step" type="text" value="3_4" style="display: none;">
+                    </div>
+                    <div id="step-4">
+                      <div class="col-md-offset-2 col-md-8">
+                        <h2 class="StepTitle text-center">修改配置文件</h2>
+                        <div class="col-md-6">
+                          <div class="checkbox">
+                            <input name="is_save_config" type="checkbox" value="true" checked="checked" id="is-save-generation-config">
+                            <label>
+                              是否将修改后的配置文件保存到./config
+                            </label>
+                          </div>
+                          <textarea name="generation_config" id="config-textarea"></textarea>
+                        </div>
+ <!--                        <div class="col-md-6">
+                          <ul>
+                            <li>
+                              <h1>【表名】(map):</h1>
+                              <ul>
+                                <li>
+                                  <h2>tbl_comment(*):【表显示的名字】,</h2>
+                                </li>
+                                <li>
+                                  <h2>id(*)(map-表主键（删除修改时用，默认自增长添加时不会显示）):</h2>
+                                  <ul>
+                                    <li>field(*):【id的字段名】,</li>
+                                    <li>comment(*):【id显示的名字】,</li>
+                                  </ul>
+                                </li>
+                                <li>
+                                  <h2>col(-)(list-表需要的列（添加查询用）):</h2>
+                                  <ul>
+                                    <li>
+                                      <h3>(map-需要的每一列):</h3>
+                                      <ul>
+                                        <li>field(*):【列的字段名】,</li>
+                                        <li>comment(*):【列显示的名字】,</li>
+                                        <li>validation:【列的验证规则（parsley.js验证规则）】,</li>
+                                        <li>type(-):【列的类型input(默认)/text/file/time/now】（input使用文本框，text将使用富文本编辑器，file将保存图片的位置，time将使用时间选择器）,</li>
+                                        <li>file-path(-):【文件保存的路径，type为file时可设置】（不设置将保存到“跟目录/upload/当前表名”文件夹),</li>
+                                      </ul>
+                                    </li>
+                                  </ul>
+                                </li>
+                                <li>
+                                  <h2>join(-)(map-外连接的表):</h2>
+                                  <ul>
+                                    <li>
+                                      <h3>【表名】(map):</h3>
+                                      <ul>
+                                        <li>pri_field:【左表字段名称】（默认是主表的字段，如果是其他表的字段要使用表名.字段名）,</li>
+                                        <li>join_field:【右表字段名称】,</li>
+                                        <li>
+                                          <h4>col(list-连接表要查询的列):</h4>
+                                          <ul>
+                                            <li>
+                                              <h5>(map-连接表要查询的每一列):</h5>
+                                              <ul>
+                                                <li>field:【列的字段名】,</li>
+                                                <li>comment:【列显示的名字】,</li>
+                                              </ul>
+                                            </li>
+                                          </ul>
+                                        </li>
+                                        <li>
+                                          <h4>manipulation_col(list-连接要操作的列):</h4>
+                                          <ul>
+                                            <li>
+                                              <h5>(map-连接的每一列):</h5>
+                                              <ul>
+                                                <li>field:【列的字段名】,</li>
+                                                <li>comment:【列显示的名字】,</li>
+                                                <li>formtype:【表单中选择的形式，input/select（默认）/multichoice】（select将使用select单选，multichoice使用checkbox复选）,</li>
+                                                <li>option-field:【formtype为select或multichoice时显示的选项内容字段】（默认是当前表的字段，如果是其他表的字段要使用表名.字段名）,</li>
+                                              </ul>
+                                            </li>
+                                          </ul>
+                                        </li>
+                                      </ul>
+                                    </li>
+                                  </ul>
+                                </li>
+                              </ul>
+                            </li>
+                          </ul>
+                        </div> -->
+                      </div>
+                    </div>
+                  </form>
                 </div>
                 <!-- End SmartWizard Content -->
               </div>
@@ -211,9 +328,15 @@
       };
       init_SmartWizard();
 
-      function leaveStep(stepnumber){
+      function leaveStep(obj, context){
+        console.log(obj, context);
+        // 点击上一步
+        if (context.fromStep > context.toStep) {
+          return true;
+        }
+        // 点击下一步
         var isStepValid = false;
-        switch(stepnumber[0].rel){
+        switch(obj[0].rel){
           case '1':
             $.ajax({
               'type': 'GET',
@@ -226,38 +349,24 @@
                 if(data['status'] == false){
                   alert(data['info']);
                 }else{
-                  $.each(data['info'], function(){
-                    var div = '<div class="col-md-6"><div class="checkbox"><input name="tables[]" type="checkbox" value="'+this['tbl_name']+'"><label>'+this['tbl_name']+(this['tbl_comment'])+'</label></div></div>';
-                    $('#tables-checkbox').append(div);
-                  });
-                  $('#select-all-tables').each(function(){
-                    var self = $(this),
-                        label = self.next(),
-                        label_text = label.text();
-                    label.remove();
-                    self.iCheck({
-                      checkboxClass: 'icheckbox_line-green',
-                      insert: '<div class="icheck_line-icon"></div>' + label_text
-                    }).on('ifChecked', function(){
-                      console.log($('#tables-checkbox input'));
-                      $('#tables-checkbox .icheckbox_line-green').addClass('checked');
-                      $('#tables-checkbox input').prop('checked', true);
-                    }).on('ifUnchecked', function(){
-                      $('#tables-checkbox .icheckbox_line-green').removeClass('checked');
-                      $('#tables-checkbox input').prop('checked', false)
+                  if ($('#tables-checkbox').attr('is_add_checkbox') != 'true') {
+                    $('#tables-checkbox').attr('is_add_checkbox', 'true')
+                    $.each(data['info'], function(){
+                      var div = '<div class="col-md-6"><div class="checkbox"><input name="tables[]" type="checkbox" value="'+this['tbl_name']+'"><label>'+this['tbl_name']+(this['tbl_comment'])+'</label></div></div>';
+                      $('#tables-checkbox').append(div);
                     });
-                  });
-                  $('#tables-checkbox input').each(function(){
-                    var self = $(this),
-                        label = self.next(),
-                        label_text = label.text();
-                    label.remove();
-                    self.iCheck({
-                      checkboxClass: 'icheckbox_line-green',
-                      insert: '<div class="icheck_line-icon"></div>' + label_text
+                    $('#tables-checkbox input').each(function(){
+                      var self = $(this),
+                          label = self.next(),
+                          label_text = label.text();
+                      label.remove();
+                      self.iCheck({
+                        checkboxClass: 'icheckbox_line-green',
+                        insert: '<div class="icheck_line-icon"></div>' + label_text
+                      });
                     });
-                  });
-
+                  }
+                  
                   $("#step-2-form [name='host']").val($("#step-1-form [name='host']").val());
                   $("#step-2-form [name='user']").val($("#step-1-form [name='user']").val());
                   $("#step-2-form [name='pwd']").val($("#step-1-form [name='pwd']").val());
@@ -282,42 +391,7 @@
                 if(data['status'] == false){
                   alert(data['info']);
                 }else{
-                  $.each(data['info'], function(){
-                    var div = '<div class="col-md-6"><div class="checkbox"><input type="checkbox" value="'+this['tbl_name']+'"><label>'+this['tbl_name']+(this['tbl_comment'])+'</label></div></div>';
-                    $('#tables-checkbox').append(div);
-                  });
-                  $('#select-all-tables').each(function(){
-                    var self = $(this),
-                        label = self.next(),
-                        label_text = label.text();
-                    label.remove();
-                    self.iCheck({
-                      checkboxClass: 'icheckbox_line-green',
-                      insert: '<div class="icheck_line-icon"></div>' + label_text
-                    }).on('ifChecked', function(){
-                      console.log($('#tables-checkbox input'));
-                      $('#tables-checkbox .icheckbox_line-green').addClass('checked');
-                      $('#tables-checkbox input').prop('checked', true);
-                    }).on('ifUnchecked', function(){
-                      $('#tables-checkbox .icheckbox_line-green').removeClass('checked');
-                      $('#tables-checkbox input').prop('checked', false)
-                    });
-                  });
-                  $('#tables-checkbox input').each(function(){
-                    var self = $(this),
-                        label = self.next(),
-                        label_text = label.text();
-                    label.remove();
-                    self.iCheck({
-                      checkboxClass: 'icheckbox_line-green',
-                      insert: '<div class="icheck_line-icon"></div>' + label_text
-                    });
-                  });
-
-                  $("#step-2-form [name='host']").val($("#step-1-form [name='host']").val());
-                  $("#step-2-form [name='user']").val($("#step-1-form [name='user']").val());
-                  $("#step-2-form [name='pwd']").val($("#step-1-form [name='pwd']").val());
-                  $("#step-2-form [name='db']").val($("#step-1-form [name='db']").val());
+                  $('#config-textarea').text(data['info']);
                   isStepValid = true;
                 }
               }
@@ -326,10 +400,82 @@
             });
             break;
           case '3':
+            $.ajax({
+              'type': 'GET',
+              'async': false,
+              'dataType': 'json',
+              'data': $('#step-2-form').serialize(),
+              'url': './ci_mvc_create.php'
+            }).done(
+              function(data,status){
+                console.log(data,status);
+                if(data['status'] == false){
+                  alert(data['info']);
+                }else{
+                  $('#config-textarea').text(data['info']);
+                  isStepValid = true;
+                }
+              }
+            ).fail(function(){
+              alert('无法连接到ci_mvc_create.php');
+            });
+            break;
           case '4':
+            $.ajax({
+              'type': 'GET',
+              'async': false,
+              'dataType': 'json',
+              'data': $('#step-3-4-form').serialize(),
+              'url': './ci_mvc_create.php'
+            }).done(
+              function(data,status){
+                console.log(data,status);
+                if(data['status'] == false){
+                  alert(data['info']);
+                }else{
+                  $('#config-textarea').text(data['info']);
+                  isStepValid = true;
+                }
+              }
+            ).fail(function(){
+              alert('无法连接到ci_mvc_create.php');
+            });
+            break;
         }
         return isStepValid;
       }
+
+      function init_iCheck() {
+        // 第二步的select-all-tables
+        $('#select-all-tables').each(function(){
+          var self = $(this),
+              label = self.next(),
+              label_text = label.text();
+          label.remove();
+          self.iCheck({
+            checkboxClass: 'icheckbox_line-green',
+            insert: '<div class="icheck_line-icon"></div>' + label_text
+          }).on('ifChecked', function(){
+            $('#tables-checkbox .icheckbox_line-green').addClass('checked');
+            $('#tables-checkbox input').prop('checked', true);
+          }).on('ifUnchecked', function(){
+            $('#tables-checkbox .icheckbox_line-green').removeClass('checked');
+            $('#tables-checkbox input').prop('checked', false)
+          });
+        });
+        // 第三步的is-save-generation-config
+        $('#is-save-generation-config').each(function(){
+          var self = $(this),
+              label = self.next(),
+              label_text = label.text();
+          label.remove();
+          self.iCheck({
+            checkboxClass: 'icheckbox_line-green',
+            insert: '<div class="icheck_line-icon"></div>' + label_text
+          });
+        });
+      }
+      init_iCheck();
     </script>
   </body>
 </html>
