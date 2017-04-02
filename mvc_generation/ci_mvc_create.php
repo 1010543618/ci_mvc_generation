@@ -83,6 +83,8 @@ function output_mvc_file($config){
 	}
 	//处理beans（填入初始值）
 	handle_beans($beans);
+
+	// var_dump($beans);die();
 	//循环生成
 	foreach ($beans as $bean_name => $bean) {
 		
@@ -95,7 +97,6 @@ function output_mvc_file($config){
         if (!is_dir($config['m_folder'])) mkdir($config['m_folder']);
   		file_put_contents("{$config['m_folder']}/$model_name.php", $model);
 		
-
 		//views
 		ob_start();
         require('./v_template.php');
@@ -180,7 +181,7 @@ function create_tables_bean($config){
 
 					default:
 						$col['type'] = 'text';
-						$col['validation'] .= $column['is_nullable'] == 'NO' && $column['default'] === null ? 'required ' : '';
+						$col['validation'] = $column['is_nullable'] == 'NO' && $column['default'] === null ? 'required ' : '';
 						break;
 				}
 				$tables[$table_name]['col'][] = $col;
@@ -325,7 +326,7 @@ function reindent_json($json){
  * @param    array     $beans 要处理的数组
  * @return   null            没有返回值
  */
-function handle_beans($beans){
+function handle_beans(&$beans){
 	// var_dump($beans);die();
 	
 	foreach ($beans as $bean_name => &$bean) {
@@ -337,8 +338,6 @@ function handle_beans($beans){
 			return_result($bean_name.'的id未设置或不是数组',false);
 		}elseif (!isset($bean['col']) || !is_array($bean['col'])) {
 			return_result($bean_name.'的col未设置或不是数组',false);
-		}elseif (!isset($bean['join']) || !is_array($bean['join'])) {
-			$bean['join'] = null;
 		}
 
 		// id
@@ -350,8 +349,8 @@ function handle_beans($beans){
 		}
 		
 		//col
-		foreach ($col as $key => $column) {
-			if (!is_array($col[$key])) {
+		foreach ($bean['col'] as $col_name => &$column) {
+			if (!is_array($bean['col'][$col_name])) {
 				return_result($bean_name.'的col中的字段不是数组',false);
 			}
 			if (!isset($column['field']) || !is_string($column['field'])) {
@@ -366,45 +365,70 @@ function handle_beans($beans){
 			if (!isset($column['validation'])) {
 				$column['validation'] = null;
 			}
-			if ($bean['column']['type'] == 'file' && !isset($column['file-path'])) {
+			if ($column['type'] == 'file' && !isset($column['file-path'])) {
 				$column['file-path'] = $bean_name;
 			}
 		}
 		
 		//join
-		foreach ($join as $join_name => $join_table) {
-			if (!is_array($col[$key])) {
-				return_result('连接表'.$join_name.'不是数组',false);
+		if (!isset($bean['join']) || !is_array($bean['join'])) {
+			$bean['join'] = null;
+		}else{
+			foreach ($bean['join'] as $join_table_name => &$join_table) {
+				if (!is_array($bean['join'][$join_table_name])) {
+					return_result('连接表'.$join_table_name.'不是数组',false);
+				}
+				if (!isset($join_table['pri_field']) || !is_string($join_table['pri_field'])) {
+					return_result('连接表'.$join_table_name.'中的pri_field未设置或不是字符串',false);
+				}else{
+					if (strpos($join_table['pri_field'], '.') === false) {
+						// pri_field没有指定表
+						$join_table['pri_field'] = $join_table_name.'.'.$join_table['pri_field'];
+					}
+				}
+				if (!isset($join_table['join_field']) || !is_string($join_table['join_field'])) {
+					return_result('连接表'.$join_table_name.'中的join_field未设置或不是字符串',false);
+				}
+				if (!isset($join_table['col'])) {
+					// 没有要显示的col
+					$join_table['col'] = null;
+				}else{
+					foreach ($join_table['col'] as $join_col_name => $join_col) {
+						if (!is_array($join_table['col'][$join_col_name])) {
+							return_result('连接表'.$join_table_name.'的col中的字段不是数组',false);
+						}
+						if (!isset($join_col['field']) || !is_string($join_col['field'])) {
+							return_result('连接表'.$join_table_name.'的col中的field未设置或不是字符串',false);
+						}
+						if (!isset($join_col['comment']) || !is_string($join_col['comment'])) {
+							return_result('连接表'.$join_table_name.'的col中的comment未设置或不是字符串',false);
+						}
+					}
+				}
+				if (!isset($join_table['manipulation_col'])) {
+					// 没有要操作的列
+					$join_table['manipulation_col'] = null;
+				}else{
+					foreach ($join_table['manipulation_col'] as $join_mani_col_name => &$join_mani_col) {
+						if (!is_array($join_table['manipulation_col'][$join_mani_col_name])) {
+							return_result('连接表'.$join_table_name.'的manipulation_col中的字段不是数组',false);
+						}
+						if (!isset($join_mani_col['field']) || !is_string($join_col['field'])) {
+							return_result('连接表'.$join_table_name.'中的manipulation_col中的field未设置或不是字符串',false);
+						}
+						if (!isset($join_mani_col['comment']) || !is_string($join_col['comment'])) {
+							return_result('连接表'.$join_table_name.'中的manipulation_col中的comment未设置或不是字符串',false);
+						}
+						if (!isset($join_mani_col['formtype'])) {
+							$join_mani_col['formtype'] = 'select';
+						}
+ 						if (!isset($join_mani_col['option_field']) || !is_string($join_mani_col['option_field'])) {
+							return_result('连接表'.$join_table_name.'中的manipulation_col中的option_field未设置或不是字符串',false);
+						}
+					}
+				}
 			}
-			if (!isset($join_table['pri_field']) || !$join_table['pri_field'])) {
-				return_result('连接表'.$join_name.'中的pri_field未设置或不是字符串',false);
-			}
-			// if (!isset($join_table['pri_field']) || !$join_table['pri_field'])) {
-			// 	return_result('连接表'.$join_name.'中的pri_field未设置或不是字符串',false);
-			// }
-			// if (!isset($bean['column']['field']) || !is_string($bean['id']['field'])) {
-			// 	return_result($bean_name.'的col中的字段的field未设置或不是字符串',false);
-			// }
-			// if (!isset($bean['column']['comment']) || !is_string($bean['id']['comment'])) {
-			// 	return_result($bean_name.'的col中的字段的comment未设置或不是字符串',false);
-			// }
-			// if (!isset($bean['column']['type'])) {
-			// 	$bean['column']['type'] = 'input';
-			// }
-			// if (!isset($bean['column']['validation'])) {
-			// 	$bean['column']['validation'] = null;
-			// }
-			// if ($bean['column']['type'] == 'file' && !isset($bean['column']['file-path'])) {
-			// 	$bean['column']['file-path'] = $bean_name;
-			// }
 		}
-
-		// if (($key == 'tbl_comment' || $key == 'comment') && $value == '') {
-		// 	$value = 'null';
-		// }
-		// if (is_array($value)) {
-		// 	replace_null($value);
-		// }
 	}
 }
 

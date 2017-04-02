@@ -217,66 +217,66 @@
                           </div>
                           <textarea name="generation_config" id="config-textarea"></textarea>
                         </div>
- <!--                        <div class="col-md-6">
+                        <div class="col-md-6">
                           <ul>
                             <li>
-                              <h1>【表名】(map):</h1>
+                              <h1>【表名】(<*>map):</h1>
                               <ul>
                                 <li>
-                                  <h2>tbl_comment(*):【表显示的名字】,</h2>
+                                  <h2>tbl_comment(<*>string):【表显示的名字】,</h2>
                                 </li>
                                 <li>
-                                  <h2>id(*)(map-表主键（删除修改时用，默认自增长添加时不会显示）):</h2>
+                                  <h2>id(<*>map，表主键（删除修改时用，默认自增长添加时不会显示）):</h2>
                                   <ul>
-                                    <li>field(*):【id的字段名】,</li>
-                                    <li>comment(*):【id显示的名字】,</li>
+                                    <li>field(<*>string):【id的字段名】,</li>
+                                    <li>comment(<*>string):【id显示的名字】,</li>
                                   </ul>
                                 </li>
                                 <li>
-                                  <h2>col(-)(list-表需要的列（添加查询用）):</h2>
+                                  <h2>col(list，表需要的列（添加查询用）):</h2>
                                   <ul>
                                     <li>
-                                      <h3>(map-需要的每一列):</h3>
+                                      <h3>(map，需要的每一列):</h3>
                                       <ul>
-                                        <li>field(*):【列的字段名】,</li>
-                                        <li>comment(*):【列显示的名字】,</li>
-                                        <li>validation:【列的验证规则（parsley.js验证规则）】,</li>
-                                        <li>type(-):【列的类型input(默认)/text/file/time/now】（input使用文本框，text将使用富文本编辑器，file将保存图片的位置，time将使用时间选择器）,</li>
-                                        <li>file-path(-):【文件保存的路径，type为file时可设置】（不设置将保存到“跟目录/upload/当前表名”文件夹),</li>
+                                        <li>field(<*>string):【列的字段名】,</li>
+                                        <li>comment(<*>string):【列显示的名字】,</li>
+                                        <li>validation(string):【列的验证规则（parsley.js验证规则）】,</li>
+                                        <li>type(string):【列的类型input(默认)/text/file/time/now】（input使用文本框，text将使用富文本编辑器，file将保存图片的位置，time将使用时间选择器）,</li>
+                                        <li>file_path(string):【文件保存的路径，type为file时可设置】（不设置将保存到“跟目录/upload/当前表名”文件夹),</li>
                                       </ul>
                                     </li>
                                   </ul>
                                 </li>
                                 <li>
-                                  <h2>join(-)(map-外连接的表):</h2>
+                                  <h2>join(map，外连接的表):</h2>
                                   <ul>
                                     <li>
                                       <h3>【表名】(map):</h3>
                                       <ul>
-                                        <li>pri_field:【左表字段名称】（默认是主表的字段，如果是其他表的字段要使用表名.字段名）,</li>
-                                        <li>join_field:【右表字段名称】,</li>
+                                        <li>pri_field(<*>string):【左表字段名称（默认是主表的字段，如果是其他表的字段要使用表名.字段名）】,</li>
+                                        <li>join_field(<*>string):【右表字段名称】,</li>
                                         <li>
-                                          <h4>col(list-连接表要查询的列):</h4>
+                                          <h4>col(list，连接表要查询的列):</h4>
                                           <ul>
                                             <li>
-                                              <h5>(map-连接表要查询的每一列):</h5>
+                                              <h5>(map，连接表要查询的每一列):</h5>
                                               <ul>
-                                                <li>field:【列的字段名】,</li>
-                                                <li>comment:【列显示的名字】,</li>
+                                                <li>field(<*>string):【列的字段名】,</li>
+                                                <li>comment<*>string):【列显示的名字】,</li>
                                               </ul>
                                             </li>
                                           </ul>
                                         </li>
                                         <li>
-                                          <h4>manipulation_col(list-连接要操作的列):</h4>
+                                          <h4>manipulation_col(list，连接要操作的列):</h4>
                                           <ul>
                                             <li>
-                                              <h5>(map-连接的每一列):</h5>
+                                              <h5>(map，连接的每一列):</h5>
                                               <ul>
-                                                <li>field:【列的字段名】,</li>
-                                                <li>comment:【列显示的名字】,</li>
-                                                <li>formtype:【表单中选择的形式，input/select（默认）/multichoice】（select将使用select单选，multichoice使用checkbox复选）,</li>
-                                                <li>option-field:【formtype为select或multichoice时显示的选项内容字段】（默认是当前表的字段，如果是其他表的字段要使用表名.字段名）,</li>
+                                                <li>field(<*>string):【列的字段名】,</li>
+                                                <li>comment(<*>string):【列显示的名字】,</li>
+                                                <li>formtype(string):【表单中选择的形式，select（默认）/multichoice/input（select将使用select单选，multichoice使用checkbox复选）】,</li>
+                                                <li>option_field(string):【formtype为select或multichoice时显示的选项内容字段（默认是当前表的字段，如果是其他表的字段要使用表名.字段名）】,</li>
                                               </ul>
                                             </li>
                                           </ul>
@@ -288,7 +288,7 @@
                               </ul>
                             </li>
                           </ul>
-                        </div> -->
+                        </div>
                       </div>
                     </div>
                   </form>

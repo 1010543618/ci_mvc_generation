@@ -1,5 +1,5 @@
 <?php echo "<?php".PHP_EOL ?>
-// 院系控制器
+// <?php echo $bean['tbl_comment'] ?>控制器
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 class <?php echo $controller_name ?> extends MY_Controller {
@@ -33,11 +33,13 @@ class <?php echo $controller_name ?> extends MY_Controller {
 		$this->loadViewhf('<?php echo "back/{$bean_name}.html" ?>');
 	}
 
-<?php if (isset($bean['join'])): //为add，edie表单查找外链接的表的数据?>
+<?php if ($bean['join'] != null): //为add，edie表单查找外链接的表的数据?>
 	public function get_form_data(){
 <?php 	foreach ($bean['join'] as $join_table_name => $join_table): ?>
-		$field = array('<?php echo $join_table['join_field'] ?>', '<?php echo $join_table['join_show_field'] ?>');
+<?php 		foreach ($join_table['col'] as $join_table_col): ?>
+		$field = array('<?php echo $join_table_col['field'] ?>');
 		$result['<?php echo $join_table_name ?>'] = $this-><?php echo $join_table_name.'_model' ?>->getAll($field);
+<?php 		endforeach ?>
 <?php 	endforeach ?>
 		$result['status'] = true;
 		$this->returnResult($result);

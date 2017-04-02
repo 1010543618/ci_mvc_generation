@@ -23,7 +23,8 @@
 			"<?php echo base_url('views/back/build/css/custom.min.css')?>",
 			
 			"http://cdn.bootcss.com/iCheck/1.0.2/skins/line/green.css",
-			"http://cdn.bootcss.com/jquery-confirm/3.1.0/jquery-confirm.min.css"
+			"http://cdn.bootcss.com/jquery-confirm/3.1.0/jquery-confirm.min.css",
+			"http://cdn.bootcss.com/bootstrap-fileinput/4.3.8/css/fileinput.min.css"
 		],
 		"js" : [    
 		    "<?php echo base_url('views/back/vendors/jquery/dist/jquery.min.js')?>",
@@ -47,8 +48,8 @@
 		    "<?php echo base_url('views/back/vendors/ueditor/ueditor.all.min.js')?>",
 			"http://cdn.bootcss.com/iCheck/1.0.2/icheck.min.js",
 		    "http://cdn.bootcss.com/jquery-confirm/3.1.0/jquery-confirm.min.js",
-		    "http://cdn.bootcss.com/datatables/1.10.13/js/jquery.dataTables.js"	
-		    
+		    "http://cdn.bootcss.com/datatables/1.10.13/js/jquery.dataTables.js",
+		    "http://cdn.bootcss.com/bootstrap-fileinput/4.3.8/js/fileinput.min.js"
 		]
 	}
 }

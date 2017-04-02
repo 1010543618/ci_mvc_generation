@@ -24,16 +24,14 @@
             <tr>
               <th>序号</th>
 <?php /*----------生成表格头----------*/?>
-<?php foreach ($bean['col'] as $key => $column): //主表字段?>
+<?php foreach ($bean['col'] as $column): //主表字段?>
               <th><?php echo $column['comment']?></th>
 <?php endforeach //end主表字段?>
-<?php if (isset($bean['join'])): //连接表字段?>
+<?php if ($bean['join'] != null): //连接表字段?>
 <?php   foreach ($bean['join'] as $join_table): ?>
-<?php     if (isset($join_table['col'])): ?>
-<?php       foreach ($join_table['col'] as $column): ?>
+<?php     foreach ($join_table['col'] as $column): ?>
               <th><?php echo $column['comment']?></th>
-<?php       endforeach ?>
-<?php     endif ?>
+<?php     endforeach ?>
 <?php   endforeach ?>
 <?php endif //end连接表字段?>
 <?php /*----------/生成表格头----------*/?>
@@ -48,18 +46,30 @@
         <!-- add -->
         <form id="js-add-form" data-parsley-validate style="display: none">
 <?php /*----------生成添加表单----------*/?>
-<?php foreach ($bean['col'] as $key => $column): //主表字段?>
+<?php foreach ($bean['col'] as $column): //主表字段?>
           <label><?php echo $column['comment']?></label>
+<?php   if ($column['type'] === 'input'): ?>
           <input name="<?php echo $column['field']?>" type="text" class="form-control"/>
+<?php   elseif ($column['type'] === 'text'): ?>
+          <script id="ue-<?php echo $column['field'] ?>" name="<?php echo $column['field'] ?>" type="text/plain"></script>
+<?php   elseif ($column['type'] === 'file'): ?>
+          <input id="fi-<?php echo $column['field'] ?>" name="<?php echo $column['field'] ?>" type="file" class="file" data-show-preview="false"> 
+<?php   elseif ($column['type'] === 'time'): ?>
+          <input name="<?php echo $column['field']?>" type="text" class="form-control"/>
+<?php   endif; ?>
 <?php endforeach //end主表字段?>
-<?php if (isset($bean['join'])): //连接表字段?>
+<?php if ($bean['join'] != null): //连接表字段?>
 <?php   foreach ($bean['join'] as $join_table_name => $join_table): ?>
-          <label><?php echo $join_table['comment']?></label>
-<?php     if (isset($join_table['form_type']) && $join_table['form_type'] == 'multichoice'): //连接表字段类型是multichoice?>
-          <div class="row js-checkbox-<?php echo $join_table_name?>"></div>
-<?php     else: //连接表字段类型是其他?>
-          <select name="<?php echo $join_table['pri_field']?>" class="js-select-<?php echo $join_table_name?> form-control"></select>
-<?php     endif ?>
+<?php     foreach ($join_table['manipulation_col'] as $join_table_mani_col): ?>
+          <label><?php echo $join_table_mani_col['comment']?></label>
+<?php       if ($join_table_mani_col['formtype'] == 'select'): //连接表字段类型是select?>
+          <select name="<?php echo $join_table_name."[{$join_table_mani_col['field']}]" ?>" class="js-select-<?php echo $join_table_name."-".$join_table_mani_col['field'] ?> form-control"></select>
+<?php       elseif ($join_table_mani_col['formtype'] == 'multichoice'): //连接表字段类型是multichoice?>
+          <div class="row js-checkbox-<?php echo $join_table_name."-".$join_table_mani_col['field'] ?>"></div>
+<?php       elseif ($join_table_mani_col['formtype'] == 'input'): //连接表字段类型是input?>
+          <input name="<?php echo $join_table_name."[{$join_table_mani_col['field']}]" ?>" type="text">
+<?php       endif ?>
+<?php     endforeach ?>
 <?php   endforeach ?>
 <?php endif //end连接表字段?>
 <?php /*----------/生成添加表单----------*/?>
@@ -71,18 +81,20 @@
         <!-- edit -->
         <form id="js-edit-form" data-parsley-validate style="display: none">
 <?php /*----------生成修改表单----------*/?>
-<?php foreach ($bean['col'] as $key => $column): //主表字段?>
+<?php foreach ($bean['col'] as $column): //主表字段?>
           <label><?php echo $column['comment']?></label>
           <input name="<?php echo $column['field']?>" type="text" class="form-control"/>
-<?php endforeach ?>
-<?php if (isset($bean['join'])): ?>
-<?php   foreach ($bean['join'] as $join_table_name => $join_table): //连接表字段?>
-          <label><?php echo $join_table['comment']?></label>
-<?php     if (isset($join_table['form_type']) && $join_table['form_type'] == 'multichoice'): //连接表字段类型是multichoice?>
-          <div class="row js-checkbox-<?php echo $join_table_name?>"></div>
-<?php     else: //连接表字段类型是其他?>
-          <select name="<?php echo $join_table['pri_field']?>" class="js-select-<?php echo $join_table_name?> form-control"></select>
-<?php     endif ?>
+<?php endforeach //end主表字段?>
+<?php if ($bean['join'] != null): //连接表字段?>
+<?php   foreach ($bean['join'] as $join_table_name => $join_table): ?>
+<?php     foreach ($join_table['manipulation_col'] as $join_table_mani_col): ?>
+          <label><?php echo $join_table_mani_col['comment']?></label>
+<?php       if ($join_table_mani_col['formtype'] == 'multichoice'): //连接表字段类型是multichoice?>
+          <div class="row js-checkbox-<?php echo $join_table_mani_col['field'] ?>"></div>
+<?php       else: //连接表字段类型是其他?>
+          <select name="<?php echo $join_table_mani_col['field'] ?>" class="js-select-<?php echo $join_table_mani_col['field'] ?> form-control"></select>
+<?php       endif ?>
+<?php     endforeach ?>
 <?php   endforeach ?>
 <?php endif //end连接表字段?>
 <?php /*----------生成修改表单----------*/?>
@@ -110,12 +122,12 @@
 <?php foreach ($bean['col'] as $key => $column): ?>
           {"data":"<?php echo $column['field']?>" },
 <?php endforeach ?>
-<?php if (isset($bean['join'])): ?>
+<?php if ($bean['join'] != null): ?>
 <?php   foreach ($bean['join'] as $join_table): ?>
-<?php     if (isset($join_table['form_type']) && $join_table['form_type'] == 'multichoice'): //连接表字段类型是multichoice?>
-<?php       foreach ($join_table['col'] as $column): ?>
+<?php     foreach ($join_table['manipulation_col'] as $join_table_mani_col): ?>
+<?php       if ($join_table_mani_col['formtype'] == 'multichoice'): //连接表字段类型是multichoice?>
           {
-            "data":"<?php echo $column['field']?>",
+            "data":"<?php echo $join_table_mani_col['field']?>",
             "render": function(data) {
               var data = data ? data.split(',') : '';
               var div = '';
@@ -126,12 +138,10 @@
               return div;
             }
           },
-<?php       endforeach ?>
-<?php     else: //连接表字段类型是其他?>
-<?php       foreach ($join_table['col'] as $column): ?>
-          {"data":"<?php echo $column['field']?>" },
-<?php       endforeach ?>
-<?php     endif ?>
+<?php       else: //连接表字段类型是其他?>
+          {"data":"<?php echo $join_table_mani_col['field']?>" },
+<?php       endif ?>
+<?php     endforeach ?>
 <?php   endforeach ?>
 <?php endif ?>
           { 
@@ -393,24 +403,26 @@
   }
 
 <?php /*----------初始化添加，修改表单（对在表单中选择用的外链表数据初始化）----------*/?>
-<?php if (isset($bean['join'])): ?>
+<?php if ($bean['join'] != null): ?>
   function init_add_edit_form(){
     $.post("<?php echo "<?=site_url('back/{$bean_name}/get_form_data')?>"?>", {}, function(data,status){
       if (data['status'] == true) {
 <?php   foreach ($bean['join'] as $join_table_name => $join_table): ?>
-<?php     if (isset($join_table['form_type']) && $join_table['form_type'] == 'multichoice'): ?>
+<?php     foreach ($join_table['manipulation_col'] as $join_table_mani_col): ?>
+<?php       if ($join_table_mani_col['formtype'] == 'multichoice'): ?>
           var $<?php echo $join_table_name?> = $('.js-checkbox-<?php echo $join_table_name?>');
           $(data.<?php echo $join_table_name?>).each(function(){
             var checkbox_str = '<div class="col-md-4"><input name="<?php echo $join_table['pri_field'] ?>[]" type="checkbox" value="'+this.<?php echo $join_table['join_field'] ?>+'" />'+'<label>'+this.<?php echo $join_table['join_show_field'] ?>+'</label></div>';
             $<?php echo $join_table_name?>.append(checkbox_str);
           });
-<?php     else: ?>
+<?php       else: ?>
           var $<?php echo $join_table_name?> = $('.js-select-<?php echo $join_table_name?>');
           $(data.<?php echo $join_table_name ?>).each(function(){
-            var option_str = '<option value="'+this.<?php echo $join_table['join_field'] ?>+'">'+this.<?php echo $join_table['join_show_field'] ?>+'</option>'
+            var option_str = '<option value="'+this.<?php echo $join_table['join_field'] ?>+'">'+this.<?php echo $join_table_mani_col['option_field'] ?>+'</option>'
             $<?php echo $join_table_name?>.append(option_str);
           });
-<?php     endif ?>       
+<?php       endif ?> 
+<?php     endforeach ?>      
 <?php   endforeach ?>
       }
     });
