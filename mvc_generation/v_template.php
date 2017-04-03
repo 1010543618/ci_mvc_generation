@@ -270,8 +270,13 @@
       $add_form.find('.btn').on('click', function() {
         //parsley()和serialize()不能用$add_form（是div节点）必须用$('#add-form')
         if ($('#add-form').parsley().validate()) {
+          fi.on("filebatchpreupload", function (event, data, previewId, index) {
+            console.log(data);
+          })
           fi.fileinput('upload');
-          var post_data = new $('#add-form').serialize();
+          console.log(fi.fileinput('getFileStack'));
+          var post_data = $('#add-form').serialize();
+          console.log(post_data);
           $.post("<?php echo "<?=site_url('back/{$bean_name}/insert')?>"?>", post_data, function(data){
             if (data['status'] == true) {
               DEP_TABLE.ajax.reload( null, false );

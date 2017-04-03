@@ -97,6 +97,8 @@ class <?php echo $controller_name ?> extends MY_Controller {
 <?php /*----------/为multichoice重写insert，update*/?>
 
 	public function upload_profile(){
+		header("Content-type: application/json");	
+		echo json_encode(array('initialPreviewConfig'=>123));die();
 		$config['upload_path']      = './uploads/';
         $config['allowed_types']    = 'gif|jpg|png';
         $config['max_size']     = 100;
