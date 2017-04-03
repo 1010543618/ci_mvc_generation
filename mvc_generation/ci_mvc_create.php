@@ -163,27 +163,52 @@ function create_tables_bean($config){
 				$col['comment'] = $column['comment'];
 				// type和validation
 				$left_bracket_pos = strpos($column['type'],'(');
-				$type = substr($column['type'], 0, $left_bracket_pos);
-				$type_bracket = substr($column['type'], $left_bracket_pos + 1, -1);
+				if ($left_bracket_pos) {
+					// 有左括号
+					$type = substr($column['type'], 0, $left_bracket_pos);
+					$type_bracket = substr($column['type'], $left_bracket_pos + 1, -1);
+				}else{
+					$type = $column['type'];
+				}
+				
 				switch ($type) {
+					//数字
 					case 'int':
-						$col['type'] = 'text';
+						$col['type'] = 'input';
 						$col['validation'] = 'type="number" ';
 						$col['validation'] .= 'maxlength="'.$type_bracket.'" ';
-						$col['validation'] .= $column['is_nullable'] == 'NO' && $column['default'] === null ? 'required ' : '';
 						break;
-
+					//字符串
 					case 'varchar':
+						$col['type'] = 'input';
+						$col['validation'] = 'maxlength="'.$type_bracket.'" ';
+						break;
+					case 'text':
 						$col['type'] = 'text';
 						$col['validation'] = 'maxlength="'.$type_bracket.'" ';
-						$col['validation'] .= $column['is_nullable'] == 'NO' && $column['default'] === null ? 'required ' : '';
 						break;
-
+					//日期和时间
+					case 'datetime':
+						$col['type'] = 'datetime';
+						break;
+					case 'timestamp':
+						$col['type'] = 'timestamp';
+						break;
+					case 'date':
+						$col['type'] = 'date';
+						break;
+					case 'time':
+						$col['type'] = 'time';
+						break;
+					case 'year':
+						$col['type'] = 'year';
+						break;
 					default:
-						$col['type'] = 'text';
-						$col['validation'] = $column['is_nullable'] == 'NO' && $column['default'] === null ? 'required ' : '';
+						$col['type'] = 'input';
 						break;
 				}
+				// 是否为null
+				$col['validation'] = $column['is_nullable'] == 'NO' && $column['default'] === null ? 'required ' : '';
 				$tables[$table_name]['col'][] = $col;
 			}
 		}
@@ -372,7 +397,7 @@ function handle_beans(&$beans){
 		
 		//join
 		if (!isset($bean['join']) || !is_array($bean['join'])) {
-			$bean['join'] = null;
+			$bean['join'] = array();
 		}else{
 			foreach ($bean['join'] as $join_table_name => &$join_table) {
 				if (!is_array($bean['join'][$join_table_name])) {
@@ -391,9 +416,9 @@ function handle_beans(&$beans){
 				}
 				if (!isset($join_table['col'])) {
 					// 没有要显示的col
-					$join_table['col'] = null;
+					$join_table['col'] = array();
 				}else{
-					foreach ($join_table['col'] as $join_col_name => $join_col) {
+					foreach ($join_table['col'] as $join_col_name => &$join_col) {
 						if (!is_array($join_table['col'][$join_col_name])) {
 							return_result('连接表'.$join_table_name.'的col中的字段不是数组',false);
 						}
@@ -403,11 +428,14 @@ function handle_beans(&$beans){
 						if (!isset($join_col['comment']) || !is_string($join_col['comment'])) {
 							return_result('连接表'.$join_table_name.'的col中的comment未设置或不是字符串',false);
 						}
+						if (!isset($join_col['is_group_concat'])) {
+							$join_col['is_group_concat'] = 'false';
+						}
 					}
 				}
 				if (!isset($join_table['manipulation_col'])) {
 					// 没有要操作的列
-					$join_table['manipulation_col'] = null;
+					$join_table['manipulation_col'] = array();
 				}else{
 					foreach ($join_table['manipulation_col'] as $join_mani_col_name => &$join_mani_col) {
 						if (!is_array($join_table['manipulation_col'][$join_mani_col_name])) {

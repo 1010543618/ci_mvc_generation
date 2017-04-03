@@ -24,7 +24,9 @@
 			
 			"http://cdn.bootcss.com/iCheck/1.0.2/skins/line/green.css",
 			"http://cdn.bootcss.com/jquery-confirm/3.1.0/jquery-confirm.min.css",
-			"http://cdn.bootcss.com/bootstrap-fileinput/4.3.8/css/fileinput.min.css"
+			"http://cdn.bootcss.com/bootstrap-fileinput/4.3.8/css/fileinput.min.css",
+			"http://cdn.bootcss.com/bootstrap-datepicker/1.7.0-RC2/css/bootstrap-datepicker.min.css",
+			"http://cdn.bootcss.com/bootstrap-timepicker/0.5.2/css/bootstrap-timepicker.min.css"
 		],
 		"js" : [    
 		    "<?php echo base_url('views/back/vendors/jquery/dist/jquery.min.js')?>",
@@ -49,7 +51,10 @@
 			"http://cdn.bootcss.com/iCheck/1.0.2/icheck.min.js",
 		    "http://cdn.bootcss.com/jquery-confirm/3.1.0/jquery-confirm.min.js",
 		    "http://cdn.bootcss.com/datatables/1.10.13/js/jquery.dataTables.js",
-		    "http://cdn.bootcss.com/bootstrap-fileinput/4.3.8/js/fileinput.min.js"
+		    "http://cdn.bootcss.com/bootstrap-fileinput/4.3.8/js/fileinput.min.js",
+		    "http://cdn.bootcss.com/bootstrap-datepicker/1.7.0-RC2/js/bootstrap-datepicker.min.js",
+		    "http://cdn.bootcss.com/bootstrap-datepicker/1.7.0-RC2/locales/bootstrap-datepicker.zh-CN.min.js",
+		    "http://cdn.bootcss.com/bootstrap-timepicker/0.5.2/js/bootstrap-timepicker.min.js"
 		]
 	}
 }

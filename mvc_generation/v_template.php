@@ -1,4 +1,9 @@
 <!-- page content -->
+<style>
+  .input-group-btn .btn{
+    margin: 0;
+  }
+</style>
 <div class="right_col" role="main">
   <div class="">
     <div class="page-title">
@@ -27,13 +32,11 @@
 <?php foreach ($bean['col'] as $column): //主表字段?>
               <th><?php echo $column['comment']?></th>
 <?php endforeach //end主表字段?>
-<?php if ($bean['join'] != null): //连接表字段?>
-<?php   foreach ($bean['join'] as $join_table): ?>
-<?php     foreach ($join_table['col'] as $column): ?>
+<?php foreach ($bean['join'] as $join_table): //连接表字段?>
+<?php   foreach ($join_table['col'] as $column): ?>
               <th><?php echo $column['comment']?></th>
-<?php     endforeach ?>
 <?php   endforeach ?>
-<?php endif //end连接表字段?>
+<?php endforeach //end连接表字段?>
 <?php /*----------/生成表格头----------*/?>
               <th>修改</th>
               <th>删除</th>
@@ -49,29 +52,60 @@
 <?php foreach ($bean['col'] as $column): //主表字段?>
           <label><?php echo $column['comment']?></label>
 <?php   if ($column['type'] === 'input'): ?>
-          <input name="<?php echo $column['field']?>" type="text" class="form-control"/>
+          <input name="<?php echo $column['field']?>" type="text" class="form-control" <?php echo $column['validation']?>/>
 <?php   elseif ($column['type'] === 'text'): ?>
-          <script id="ue-<?php echo $column['field'] ?>" name="<?php echo $column['field'] ?>" type="text/plain"></script>
+          <script name="<?php echo $column['field'] ?>" type="text/plain"></script>
 <?php   elseif ($column['type'] === 'file'): ?>
-          <input id="fi-<?php echo $column['field'] ?>" name="<?php echo $column['field'] ?>" type="file" class="file" data-show-preview="false"> 
+          <input name="<?php echo $column['field'] ?>" type="file" data-show-upload="false" data-show-preview="false" <?php echo $column['validation']?>/>
+<?php   elseif ($column['type'] === 'datetime'): ?>
+          <div class="input-group date">
+            <div class="input-group-addon">
+                <span class="glyphicon glyphicon-calendar fa fa-calendar"></span>
+            </div>
+            <input name="<?php echo $column['field']?>" type="text" class="form-control" data-date-language="zh-CN" data-date-min-view-mode="0" data-date-format="yyyy-mm-dd" <?php echo $column['validation']?>/>
+          </div>
+<?php   elseif ($column['type'] === 'timestamp'): ?>
+          <div class="input-group date">
+            <div class="input-group-addon">
+                <span class="glyphicon glyphicon-calendar fa fa-calendar"></span>
+            </div>
+            <input name="<?php echo $column['field']?>" type="text" class="form-control" data-date-language="zh-CN" data-date-min-view-mode="0" data-date-format="yyyy-mm-dd" <?php echo $column['validation']?>/>
+          </div>
+<?php   elseif ($column['type'] === 'date'): ?>
+          <div class="input-group date">
+            <div class="input-group-addon">
+                <span class="glyphicon glyphicon-calendar fa fa-calendar"></span>
+            </div>
+            <input name="<?php echo $column['field']?>" type="text" class="form-control" data-date-language="zh-CN" data-date-min-view-mode="0" data-date-format="yyyy-mm-dd"  <?php echo $column['validation']?>/>
+          </div>
 <?php   elseif ($column['type'] === 'time'): ?>
-          <input name="<?php echo $column['field']?>" type="text" class="form-control"/>
+          <div class="input-group">
+            <div class="input-group-addon">
+                <span class="glyphicon glyphicon-time"></span>
+            </div>
+            <input name="<?php echo $column['field']?>" type="text" class="form-control" <?php echo $column['validation']?>/>
+          </div>
+<?php   elseif ($column['type'] === 'year'): ?>
+          <div class="input-group date">
+            <div class="input-group-addon">
+                <span class="glyphicon glyphicon-calendar fa fa-calendar"></span>
+            </div>
+            <input name="<?php echo $column['field']?>" type="text" class="form-control" data-date-language="zh-CN" data-date-min-view-mode="2" data-date-format="yyyy" <?php echo $column['validation']?>/>
+          </div>
 <?php   endif; ?>
 <?php endforeach //end主表字段?>
-<?php if ($bean['join'] != null): //连接表字段?>
-<?php   foreach ($bean['join'] as $join_table_name => $join_table): ?>
-<?php     foreach ($join_table['manipulation_col'] as $join_table_mani_col): ?>
+<?php foreach ($bean['join'] as $join_table_name => $join_table): //连接表字段?>
+<?php   foreach ($join_table['manipulation_col'] as $join_table_mani_col): ?>
           <label><?php echo $join_table_mani_col['comment']?></label>
-<?php       if ($join_table_mani_col['formtype'] == 'select'): //连接表字段类型是select?>
+<?php     if ($join_table_mani_col['formtype'] == 'select'): //连接表字段类型是select?>
           <select name="<?php echo $join_table_name."[{$join_table_mani_col['field']}]" ?>" class="js-select-<?php echo $join_table_name."-".$join_table_mani_col['field'] ?> form-control"></select>
-<?php       elseif ($join_table_mani_col['formtype'] == 'multichoice'): //连接表字段类型是multichoice?>
+<?php     elseif ($join_table_mani_col['formtype'] == 'multichoice'): //连接表字段类型是multichoice?>
           <div class="row js-checkbox-<?php echo $join_table_name."-".$join_table_mani_col['field'] ?>"></div>
-<?php       elseif ($join_table_mani_col['formtype'] == 'input'): //连接表字段类型是input?>
+<?php     elseif ($join_table_mani_col['formtype'] == 'input'): //连接表字段类型是input?>
           <input name="<?php echo $join_table_name."[{$join_table_mani_col['field']}]" ?>" type="text">
-<?php       endif ?>
-<?php     endforeach ?>
+<?php     endif ?>
 <?php   endforeach ?>
-<?php endif //end连接表字段?>
+<?php endforeach //end连接表字段?>
 <?php /*----------/生成添加表单----------*/?>
           <br/>
           <span class="btn btn-primary">添加<?php echo $bean['tbl_comment']?></span>
@@ -83,20 +117,36 @@
 <?php /*----------生成修改表单----------*/?>
 <?php foreach ($bean['col'] as $column): //主表字段?>
           <label><?php echo $column['comment']?></label>
-          <input name="<?php echo $column['field']?>" type="text" class="form-control"/>
+<?php   if ($column['type'] === 'input'): ?>
+          <input name="<?php echo $column['field']?>" type="text" class="form-control" <?php echo $column['validation']?>/>
+<?php   elseif ($column['type'] === 'text'): ?>
+          <script name="<?php echo $column['field'] ?>" type="text/plain"></script>
+<?php   elseif ($column['type'] === 'file'): ?>
+          <input name="<?php echo $column['field'] ?>" type="file" class="file" data-show-preview="false" <?php echo $column['validation']?>/>
+<?php   elseif ($column['type'] === 'datetime'): ?>
+          <input name="<?php echo $column['field']?>" type="text" class="form-control" <?php echo $column['validation']?>/>
+<?php   elseif ($column['type'] === 'timestamp'): ?>
+          <input name="<?php echo $column['field']?>" type="text" class="form-control" <?php echo $column['validation']?>/>
+<?php   elseif ($column['type'] === 'date'): ?>
+          <input name="<?php echo $column['field']?>" type="text" class="form-control" <?php echo $column['validation']?>/>
+<?php   elseif ($column['type'] === 'time'): ?>
+          <input name="<?php echo $column['field']?>" type="text" class="form-control" <?php echo $column['validation']?>/>
+<?php   elseif ($column['type'] === 'year'): ?>
+          <input name="<?php echo $column['field']?>" type="text" class="form-control" <?php echo $column['validation']?>/>
+<?php   endif; ?>
 <?php endforeach //end主表字段?>
-<?php if ($bean['join'] != null): //连接表字段?>
-<?php   foreach ($bean['join'] as $join_table_name => $join_table): ?>
-<?php     foreach ($join_table['manipulation_col'] as $join_table_mani_col): ?>
+<?php foreach ($bean['join'] as $join_table_name => $join_table): //连接表字段?>
+<?php   foreach ($join_table['manipulation_col'] as $join_table_mani_col): ?>
           <label><?php echo $join_table_mani_col['comment']?></label>
-<?php       if ($join_table_mani_col['formtype'] == 'multichoice'): //连接表字段类型是multichoice?>
-          <div class="row js-checkbox-<?php echo $join_table_mani_col['field'] ?>"></div>
-<?php       else: //连接表字段类型是其他?>
-          <select name="<?php echo $join_table_mani_col['field'] ?>" class="js-select-<?php echo $join_table_mani_col['field'] ?> form-control"></select>
-<?php       endif ?>
-<?php     endforeach ?>
+<?php     if ($join_table_mani_col['formtype'] == 'select'): //连接表字段类型是select?>
+          <select name="<?php echo $join_table_name."[{$join_table_mani_col['field']}]" ?>" class="js-select-<?php echo $join_table_name."-".$join_table_mani_col['field'] ?> form-control"></select>
+<?php     elseif ($join_table_mani_col['formtype'] == 'multichoice'): //连接表字段类型是multichoice?>
+          <div class="row js-checkbox-<?php echo $join_table_name."-".$join_table_mani_col['field'] ?>"></div>
+<?php     elseif ($join_table_mani_col['formtype'] == 'input'): //连接表字段类型是input?>
+          <input name="<?php echo $join_table_name."[{$join_table_mani_col['field']}]" ?>" type="text">
+<?php     endif ?>
 <?php   endforeach ?>
-<?php endif //end连接表字段?>
+<?php endforeach //end连接表字段?>
 <?php /*----------生成修改表单----------*/?>
           <input name="<?php echo $bean['id']['field']?>" type="text" style="display: none" />
           <br/>
@@ -122,10 +172,9 @@
 <?php foreach ($bean['col'] as $key => $column): ?>
           {"data":"<?php echo $column['field']?>" },
 <?php endforeach ?>
-<?php if ($bean['join'] != null): ?>
-<?php   foreach ($bean['join'] as $join_table): ?>
-<?php     foreach ($join_table['manipulation_col'] as $join_table_mani_col): ?>
-<?php       if ($join_table_mani_col['formtype'] == 'multichoice'): //连接表字段类型是multichoice?>
+<?php foreach ($bean['join'] as $join_table): ?>
+<?php   foreach ($join_table['col'] as $join_table_col): ?>
+<?php     if ($join_table['is_group_concat'] == 'true'): //连接表字段类型是multichoice?>
           {
             "data":"<?php echo $join_table_mani_col['field']?>",
             "render": function(data) {
@@ -138,12 +187,11 @@
               return div;
             }
           },
-<?php       else: //连接表字段类型是其他?>
+<?php     else: //连接表字段类型是其他?>
           {"data":"<?php echo $join_table_mani_col['field']?>" },
-<?php       endif ?>
-<?php     endforeach ?>
+<?php     endif ?>
 <?php   endforeach ?>
-<?php endif ?>
+<?php endforeach ?>
           { 
             "data": null,
             "render": function(data) {
@@ -202,102 +250,6 @@
         },
     });
   }
-  
-
-  function edit_dialog(data){
-    data = data.replace(/&quot;/g, '"');
-    data = JSON.parse(data);
-    var validate_form = function() {
-      if (true === $('#edit-form').parsley().isValid()) {
-        $('.bs-callout-info').removeClass('hidden');
-        $('.bs-callout-warning').addClass('hidden');
-      } else {
-        $('.bs-callout-info').addClass('hidden');
-        $('.bs-callout-warning').removeClass('hidden');
-      }
-    };
-
-    var init_dialog = function($edit_form){
-<?php foreach ($bean['col'] as $key => $column): //初始化主表默认值?>
-      $edit_form.find(":input[name='<?php echo $column['field']?>']").val(data['<?php echo $column['field']?>']);
-<?php endforeach ?>
-<?php if (isset($bean['join'])): //初始化连接表默认值?>
-<?php   foreach ($bean['join'] as $join_table_name => $join_table): ?>
-      $edit_form.find(":input[name='<?php echo $join_table['pri_field']?>']").val(data['<?php echo $join_table['pri_field']?>']);
-<?php   endforeach ?>
-<?php endif ?>
-      $edit_form.find(":input[name='<?php echo $bean['id']['field']?>']").val(data['<?php echo $bean['id']['field']?>']);
-      $/*.listen*/('parsley:field:validate', function() {
-        validate_form();
-      });
-      $edit_form.find(".btn").on('click', function() {
-        //parsley()和serialize()不能用$edit_form（是div节点）必须用$('#edit-form')
-        if ($('#edit-form').parsley().validate()) {
-          var post_data = $('#edit-form').serialize();
-          $.post("<?php echo "<?=site_url('back/{$bean_name}/update')?>"?>", post_data, function(data){
-            if (data['status'] == true) {
-              DEP_TABLE.ajax.reload( null, false );
-              edit_dialog.setContent('修改成功');
-            }else{
-              edit_dialog.setContent(data['message']);
-            }
-          });
-        }       
-        validate_form();
-      });
-<?php /*----------初始化富文本编辑器----------*/?>
-<?php foreach ($bean['col'] as $key => $column): //主表字段?>
-<?php   if ($column['type'] == 'text'): ?>
-      $edit_form.find(":input[name='<?php echo $column['field'] ?>']").replaceWith(function(){return '<script id="ue-<?php echo $column['field'] ?>" name="<?php echo $column['field'] ?>" type="text/plain">'+$(this).val()+'<\/script>'});
-      var ue_width = $edit_form.width();
-      // jquery-confirm的zindex是8个9，UE要9个9在jquery-confirm上面
-      var ue = UE.getEditor('ue-<?php echo $column['field'] ?>',{initialFrameWidth:ue_width,zIndex:999999999,autoFloatEnabled:false});
-<?php   endif ?>
-<?php endforeach ?>
-<?php /*----------/初始化富文本编辑器----------*/?>
-
-<?php /*----------初始化multichoice----------*/?>
-<?php if (isset($bean['join'])): ?>
-<?php   foreach ($bean['join'] as $join_table_name => $join_table): ?>
-<?php     if (isset($join_table['form_type']) && $join_table['form_type'] == 'multichoice'): ?>
-      var checked_<?php echo $join_table['pri_field']?>_array = data['<?php echo $join_table['pri_field']?>'].split(',');
-      $edit_form.find('.js-checkbox-<?php echo $join_table_name?> input').each(function(){
-        var self = $(this),
-            label = self.next(),
-            label_text = label.text();
-        if ($.inArray(self.val(), checked_<?php echo $join_table['pri_field']?>_array) != -1) {
-          self.prop('checked',true);
-        };
-        label.remove();
-        self.iCheck({
-          checkboxClass: 'icheckbox_line-green',
-          insert: '<div class="icheck_line-icon"></div>' + label_text
-        });
-      });
-<?php     endif ?>
-<?php   endforeach ?>
-<?php endif ?>
-<?php /*----------/初始化multichoice----------*/?>
-    }
-
-    var edit_dialog = $.dialog({
-        title: '修改<?php echo $bean['tbl_comment']?>',
-        content: function(){
-          return '<form id="edit-form" data-parsley-validate>' + $('#js-edit-form').html() + '</form>';
-        },
-        onContentReady: function(){
-          init_dialog(edit_dialog.$content);
-        },
-        onDestroy: function(){
-<?php foreach ($bean['col'] as $key => $column): ?>
-<?php   if ($column['type'] == 'text'): ?>
-          UE.getEditor('ue-<?php echo $column['field'] ?>').destroy();
-<?php   endif ?>
-<?php endforeach ?>
-        }
-    });
-  }
-
 
 
   function add_dialog(data){
@@ -318,6 +270,7 @@
       $add_form.find('.btn').on('click', function() {
         //parsley()和serialize()不能用$add_form（是div节点）必须用$('#add-form')
         if ($('#add-form').parsley().validate()) {
+          fi.fileinput('upload');
           var post_data = new $('#add-form').serialize();
           $.post("<?php echo "<?=site_url('back/{$bean_name}/insert')?>"?>", post_data, function(data){
             if (data['status'] == true) {
@@ -330,20 +283,33 @@
         }
 
       });
-<?php /*----------初始化富文本编辑器----------*/?>
-<?php foreach ($bean['col'] as $key => $column): //主表字段?>
+<?php /*----------初始化type不是input的字段---------*/?>
+<?php foreach ($bean['col'] as $column): //主表字段?>
 <?php   if ($column['type'] == 'text'): ?>
-      $add_form.find(":input[name='<?php echo $column['field'] ?>']").replaceWith('<script id="ue-<?php echo $column['field'] ?>" name="<?php echo $column['field'] ?>" type="text/plain"><\/script>');
+      $add_form.find("script[name='<?php echo $column['field'] ?>']").attr('id','ue-<?php echo $column['field'] ?>');
       var ue_width = $add_form.width();
       // jquery-confirm的zindex是8个9，UE要9个9在jquery-confirm上面
       var ue = UE.getEditor('ue-<?php echo $column['field'] ?>',{initialFrameWidth:ue_width,zIndex:999999999,autoFloatEnabled:false});
+      // 不设置初始值，serialize可能没有这个字段
+      ue.ready(function(){ue.setContent('');});
+<?php   elseif ($column['type'] == 'file'): ?>
+      var fi = $add_form.find(":input[name='<?php echo $column['field'] ?>']").fileinput({'language':'zh',uploadUrl: '<?php echo "<?=site_url('back/{$bean_name}/upload_{$column['field']}')?>" ?>'});
+<?php   elseif ($column['type'] == 'datetime'): ?>
+      $add_form.find(":input[name='<?php echo $column['field'] ?>']").datepicker();
+<?php   elseif ($column['type'] == 'timestamp'): ?>
+      $add_form.find(":input[name='<?php echo $column['field'] ?>']").datepicker();
+<?php   elseif ($column['type'] == 'date'): ?>
+      $add_form.find(":input[name='<?php echo $column['field'] ?>']").datepicker();
+<?php   elseif ($column['type'] == 'time'): ?>
+      $add_form.find(":input[name='<?php echo $column['field'] ?>']").timepicker({'showMeridian':false,'showSeconds':true,'defaultTime':false});
+<?php   elseif ($column['type'] == 'year'): ?>
+      $add_form.find(":input[name='<?php echo $column['field'] ?>']").datepicker();
 <?php   endif ?>
 <?php endforeach ?>
-<?php /*----------/初始化富文本编辑器----------*/?>
-
-<?php if (isset($bean['join'])): ?>
-<?php   foreach ($bean['join'] as $join_table_name => $join_table): ?>
-<?php     if (isset($join_table['form_type']) && $join_table['form_type'] == 'multichoice'): ?>
+<?php /*----------/初始化type不是input的字段----------*/?>
+<?php foreach ($bean['join'] as $join_table_name => $join_table): ?>
+<?php   foreach ($join_table['manipulation_col'] as $join_table_mani_col): ?>
+<?php     if ($join_table_mani_col['formtype'] == 'multichoice'): ?>
     $add_form.find('.js-checkbox-<?php echo $join_table_name?> input').each(function(){
       var self = $(this),
           label = self.next(),
@@ -356,7 +322,7 @@
       });
 <?php     endif ?>
 <?php   endforeach ?>
-<?php endif ?>
+<?php endforeach ?>
     }
 
     var add_dialog = $.dialog({
@@ -376,6 +342,114 @@
         }
     });
   }
+  
+
+  function edit_dialog(data){
+    data = data.replace(/&quot;/g, '"');
+    data = JSON.parse(data);
+    var validate_form = function() {
+      if (true === $('#edit-form').parsley().isValid()) {
+        $('.bs-callout-info').removeClass('hidden');
+        $('.bs-callout-warning').addClass('hidden');
+      } else {
+        $('.bs-callout-info').addClass('hidden');
+        $('.bs-callout-warning').removeClass('hidden');
+      }
+    };
+
+    var init_dialog = function($edit_form){
+<?php foreach ($bean['col'] as $key => $column): //初始化主表默认值?>
+      $edit_form.find(":input[name='<?php echo $column['field']?>']").val(data['<?php echo $column['field']?>']);
+<?php endforeach ?>
+<?php foreach ($bean['join'] as $join_table_name => $join_table): //初始化连接表默认值?>
+<?php   foreach ($join_table['manipulation_col'] as $join_table_mani_col): ?>
+      $edit_form.find(":input[name='<?php echo $join_table_name."[{$join_table_mani_col['field']}]"?>']").val(data['<?php echo $join_table_mani_col['field'] ?>']);  
+<?php   endforeach ?>
+<?php endforeach ?>
+      $edit_form.find(":input[name='<?php echo $bean['id']['field']?>']").val(data['<?php echo $bean['id']['field']?>']);
+      $/*.listen*/('parsley:field:validate', function() {
+        validate_form();
+      });
+      $edit_form.find(".btn").on('click', function() {
+        //parsley()和serialize()不能用$edit_form（是div节点）必须用$('#edit-form')
+        if ($('#edit-form').parsley().validate()) {
+          var post_data = $('#edit-form').serialize();
+          $.post("<?php echo "<?=site_url('back/{$bean_name}/update')?>"?>", post_data, function(data){
+            if (data['status'] == true) {
+              DEP_TABLE.ajax.reload( null, false );
+              edit_dialog.setContent('修改成功');
+            }else{
+              edit_dialog.setContent(data['message']);
+            }
+          });
+        }       
+        validate_form();
+      });
+<?php /*----------初始化type不是input的字段---------*/?>
+<?php foreach ($bean['col'] as $column): //主表字段?>
+<?php   if ($column['type'] == 'text'): ?>
+      $edit_form.find(":input[name='<?php echo $column['field'] ?>']").attr('id','ue-<?php echo $column['field'] ?>');
+      var ue_width = $edit_form.width();
+      // jquery-confirm的zindex是8个9，UE要9个9在jquery-confirm上面
+      var ue = UE.getEditor('ue-<?php echo $column['field'] ?>',{initialFrameWidth:ue_width,zIndex:999999999,autoFloatEnabled:false});
+<?php   elseif ($column['type'] == 'file'): ?>
+      $edit_form.find(":input[name='<?php echo $column['field'] ?>']").fileinput({});
+<?php   elseif ($column['type'] == 'datetime'): ?>
+      $edit_form.find(":input[name='<?php echo $column['field'] ?>']").datepicker({});
+<?php   elseif ($column['type'] == 'timestamp'): ?>
+      $edit_form.find(":input[name='<?php echo $column['field'] ?>']").datepicker({});
+<?php   elseif ($column['type'] == 'date'): ?>
+      $edit_form.find(":input[name='<?php echo $column['field'] ?>']").datepicker({});
+<?php   elseif ($column['type'] == 'time'): ?>
+      $edit_form.find(":input[name='<?php echo $column['field'] ?>']").datepicker({});
+<?php   elseif ($column['type'] == 'year'): ?>
+      $edit_form.find(":input[name='<?php echo $column['field'] ?>']").datepicker({});
+<?php   endif ?>
+<?php endforeach ?>
+<?php /*----------/初始化type不是input的字段----------*/?>
+
+<?php /*----------初始化manipulation_col----------*/?>
+<?php foreach ($bean['join'] as $join_table_name => $join_table): ?>
+<?php   foreach ($join_table['manipulation_col'] as $join_table_mani_col): ?>
+<?php     if ($join_table_mani_col['formtype'] == 'multichoice'): ?>
+      var checked_<?php echo $join_table_mani_col['field']?>_array = data['<?php echo $join_table_mani_col['field']?>'].split(',');
+      $edit_form.find('.js-checkbox-<?php echo $join_table_name?> input').each(function(){
+        var self = $(this),
+            label = self.next(),
+            label_text = label.text();
+        if ($.inArray(self.val(), checked_<?php echo $join_table_mani_col['field']?>_array) != -1) {
+          self.prop('checked',true);
+        };
+        label.remove();
+        self.iCheck({
+          checkboxClass: 'icheckbox_line-green',
+          insert: '<div class="icheck_line-icon"></div>' + label_text
+        });
+      });
+<?php     endif ?>
+<?php   endforeach ?>
+<?php endforeach ?>
+<?php /*----------/初始化manipulation_col----------*/?>
+    }
+
+    var edit_dialog = $.dialog({
+        title: '修改<?php echo $bean['tbl_comment']?>',
+        content: function(){
+          return '<form id="edit-form" data-parsley-validate>' + $('#js-edit-form').html() + '</form>';
+        },
+        onContentReady: function(){
+          init_dialog(edit_dialog.$content);
+        },
+        onDestroy: function(){
+<?php foreach ($bean['col'] as $column): ?>
+<?php   if ($column['type'] == 'text'): ?>
+          UE.getEditor('ue-<?php echo $column['field'] ?>').destroy();
+<?php   endif ?>
+<?php endforeach ?>
+        }
+    });
+  }
+
 
   function del_confirm(data){
     var del_confirm = $.confirm({
@@ -432,7 +506,7 @@
 
   window.onload = function(){
     init_table();
-<?php if (isset($bean['join'])): ?>
+<?php if ($bean['join'] != null): ?>
     init_add_edit_form();
 <?php endif ?>
   }

@@ -115,7 +115,7 @@
                       <div class="form-group">
                         <label class="control-label col-md-3 col-sm-3 col-xs-12">数据库&nbsp;<span class="required">*</span></label>
                         <div class="col-md-6 col-sm-6 col-xs-12">
-                            <input name="db" type="text" value="test" class="form-control col-md-7 col-xs-12">
+                            <input name="db" type="text" value="cmg_test" class="form-control col-md-7 col-xs-12">
                         </div>
                       </div>
                       <input name="step" type="text" value="1" style="display: none;">
@@ -241,7 +241,7 @@
                                         <li>field(<*>string):【列的字段名】,</li>
                                         <li>comment(<*>string):【列显示的名字】,</li>
                                         <li>validation(string):【列的验证规则（parsley.js验证规则）】,</li>
-                                        <li>type(string):【列的类型input(默认)/text/file/time/now】（input使用文本框，text将使用富文本编辑器，file将保存图片的位置，time将使用时间选择器）,</li>
+                                        <li>type(string):【列的类型input(默认)/text/file/datetime/timestamp/date/time/year】（input使用文本框，text将使用富文本编辑器，file将保存图片的位置，datetime/timestamp/date/time/year将使用不同配置的时间选择器）,</li>
                                         <li>file_path(string):【文件保存的路径，type为file时可设置】（不设置将保存到“跟目录/upload/当前表名”文件夹),</li>
                                       </ul>
                                     </li>
@@ -262,7 +262,8 @@
                                               <h5>(map，连接表要查询的每一列):</h5>
                                               <ul>
                                                 <li>field(<*>string):【列的字段名】,</li>
-                                                <li>comment<*>string):【列显示的名字】,</li>
+                                                <li>comment(<*>string):【列显示的名字】,</li>
+                                                <li>is_group_concat(string):【false（默认）/true是否将该字段合并（一对多，多对多设置为true时将多个结果合并）】,</li>
                                               </ul>
                                             </li>
                                           </ul>
