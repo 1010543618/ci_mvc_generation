@@ -12,7 +12,7 @@ create table user(
 	user_id int not null auto_increment comment '用户id',
 	user_name varchar(10) not null comment '用户名',
 	info text not null comment '用户信息',
-	profile varchar(32) comment '用户头像',
+	profile varchar(200) comment '用户头像',
 	birthday date not null comment '用户生日',
 	get_up_time time not null comment '起床时间',
 	gift_time timestamp not null comment '收礼物的时间',

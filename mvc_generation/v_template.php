@@ -54,9 +54,10 @@
 <?php   if ($column['type'] === 'input'): ?>
           <input name="<?php echo $column['field']?>" type="text" class="form-control" <?php echo $column['validation']?>/>
 <?php   elseif ($column['type'] === 'text'): ?>
-          <script name="<?php echo $column['field'] ?>" type="text/plain"></script>
+          <script name="<?php echo $column['field'] ?>" type="text/plain">请输入。。。</script>
 <?php   elseif ($column['type'] === 'file'): ?>
-          <input name="<?php echo $column['field'] ?>" type="file" data-show-upload="false" data-show-preview="false" <?php echo $column['validation']?>/>
+          <input name="<?php echo $column['field'] ?>-file" type="file" data-show-upload="false" data-show-preview="false" data-language="zh" data-upload-async="true" data-upload-url="<?php echo "<?=site_url('back/{$bean_name}/upload_{$column['field']}')?>" ?>" />
+          <input name="<?php echo $column['field'] ?>" type="text" style="display: none" />
 <?php   elseif ($column['type'] === 'datetime'): ?>
           <div class="input-group date">
             <div class="input-group-addon">
@@ -120,19 +121,45 @@
 <?php   if ($column['type'] === 'input'): ?>
           <input name="<?php echo $column['field']?>" type="text" class="form-control" <?php echo $column['validation']?>/>
 <?php   elseif ($column['type'] === 'text'): ?>
-          <script name="<?php echo $column['field'] ?>" type="text/plain"></script>
+          <script name="<?php echo $column['field'] ?>" type="text/plain"> </script>
 <?php   elseif ($column['type'] === 'file'): ?>
-          <input name="<?php echo $column['field'] ?>" type="file" class="file" data-show-preview="false" <?php echo $column['validation']?>/>
+          <input name="<?php echo $column['field'] ?>-file" type="file" data-show-upload="false" data-show-preview="false" data-language="zh" data-upload-async="true" data-upload-url="<?php echo "<?=site_url('back/{$bean_name}/upload_{$column['field']}')?>" ?>" />
+          <input name="<?php echo $column['field'] ?>" type="text" style="display: none" />
 <?php   elseif ($column['type'] === 'datetime'): ?>
-          <input name="<?php echo $column['field']?>" type="text" class="form-control" <?php echo $column['validation']?>/>
+          <div class="input-group date">
+            <div class="input-group-addon">
+                <span class="glyphicon glyphicon-calendar fa fa-calendar"></span>
+            </div>
+            <input name="<?php echo $column['field']?>" type="text" class="form-control" data-date-language="zh-CN" data-date-min-view-mode="0" data-date-format="yyyy-mm-dd" <?php echo $column['validation']?>/>
+          </div>
 <?php   elseif ($column['type'] === 'timestamp'): ?>
-          <input name="<?php echo $column['field']?>" type="text" class="form-control" <?php echo $column['validation']?>/>
+          <div class="input-group date">
+            <div class="input-group-addon">
+                <span class="glyphicon glyphicon-calendar fa fa-calendar"></span>
+            </div>
+            <input name="<?php echo $column['field']?>" type="text" class="form-control" data-date-language="zh-CN" data-date-min-view-mode="0" data-date-format="yyyy-mm-dd" <?php echo $column['validation']?>/>
+          </div>
 <?php   elseif ($column['type'] === 'date'): ?>
-          <input name="<?php echo $column['field']?>" type="text" class="form-control" <?php echo $column['validation']?>/>
+          <div class="input-group date">
+            <div class="input-group-addon">
+                <span class="glyphicon glyphicon-calendar fa fa-calendar"></span>
+            </div>
+            <input name="<?php echo $column['field']?>" type="text" class="form-control" data-date-language="zh-CN" data-date-min-view-mode="0" data-date-format="yyyy-mm-dd"  <?php echo $column['validation']?>/>
+          </div>
 <?php   elseif ($column['type'] === 'time'): ?>
-          <input name="<?php echo $column['field']?>" type="text" class="form-control" <?php echo $column['validation']?>/>
+          <div class="input-group">
+            <div class="input-group-addon">
+                <span class="glyphicon glyphicon-time"></span>
+            </div>
+            <input name="<?php echo $column['field']?>" type="text" class="form-control" <?php echo $column['validation']?>/>
+          </div>
 <?php   elseif ($column['type'] === 'year'): ?>
-          <input name="<?php echo $column['field']?>" type="text" class="form-control" <?php echo $column['validation']?>/>
+          <div class="input-group date">
+            <div class="input-group-addon">
+                <span class="glyphicon glyphicon-calendar fa fa-calendar"></span>
+            </div>
+            <input name="<?php echo $column['field']?>" type="text" class="form-control" data-date-language="zh-CN" data-date-min-view-mode="2" data-date-format="yyyy" <?php echo $column['validation']?>/>
+          </div>
 <?php   endif; ?>
 <?php endforeach //end主表字段?>
 <?php foreach ($bean['join'] as $join_table_name => $join_table): //连接表字段?>
@@ -253,83 +280,7 @@
 
 
   function add_dialog(data){
-    var validate_form = function() {
-      if (true === $('#add-form').parsley().isValid()) {
-        $('.bs-callout-info').removeClass('hidden');
-        $('.bs-callout-warning').addClass('hidden');
-      } else {
-        $('.bs-callout-info').addClass('hidden');
-        $('.bs-callout-warning').removeClass('hidden');
-      }
-    };
-    
-    var init_dialog = function($add_form){
-      $/*.listen*/('parsley:field:validate', function() {
-        validate_form();
-      });
-      $add_form.find('.btn').on('click', function() {
-        //parsley()和serialize()不能用$add_form（是div节点）必须用$('#add-form')
-        if ($('#add-form').parsley().validate()) {
-          fi.on("filebatchpreupload", function (event, data, previewId, index) {
-            console.log(data);
-          })
-          fi.fileinput('upload');
-          console.log(fi.fileinput('getFileStack'));
-          var post_data = $('#add-form').serialize();
-          console.log(post_data);
-          $.post("<?php echo "<?=site_url('back/{$bean_name}/insert')?>"?>", post_data, function(data){
-            if (data['status'] == true) {
-              DEP_TABLE.ajax.reload( null, false );
-              add_dialog.setContent('添加成功');
-            }else{
-              add_dialog.setContent(data['message']);
-            }
-          })
-        }
-
-      });
-<?php /*----------初始化type不是input的字段---------*/?>
-<?php foreach ($bean['col'] as $column): //主表字段?>
-<?php   if ($column['type'] == 'text'): ?>
-      $add_form.find("script[name='<?php echo $column['field'] ?>']").attr('id','ue-<?php echo $column['field'] ?>');
-      var ue_width = $add_form.width();
-      // jquery-confirm的zindex是8个9，UE要9个9在jquery-confirm上面
-      var ue = UE.getEditor('ue-<?php echo $column['field'] ?>',{initialFrameWidth:ue_width,zIndex:999999999,autoFloatEnabled:false});
-      // 不设置初始值，serialize可能没有这个字段
-      ue.ready(function(){ue.setContent('');});
-<?php   elseif ($column['type'] == 'file'): ?>
-      var fi = $add_form.find(":input[name='<?php echo $column['field'] ?>']").fileinput({'language':'zh',uploadUrl: '<?php echo "<?=site_url('back/{$bean_name}/upload_{$column['field']}')?>" ?>'});
-<?php   elseif ($column['type'] == 'datetime'): ?>
-      $add_form.find(":input[name='<?php echo $column['field'] ?>']").datepicker();
-<?php   elseif ($column['type'] == 'timestamp'): ?>
-      $add_form.find(":input[name='<?php echo $column['field'] ?>']").datepicker();
-<?php   elseif ($column['type'] == 'date'): ?>
-      $add_form.find(":input[name='<?php echo $column['field'] ?>']").datepicker();
-<?php   elseif ($column['type'] == 'time'): ?>
-      $add_form.find(":input[name='<?php echo $column['field'] ?>']").timepicker({'showMeridian':false,'showSeconds':true,'defaultTime':false});
-<?php   elseif ($column['type'] == 'year'): ?>
-      $add_form.find(":input[name='<?php echo $column['field'] ?>']").datepicker();
-<?php   endif ?>
-<?php endforeach ?>
-<?php /*----------/初始化type不是input的字段----------*/?>
-<?php foreach ($bean['join'] as $join_table_name => $join_table): ?>
-<?php   foreach ($join_table['manipulation_col'] as $join_table_mani_col): ?>
-<?php     if ($join_table_mani_col['formtype'] == 'multichoice'): ?>
-    $add_form.find('.js-checkbox-<?php echo $join_table_name?> input').each(function(){
-      var self = $(this),
-          label = self.next(),
-          label_text = label.text();
-        label.remove();
-        self.iCheck({
-          checkboxClass: 'icheckbox_line-green',
-          insert: '<div class="icheck_line-icon"></div>' + label_text
-        });
-      });
-<?php     endif ?>
-<?php   endforeach ?>
-<?php endforeach ?>
-    }
-
+    // 先生成添加模态框
     var add_dialog = $.dialog({
         title: '添加<?php echo $bean['tbl_comment']?>',
         content: function(){
@@ -346,69 +297,168 @@
 <?php endforeach ?>
         }
     });
-  }
-  
-
-  function edit_dialog(data){
-    data = data.replace(/&quot;/g, '"');
-    data = JSON.parse(data);
+    
+    var init_dialog = function($form){
+      $/*.listen*/('parsley:field:validate', function() {
+        validate_form();
+      });
+      $form.find('.btn').on('click', function() {
+        //parsley()和serialize()不能用$form（是div节点）必须用$('#add-form')
+        if ($('#add-form').parsley().validate()) {
+<?php foreach ($bean['col'] as $key => $column): ?>
+<?php   if ($column['type'] == 'file'): ?>
+          $fi_<?php echo $column['field'] ?>.fileinput('upload');
+          window.WAIT_UPLOAD = new Object();
+          window.WAIT_UPLOAD['<?php echo $column['field'] ?>'] = true;
+<?php   endif ?>
+<?php endforeach ?>
+          window.POST_DATA();
+        }
+      });
+<?php /*----------初始化type不是input的字段---------*/?>
+<?php foreach ($bean['col'] as $column): //主表字段?>
+<?php   if ($column['type'] == 'text'): ?>
+      $form.find("script[name='<?php echo $column['field'] ?>']").attr('id','ue-<?php echo $column['field'] ?>');
+      var ue_width = $form.width();
+      // jquery-confirm的zindex是8个9，UE要9个9在jquery-confirm上面
+      // 不在ready设置初始值，serialize可能没有这个字段
+      UE.getEditor('ue-<?php echo $column['field'] ?>',{initialFrameWidth:ue_width,zIndex:999999999,autoFloatEnabled:false});
+<?php   elseif ($column['type'] == 'file'): ?>
+      var $fi_<?php echo $column['field'] ?> = $form.find(":input[name='<?php echo $column['field'] ?>-file']").fileinput().on("fileuploaded", function (event, data, previewId, index) {
+          delete(window.WAIT_UPLOAD['<?php echo $column['field'] ?>']);
+          $form.find(":input[name='<?php echo $column['field'] ?>']").val(data.response.file_path);
+      });
+<?php   elseif ($column['type'] == 'datetime'): ?>
+      $form.find(":input[name='<?php echo $column['field'] ?>']").datepicker();
+<?php   elseif ($column['type'] == 'timestamp'): ?>
+      $form.find(":input[name='<?php echo $column['field'] ?>']").datepicker();
+<?php   elseif ($column['type'] == 'date'): ?>
+      $form.find(":input[name='<?php echo $column['field'] ?>']").datepicker();
+<?php   elseif ($column['type'] == 'time'): ?>
+      $form.find(":input[name='<?php echo $column['field'] ?>']").timepicker({'showMeridian':false,'showSeconds':true,'defaultTime':false});
+<?php   elseif ($column['type'] == 'year'): ?>
+      $form.find(":input[name='<?php echo $column['field'] ?>']").datepicker();
+<?php   endif ?>
+<?php endforeach ?>
+<?php /*----------/初始化type不是input的字段----------*/?>
+<?php foreach ($bean['join'] as $join_table_name => $join_table): ?>
+<?php   foreach ($join_table['manipulation_col'] as $join_table_mani_col): ?>
+<?php     if ($join_table_mani_col['formtype'] == 'multichoice'): ?>
+      $form.find('.js-checkbox-<?php echo $join_table_name?> input').each(function(){
+      var self = $(this),
+          label = self.next(),
+          label_text = label.text();
+        label.remove();
+        self.iCheck({
+          checkboxClass: 'icheckbox_line-green',
+          insert: '<div class="icheck_line-icon"></div>' + label_text
+        });
+      });
+<?php     endif ?>
+<?php   endforeach ?>
+<?php endforeach ?>
+    }
     var validate_form = function() {
-      if (true === $('#edit-form').parsley().isValid()) {
+      if (true === $('#add-form').parsley().isValid()) {
         $('.bs-callout-info').removeClass('hidden');
         $('.bs-callout-warning').addClass('hidden');
       } else {
         $('.bs-callout-info').addClass('hidden');
         $('.bs-callout-warning').removeClass('hidden');
       }
-    };
+    }
+    window.POST_DATA = function(){
+      if (!$.isEmptyObject(window.WAIT_UPLOAD)) {
+        setTimeout(window.POST_DATA,2000);
+      }else{
+        var post_data = $('#add-form').serialize();
+        $.post("<?php echo "<?=site_url('back/{$bean_name}/insert')?>"?>", post_data, function(data){
+          if (data['status'] == true) {
+            DEP_TABLE.ajax.reload( null, false );
+            add_dialog.setContent('添加成功');
+          }else{
+            add_dialog.setContent(data['message']);
+          }
+        });
+      }
+    }
+  }
+  
 
-    var init_dialog = function($edit_form){
+  function edit_dialog(data){
+    data = data.replace(/&quot;/g, '"');
+    data = JSON.parse(data);
+    var edit_dialog = $.dialog({
+      title: '修改<?php echo $bean['tbl_comment']?>',
+      content: function(){
+        return '<form id="edit-form" data-parsley-validate>' + $('#js-edit-form').html() + '</form>';
+      },
+      onContentReady: function(){
+        init_dialog(edit_dialog.$content);
+      },
+      onDestroy: function(){
+<?php foreach ($bean['col'] as $column): ?>
+<?php   if ($column['type'] == 'text'): ?>
+        UE.getEditor('ue-<?php echo $column['field'] ?>').destroy();
+<?php   endif ?>
+<?php endforeach ?>
+      }
+    });
+
+    var init_dialog = function($form){
 <?php foreach ($bean['col'] as $key => $column): //初始化主表默认值?>
-      $edit_form.find(":input[name='<?php echo $column['field']?>']").val(data['<?php echo $column['field']?>']);
+<?php if ($column['type'] == 'text'): ?>
+      $form.find("script[name='<?php echo $column['field'] ?>']").text(data['<?php echo $column['field']?>']);
+<?php else: ?>
+      $form.find(":input[name='<?php echo $column['field']?>']").val(data['<?php echo $column['field']?>']);
+<?php endif ?>
 <?php endforeach ?>
 <?php foreach ($bean['join'] as $join_table_name => $join_table): //初始化连接表默认值?>
 <?php   foreach ($join_table['manipulation_col'] as $join_table_mani_col): ?>
-      $edit_form.find(":input[name='<?php echo $join_table_name."[{$join_table_mani_col['field']}]"?>']").val(data['<?php echo $join_table_mani_col['field'] ?>']);  
+      $form.find(":input[name='<?php echo $join_table_name."[{$join_table_mani_col['field']}]"?>']").val(data['<?php echo $join_table_mani_col['field'] ?>']);  
 <?php   endforeach ?>
 <?php endforeach ?>
-      $edit_form.find(":input[name='<?php echo $bean['id']['field']?>']").val(data['<?php echo $bean['id']['field']?>']);
+      $form.find(":input[name='<?php echo $bean['id']['field']?>']").val(data['<?php echo $bean['id']['field']?>']);
       $/*.listen*/('parsley:field:validate', function() {
         validate_form();
       });
-      $edit_form.find(".btn").on('click', function() {
-        //parsley()和serialize()不能用$edit_form（是div节点）必须用$('#edit-form')
+      $form.find(".btn").on('click', function() {
+        //parsley()和serialize()不能用$form（是div节点）必须用$('#edit-form')
         if ($('#edit-form').parsley().validate()) {
-          var post_data = $('#edit-form').serialize();
-          $.post("<?php echo "<?=site_url('back/{$bean_name}/update')?>"?>", post_data, function(data){
-            if (data['status'] == true) {
-              DEP_TABLE.ajax.reload( null, false );
-              edit_dialog.setContent('修改成功');
-            }else{
-              edit_dialog.setContent(data['message']);
-            }
-          });
+<?php foreach ($bean['col'] as $key => $column): ?>
+<?php   if ($column['type'] == 'file'): ?>
+          $fi_<?php echo $column['field'] ?>.fileinput('upload');
+          window.WAIT_UPLOAD = new Object();
+          window.WAIT_UPLOAD['<?php echo $column['field'] ?>'] = true;
+<?php   endif ?>
+<?php endforeach ?>
+          window.POST_DATA();
         }       
         validate_form();
       });
 <?php /*----------初始化type不是input的字段---------*/?>
 <?php foreach ($bean['col'] as $column): //主表字段?>
 <?php   if ($column['type'] == 'text'): ?>
-      $edit_form.find(":input[name='<?php echo $column['field'] ?>']").attr('id','ue-<?php echo $column['field'] ?>');
-      var ue_width = $edit_form.width();
+      $form.find("script[name='<?php echo $column['field'] ?>']").attr('id','ue-<?php echo $column['field'] ?>');
+      var ue_width = $form.width();
       // jquery-confirm的zindex是8个9，UE要9个9在jquery-confirm上面
-      var ue = UE.getEditor('ue-<?php echo $column['field'] ?>',{initialFrameWidth:ue_width,zIndex:999999999,autoFloatEnabled:false});
+      // 不在ready设置初始值，serialize可能没有这个字段
+      UE.getEditor('ue-<?php echo $column['field'] ?>',{initialFrameWidth:ue_width,zIndex:999999999,autoFloatEnabled:false});
 <?php   elseif ($column['type'] == 'file'): ?>
-      $edit_form.find(":input[name='<?php echo $column['field'] ?>']").fileinput({});
+      var $fi_<?php echo $column['field'] ?> = $form.find(":input[name='<?php echo $column['field'] ?>-file']").fileinput().on("fileuploaded", function (event, data, previewId, index) {
+          delete(window.WAIT_UPLOAD['<?php echo $column['field'] ?>']);
+          $form.find(":input[name='<?php echo $column['field'] ?>']").val(data.response.file_path);
+      });
 <?php   elseif ($column['type'] == 'datetime'): ?>
-      $edit_form.find(":input[name='<?php echo $column['field'] ?>']").datepicker({});
+      $form.find(":input[name='<?php echo $column['field'] ?>']").datepicker();
 <?php   elseif ($column['type'] == 'timestamp'): ?>
-      $edit_form.find(":input[name='<?php echo $column['field'] ?>']").datepicker({});
+      $form.find(":input[name='<?php echo $column['field'] ?>']").datepicker();
 <?php   elseif ($column['type'] == 'date'): ?>
-      $edit_form.find(":input[name='<?php echo $column['field'] ?>']").datepicker({});
+      $form.find(":input[name='<?php echo $column['field'] ?>']").datepicker();
 <?php   elseif ($column['type'] == 'time'): ?>
-      $edit_form.find(":input[name='<?php echo $column['field'] ?>']").datepicker({});
+      $form.find(":input[name='<?php echo $column['field'] ?>']").timepicker({'showMeridian':false,'showSeconds':true,'defaultTime':false});
 <?php   elseif ($column['type'] == 'year'): ?>
-      $edit_form.find(":input[name='<?php echo $column['field'] ?>']").datepicker({});
+      $form.find(":input[name='<?php echo $column['field'] ?>']").datepicker();
 <?php   endif ?>
 <?php endforeach ?>
 <?php /*----------/初始化type不是input的字段----------*/?>
@@ -418,7 +468,7 @@
 <?php   foreach ($join_table['manipulation_col'] as $join_table_mani_col): ?>
 <?php     if ($join_table_mani_col['formtype'] == 'multichoice'): ?>
       var checked_<?php echo $join_table_mani_col['field']?>_array = data['<?php echo $join_table_mani_col['field']?>'].split(',');
-      $edit_form.find('.js-checkbox-<?php echo $join_table_name?> input').each(function(){
+      $form.find('.js-checkbox-<?php echo $join_table_name?> input').each(function(){
         var self = $(this),
             label = self.next(),
             label_text = label.text();
@@ -437,22 +487,30 @@
 <?php /*----------/初始化manipulation_col----------*/?>
     }
 
-    var edit_dialog = $.dialog({
-        title: '修改<?php echo $bean['tbl_comment']?>',
-        content: function(){
-          return '<form id="edit-form" data-parsley-validate>' + $('#js-edit-form').html() + '</form>';
-        },
-        onContentReady: function(){
-          init_dialog(edit_dialog.$content);
-        },
-        onDestroy: function(){
-<?php foreach ($bean['col'] as $column): ?>
-<?php   if ($column['type'] == 'text'): ?>
-          UE.getEditor('ue-<?php echo $column['field'] ?>').destroy();
-<?php   endif ?>
-<?php endforeach ?>
-        }
-    });
+    var validate_form = function() {
+      if (true === $('#edit-form').parsley().isValid()) {
+        $('.bs-callout-info').removeClass('hidden');
+        $('.bs-callout-warning').addClass('hidden');
+      } else {
+        $('.bs-callout-info').addClass('hidden');
+        $('.bs-callout-warning').removeClass('hidden');
+      }
+    }
+    window.POST_DATA = function(){
+      if (!$.isEmptyObject(window.WAIT_UPLOAD)) {
+        setTimeout(window.POST_DATA,2000);
+      }else{
+        var post_data = $('#edit-form').serialize();
+        $.post("<?php echo "<?=site_url('back/{$bean_name}/update')?>"?>", post_data, function(data){
+          if (data['status'] == true) {
+            DEP_TABLE.ajax.reload( null, false );
+            edit_dialog.setContent('修改成功');
+          }else{
+            edit_dialog.setContent(data['message']);
+          }
+        });
+      }
+    }
   }
 
 
@@ -483,7 +541,7 @@
 
 <?php /*----------初始化添加，修改表单（对在表单中选择用的外链表数据初始化）----------*/?>
 <?php if ($bean['join'] != null): ?>
-  function init_add_edit_form(){
+  function init_add_form(){
     $.post("<?php echo "<?=site_url('back/{$bean_name}/get_form_data')?>"?>", {}, function(data,status){
       if (data['status'] == true) {
 <?php   foreach ($bean['join'] as $join_table_name => $join_table): ?>
@@ -512,7 +570,7 @@
   window.onload = function(){
     init_table();
 <?php if ($bean['join'] != null): ?>
-    init_add_edit_form();
+    init_add_form();
 <?php endif ?>
   }
 </script>

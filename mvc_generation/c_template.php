@@ -96,31 +96,39 @@ class <?php echo $controller_name ?> extends MY_Controller {
 <?php endif ?>
 <?php /*----------/为multichoice重写insert，update*/?>
 
-	public function upload_profile(){
-		header("Content-type: application/json");	
-		echo json_encode(array('initialPreviewConfig'=>123));die();
-		$config['upload_path']      = './uploads/';
+<?php foreach ($bean['col'] as $key => $column): ?>
+<?php   if ($column['type'] == 'file'): ?>
+    public function upload_<?php echo $column['field']?>(){
+        // header("Content-type: application/json");
+    	$config['upload_path']      = './uploads/<?php echo $column['file_path'] ?>/'.date("Ym");
         $config['allowed_types']    = 'gif|jpg|png';
         $config['max_size']     = 100;
         $config['max_width']        = 1024;
         $config['max_height']       = 768;
-
+        $config['encrypt_name']     = true;
         $this->load->library('upload', $config);
-
-        if ( ! $this->upload->do_upload('userfile'))
-        {
-            $error = array('error' => $this->upload->display_errors());
-
-            $this->load->view('upload_form', $error);
+        if (!is_dir($config['upload_path'])) {
+            if (!mkdir($config['upload_path'],0777,true)) {
+                echo json_encode(array('error'=>array('创建文件夹失败')));die();
+            }
         }
-        else
+        if (!$this->upload->do_upload('<?php echo $column['field']?>-file'))
         {
-            $data = array('upload_data' => $this->upload->data());
-
-            $this->load->view('upload_success', $data);
+			echo json_encode(array('error'=>array($this->upload->display_errors())));
+            die();
+        }else{
+            $file_path = strstr($config['upload_path'],'uploads').'/'.$this->upload->data()['file_name'];
+            echo json_encode(array('error'=>array(),'file_path'=>$file_path));
+            die();
         }
-		var_dump($_REQUEST);
-		var_dump($_FILES);die();
 	}
+
+	// 更新，删除时删除文件的坑还没做
+	public function delete_<?php echo $column['field']?>_file(){
+
+	}
+<?php   endif ?>
+<?php endforeach ?>
+	
 
 }

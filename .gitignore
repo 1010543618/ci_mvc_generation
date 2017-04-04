@@ -17,6 +17,9 @@
 /mvc_generation/config.json
 /mvc_generation/config_back.json
 
+#uploads
+/uploads
+
 .DS_Store
 
 application/cache/*

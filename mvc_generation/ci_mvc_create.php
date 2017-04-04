@@ -390,8 +390,8 @@ function handle_beans(&$beans){
 			if (!isset($column['validation'])) {
 				$column['validation'] = null;
 			}
-			if ($column['type'] == 'file' && !isset($column['file-path'])) {
-				$column['file-path'] = $bean_name;
+			if ($column['type'] == 'file' && !isset($column['file_path'])) {
+				$column['file_path'] = "$bean_name/{$column['field']}";
 			}
 		}
 		
