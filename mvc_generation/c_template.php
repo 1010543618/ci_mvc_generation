@@ -8,18 +8,22 @@ class <?php echo $controller_name ?> extends MY_Controller {
 		$this->bean = array(
 			'id' => '<?php echo $bean['id']['field'] ?>',
 <?php //生成表单需要的字段
-	$form_fields = "'{$bean['col'][0]['field']}'";
+	$form_fields = array();
+	$files = array();
 	foreach ($bean['col'] as $key => $column) {
-		if ($key == 0) continue;
-		$form_fields = $form_fields . ", '{$column['field']}'";
+		$form_fields[] = "'{$column['field']}'";
+		if ($column['type'] == 'file') {
+			$files[] = "'{$column['field']}'";
+		}
 	}
 	if (isset($bean['join'])) {
 		foreach ($bean['join'] as $key => $join_table) {
-			$form_fields = $form_fields . ", '{$join_table['pri_field']}'";
+			$form_fields[] = "'{$join_table['pri_field']}'";
 		}
 	}
 ?>
-			'form_fields' => array(<?php echo $form_fields ?>)
+			'form_fields' => array(<?php echo implode(', ', $form_fields) ?>),
+			'files' => array(<?php echo implode(', ', $files) ?>)
 			);
 <?php if (isset($bean['join'])): //引入join的表的模型?>
 <?php	foreach ($bean['join'] as $join_table_name => $join_table): ?>

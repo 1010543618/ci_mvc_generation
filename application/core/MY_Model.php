@@ -16,6 +16,7 @@ class MY_Model extends CI_Model {
 	}
 
 	public function countAll(){
+		// count_all：获取记录总数
 		return $this->db->count_all($this->model_table);
 	}
 
@@ -34,8 +35,27 @@ class MY_Model extends CI_Model {
 		return $this->db->delete($this->model_table, $id);
 	}
 
-	public function getAll($field){
+	/**
+	 * 获取全部数据（可以指定字段）
+	 * @Author   zjf
+	 * @DateTime 2017-04-05
+	 * @param    [stirng     $field  查找的字段的字符串]
+	 * @return   array               查找的结果
+	 */
+	public function getAll($field = '*'){
 		return $this->db->select($field)->get($this->model_table)->result_array();
+	}
+
+	/**
+	 * 获取记录通过id和字段名称
+	 * @Author   zjf
+	 * @DateTime 2017-04-05
+	 * @param    string     $id    id条件字符串
+	 * @param    string     $field 查找的字段的字符串
+	 * @return   array             查找的结果
+	 */
+	public function getByIdAndField($id,$field){
+		return $this->db->select($field)->get_where($this->model_table, $id)->row_array();
 	}
 	
 }

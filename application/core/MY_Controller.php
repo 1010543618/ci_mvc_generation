@@ -43,10 +43,19 @@ class MY_Controller extends CI_Controller {
         }
         // 获取id
         $id = array($this->bean['id'] => $this->input->post($this->bean['id'], TRUE));
+        // 若有文件update前将文件位置保存
+        if ($this->bean['files']) {
+            $files = $this->{$this->model_name}->getByIdAndField($id, implode(',', $this->bean['files']));
+        }
+        // 更新数据
         if ($this->{$this->model_name}->update($form_data, $id)) {
             $result['status'] = true;
         }else{
             $result['status'] = false;
+        }
+        // 若有文件update后删除删除原文件
+        foreach ($files as $file) {
+             @unlink('./'.$file);
         }
         $this->returnResult($result);
     }
@@ -55,10 +64,19 @@ class MY_Controller extends CI_Controller {
     {
         // 获取id
         $id = array($this->bean['id'] => $this->input->post($this->bean['id'], TRUE));
+        // 若有文件delete前将文件位置保存
+        if ($this->bean['files']) {
+            $files = $this->{$this->model_name}->getByIdAndField($id, implode(',', $this->bean['files']));
+        }
+        // 删除数据
         if ($this->{$this->model_name}->delete($id)) {
             $result['status'] = true;
         }else{
             $result['status'] = false;
+        }
+        // 若有文件delete后删除删除原文件
+        foreach ($files as $file) {
+             @unlink('./'.$file);
         }
         $this->returnResult($result);
     }

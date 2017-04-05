@@ -447,8 +447,8 @@ function handle_beans(&$beans){
 						if (!isset($join_mani_col['comment']) || !is_string($join_col['comment'])) {
 							return_result('连接表'.$join_table_name.'中的manipulation_col中的comment未设置或不是字符串',false);
 						}
-						if (!isset($join_mani_col['formtype'])) {
-							$join_mani_col['formtype'] = 'select';
+						if (!isset($join_mani_col['type'])) {
+							$join_mani_col['type'] = 'select';
 						}
  						if (!isset($join_mani_col['option_field']) || !is_string($join_mani_col['option_field'])) {
 							return_result('连接表'.$join_table_name.'中的manipulation_col中的option_field未设置或不是字符串',false);
