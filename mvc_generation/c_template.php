@@ -14,6 +14,8 @@ class <?php echo $controller_name ?> extends MY_Controller {
 		$form_fields[] = "'{$column['field']}'";
 		if ($column['type'] == 'file') {
 			$files[] = "'{$column['field']}'";
+		}elseif($column['type'] == 'multichoice'){
+			$multichoice[] = "'{$column['field']}'";
 		}
 	}
 	if (isset($bean['join'])) {
@@ -23,7 +25,8 @@ class <?php echo $controller_name ?> extends MY_Controller {
 	}
 ?>
 			'form_fields' => array(<?php echo implode(', ', $form_fields) ?>),
-			'files' => array(<?php echo implode(', ', $files) ?>)
+			'files' => array(<?php echo implode(', ', $files) ?>),
+			'multichoice' => array(<?php echo implode(', ', $multichoice) ?>),
 			);
 <?php if (isset($bean['join'])): //引入join的表的模型?>
 <?php	foreach ($bean['join'] as $join_table_name => $join_table): ?>
@@ -125,11 +128,6 @@ class <?php echo $controller_name ?> extends MY_Controller {
             echo json_encode(array('error'=>array(),'file_path'=>$file_path));
             die();
         }
-	}
-
-	// 更新，删除时删除文件的坑还没做
-	public function delete_<?php echo $column['field']?>_file(){
-
 	}
 <?php   endif ?>
 <?php endforeach ?>

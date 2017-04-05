@@ -27,7 +27,10 @@ class MY_Controller extends CI_Controller {
         foreach ($this->bean['form_fields'] as $form_field) {
             $form_data[$form_field] = $this->input->post($form_field, TRUE);
         }
-        
+        // 处理mutilchoice字段
+        foreach ($this->bean['multichoice'] as $multichoice) {
+            $form_data[$multichoice] = implode(',', $form_data[$multichoice]);
+        }
         if ($this->{$this->model_name}->insert($form_data)) {
             $result['status'] = true;
         }else{
@@ -43,6 +46,10 @@ class MY_Controller extends CI_Controller {
         }
         // 获取id
         $id = array($this->bean['id'] => $this->input->post($this->bean['id'], TRUE));
+        // 处理mutilchoice字段
+        foreach ($this->bean['multichoice'] as $multichoice) {
+            $form_data[$multichoice] = implode(',', $form_data[$multichoice]);
+        }
         // 若有文件update前将文件位置保存
         if ($this->bean['files']) {
             $files = $this->{$this->model_name}->getByIdAndField($id, implode(',', $this->bean['files']));
@@ -54,8 +61,10 @@ class MY_Controller extends CI_Controller {
             $result['status'] = false;
         }
         // 若有文件update后删除删除原文件
-        foreach ($files as $file) {
-             @unlink('./'.$file);
+        if ($this->bean['files']) {
+            foreach ($files as $file) {
+                 @unlink('./'.$file);
+            }
         }
         $this->returnResult($result);
     }
@@ -75,8 +84,10 @@ class MY_Controller extends CI_Controller {
             $result['status'] = false;
         }
         // 若有文件delete后删除删除原文件
-        foreach ($files as $file) {
-             @unlink('./'.$file);
+        if ($this->bean['files']) {
+            foreach ($files as $file) {
+                 @unlink('./'.$file);
+            }
         }
         $this->returnResult($result);
     }

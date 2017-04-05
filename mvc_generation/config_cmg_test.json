@@ -1,0 +1,150 @@
+{
+	"admin":{
+		"tbl_comment":"管理员",
+		"id":{
+			"field":"admin_id",
+			"comment":"管理员ID"
+		},
+		"col":[{
+			"field":"admin_name",
+			"comment":"管理员名",
+			"type":"input",
+			"validation":"required "
+		},
+		{
+			"field":"role_id",
+			"comment":"角色ID（用“,
+			”分隔）",
+			"type":"input",
+			"validation":""
+		},
+		{
+			"field":"perm_id",
+			"comment":"权限ID（用“,
+			”分隔）",
+			"type":"input",
+			"validation":""
+		}],
+		"join":{
+			"admin_game":{
+			"pri_field":"admin_id",
+			"join_field":"admin_id",
+			"manipulation_col":[{
+				"field":"game_id",
+				"comment":"管理员id",
+				"type":"multichoice",
+				"option_field":
+			}]
+		}}
+	},
+	"admin_game":{
+		"tbl_comment":"管理员_游戏",
+		"col":[{
+			"field":"admin_id",
+			"comment":"管理员ID",
+			"type":"input",
+			"validation":"required "
+		},
+		{
+			"field":"game_id",
+			"comment":"游戏ID",
+			"type":"input",
+			"validation":"required "
+		}]
+	},
+	"game":{
+		"tbl_comment":"游戏",
+		"id":{
+			"field":"game_id",
+			"comment":"游戏ID"
+		},
+		"col":[{
+			"field":"game_name",
+			"comment":"游戏名",
+			"type":"input",
+			"validation":"required "
+		}]
+	},
+	"permission":{
+		"tbl_comment":"权限",
+		"id":{
+			"field":"perm_id",
+			"comment":"权限ID"
+		},
+		"col":[{
+			"field":"controller",
+			"comment":"模块（控制器）",
+			"type":"input",
+			"validation":"required "
+		},
+		{
+			"field":"action",
+			"comment":"功能（方法）",
+			"type":"input",
+			"validation":"required "
+		}]
+	},
+	"role":{
+		"tbl_comment":"角色",
+		"id":{
+			"field":"role_id",
+			"comment":"角色ID"
+		},
+		"col":[{
+			"field":"role_name",
+			"comment":"角色",
+			"type":"input",
+			"validation":"required "
+		},
+		{
+			"field":"perm_id",
+			"comment":"权限ID（用“,
+			”分隔）",
+			"type":"input",
+			"validation":"required "
+		}]
+	},
+	"user":{
+		"tbl_comment":"用户",
+		"id":{
+			"field":"user_id",
+			"comment":"用户id"
+		},
+		"col":[{
+			"field":"user_name",
+			"comment":"用户名",
+			"type":"input",
+			"validation":"required "
+		},
+		{
+			"field":"info",
+			"comment":"用户信息",
+			"type":"text",
+			"validation":"required "
+		},
+		{
+			"field":"profile",
+			"comment":"用户头像",
+			"type":"input",
+			"validation":""
+		},
+		{
+			"field":"birthday",
+			"comment":"用户生日",
+			"type":"date",
+			"validation":"required "
+		},
+		{
+			"field":"get_up_time",
+			"comment":"起床时间",
+			"type":"time",
+			"validation":"required "
+		},
+		{
+			"field":"gift_time",
+			"comment":"收礼物的时间",
+			"type":"timestamp",
+			"validation":"required "
+		}]
+	}
+}

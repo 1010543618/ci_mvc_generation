@@ -58,6 +58,22 @@
 <?php   elseif ($column['type'] === 'file'): ?>
           <input name="<?php echo $column['field'] ?>-file" type="file" data-show-upload="false" data-show-preview="false" data-language="zh" data-upload-async="true" data-upload-url="<?php echo "<?=site_url('back/{$bean_name}/upload_{$column['field']}')?>" ?>" />
           <input name="<?php echo $column['field'] ?>" type="text" style="display: none" />
+<?php   elseif ($column['type'] === 'select' && is_array($column['select_conf'])): ?>
+          <select name="<?php echo $column['field'] ?>" class="form-control">
+<?php     foreach ($column['select_conf'] as $select_option): ?>
+            <option value="<?php echo $select_option?>"><?php echo $select_option?></option>
+<?php     endforeach ?>
+          </select>
+<?php   elseif ($column['type'] === 'multichoice' && is_array($column['multichoice_conf'])): ?>
+          <div class="row js-multichoice-<?php echo $column['field'] ?>">
+<?php     foreach ($column['multichoice_conf'] as $checkbox): ?>
+            <div class="col-md-4"><input name="<?php echo $column['field'] ?>[]" type="checkbox" value="<?php echo $checkbox ?>" /><label><?php echo $checkbox ?></label></div>
+<?php     endforeach ?>
+          </div>
+<?php   elseif ($column['type'] === 'select' && is_string($column['select_conf'])): ?>
+
+<?php   elseif ($column['type'] === 'multichoice' && is_string($column['multichoice_conf'])): ?>
+
 <?php   elseif ($column['type'] === 'datetime'): ?>
           <div class="input-group date">
             <div class="input-group-addon">
@@ -125,6 +141,22 @@
 <?php   elseif ($column['type'] === 'file'): ?>
           <input name="<?php echo $column['field'] ?>-file" type="file" data-show-upload="false" data-show-preview="false" data-language="zh" data-upload-async="true" data-upload-url="<?php echo "<?=site_url('back/{$bean_name}/upload_{$column['field']}')?>" ?>" />
           <input name="<?php echo $column['field'] ?>" type="text" style="display: none" />
+<?php   elseif ($column['type'] === 'select' && is_array($column['select_conf'])): ?>
+          <select name="<?php echo $column['field'] ?>" class="form-control">
+<?php     foreach ($column['select_conf'] as $select_option): ?>
+            <option value="<?php echo $select_option?>"><?php echo $select_option?></option>
+<?php     endforeach ?>
+          </select>
+<?php   elseif ($column['type'] === 'multichoice' && is_array($column['multichoice_conf'])): ?>
+          <div class="row js-multichoice-<?php echo $column['field'] ?>">
+<?php     foreach ($column['multichoice_conf'] as $checkbox): ?>
+            <div class="col-md-4"><input name="<?php echo $column['field'] ?>[]" type="checkbox" value="<?php echo $checkbox ?>" /><label><?php echo $checkbox ?></label></div>
+<?php     endforeach ?>
+          </div>
+<?php   elseif ($column['type'] === 'select' && is_string($column['select_conf'])): ?>
+
+<?php   elseif ($column['type'] === 'multichoice' && is_string($column['multichoice_conf'])): ?>
+
 <?php   elseif ($column['type'] === 'datetime'): ?>
           <div class="input-group date">
             <div class="input-group-addon">
@@ -309,7 +341,7 @@
 <?php   if ($column['type'] == 'file'): ?>
           $fi_<?php echo $column['field'] ?>.fileinput('upload');
           window.WAIT_UPLOAD = new Object();
-          window.WAIT_UPLOAD['<?php echo $column['field'] ?>'] = true;
+          window.WAIT_UPLOAD['<?php echo $column['field'] ?>'] = true;      
 <?php   endif ?>
 <?php endforeach ?>
           window.POST_DATA();
@@ -328,6 +360,17 @@
           delete(window.WAIT_UPLOAD['<?php echo $column['field'] ?>']);
           $form.find(":input[name='<?php echo $column['field'] ?>']").val(data.response.file_path);
       });
+<?php   elseif ($column['type'] == 'multichoice'): ?>
+      $form.find(".js-multichoice-<?php echo $column['field'] ?> input").each(function(){
+        var self = $(this),
+          label = self.next(),
+          label_text = label.text();
+        label.remove();
+        self.iCheck({
+          checkboxClass: 'icheckbox_line-green',
+          insert: '<div class="icheck_line-icon"></div>' + label_text
+        });
+      });
 <?php   elseif ($column['type'] == 'datetime'): ?>
       $form.find(":input[name='<?php echo $column['field'] ?>']").datepicker();
 <?php   elseif ($column['type'] == 'timestamp'): ?>
@@ -345,7 +388,7 @@
 <?php   foreach ($join_table['manipulation_col'] as $join_table_mani_col): ?>
 <?php     if ($join_table_mani_col['formtype'] == 'multichoice'): ?>
       $form.find('.js-checkbox-<?php echo $join_table_name?> input').each(function(){
-      var self = $(this),
+        var self = $(this),
           label = self.next(),
           label_text = label.text();
         label.remove();
@@ -409,6 +452,14 @@
 <?php foreach ($bean['col'] as $key => $column): //初始化主表默认值?>
 <?php if ($column['type'] == 'text'): ?>
       $form.find("script[name='<?php echo $column['field'] ?>']").text(data['<?php echo $column['field']?>']);
+<?php elseif ($column['type'] == 'select'): ?>
+      $form.find("select[name='<?php echo $column['field']?>'] option[value='"+data['<?php echo $column['field']?>']+"']").prop('selected',true);
+<?php elseif ($column['type'] == 'multichoice'): ?>
+      if(data['<?php echo $column['field']?>']){
+        $(data['<?php echo $column['field']?>'].split(',')).each(function(){
+          $form.find(".js-multichoice-<?php echo $column['field'] ?> :input[value='"+this+"']").prop('checked',true);
+        });
+      }
 <?php else: ?>
       $form.find(":input[name='<?php echo $column['field']?>']").val(data['<?php echo $column['field']?>']);
 <?php endif ?>
@@ -448,6 +499,17 @@
       var $fi_<?php echo $column['field'] ?> = $form.find(":input[name='<?php echo $column['field'] ?>-file']").fileinput().on("fileuploaded", function (event, data, previewId, index) {
           delete(window.WAIT_UPLOAD['<?php echo $column['field'] ?>']);
           $form.find(":input[name='<?php echo $column['field'] ?>']").val(data.response.file_path);
+      });
+<?php   elseif ($column['type'] == 'multichoice'): ?>
+      $form.find(".js-multichoice-<?php echo $column['field'] ?> input").each(function(){
+        var self = $(this),
+          label = self.next(),
+          label_text = label.text();
+        label.remove();
+        self.iCheck({
+          checkboxClass: 'icheckbox_line-green',
+          insert: '<div class="icheck_line-icon"></div>' + label_text
+        });
       });
 <?php   elseif ($column['type'] == 'datetime'): ?>
       $form.find(":input[name='<?php echo $column['field'] ?>']").datepicker();

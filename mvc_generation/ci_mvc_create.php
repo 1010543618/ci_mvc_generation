@@ -39,7 +39,6 @@ if ($_GET) {
 			// 将tables_bean输出到config
 			if (!file_put_contents('./config.json', $tables_bean))
 				return_result('创建配置文件失败', true);
-
 			return_result($tables_bean, true);
 			break;
 
@@ -142,6 +141,7 @@ function output_mvc_file($config){
 function create_tables_bean($config){
 	// 1。获取tables数组并处理成规定格式
 	$tables_source = get_tables_info($config);
+	// var_dump($tables_source);die();
 	$tables = array();
 	foreach ($tables_source as $table_name => $table_source) {
 		$tables[$table_name] = array();
@@ -149,13 +149,18 @@ function create_tables_bean($config){
 		// 当前表是否有主键
 		$has_key = false;
 		foreach ($table_source['col'] as $column) {
+			$col = array();
 			if ($column['key'] == "PRI") {
 				// 主键
 				if ($has_key == true) {
-					return_result("配置文件中不能有两个主键",false);
+					// 是否为null
+					$col['field'] = $column['field'];
+					$col['comment'] = $column['comment'];
+					$tables[$table_name]['col'][] = $col;
+				}else{
+					$tables[$table_name]['id']['field'] = $column['field'];
+					$tables[$table_name]['id']['comment'] = $column['comment'];
 				}
-				$tables[$table_name]['id']['field'] = $column['field'];
-				$tables[$table_name]['id']['comment'] = $column['comment'];
 				$has_key = true;
 			}else {
 				// 普通字段
@@ -170,7 +175,6 @@ function create_tables_bean($config){
 				}else{
 					$type = $column['type'];
 				}
-				
 				switch ($type) {
 					//数字
 					case 'int':
@@ -186,6 +190,15 @@ function create_tables_bean($config){
 					case 'text':
 						$col['type'] = 'text';
 						$col['validation'] = 'maxlength="'.$type_bracket.'" ';
+						break;
+					// enum和set
+					case 'enum':
+						$col['type'] = 'select';
+						$col['select_conf'] = explode(',', str_replace("'", '', $type_bracket));
+						break;
+					case 'set':
+						$col['type'] = 'multichoice';
+						$col['multichoice_conf'] = explode(',', str_replace("'", '', $type_bracket));
 						break;
 					//日期和时间
 					case 'datetime':
@@ -393,6 +406,12 @@ function handle_beans(&$beans){
 			if ($column['type'] == 'file' && !isset($column['file_path'])) {
 				$column['file_path'] = "$bean_name/{$column['field']}";
 			}
+			if ($column['type'] == 'select' && !isset($column['select_conf'])) {
+				$column['select_conf'] = "[]";
+			}
+			if ($column['type'] == 'multichoice' && !isset($column['multichoice_conf'])) {
+				$column['multichoice_conf'] = "[]";
+			}
 		}
 		
 		//join
@@ -475,7 +494,7 @@ function return_result($info, $status){
 	$result = array();
 	$result['info'] = $info;
 	$result['status'] = $status;
-	// header("Content-type: application/json");
+	header("Content-type: application/json");
 	echo json_encode($result);
 	die();
 }
