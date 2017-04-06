@@ -49,6 +49,7 @@
         <!-- add -->
         <form id="js-add-form" data-parsley-validate style="display: none">
 <?php /*----------生成添加表单----------*/?>
+<?php $init_form_s_m_col = array() //需要初始化select和mutichoice时保存数据用?>
 <?php foreach ($bean['col'] as $column): //主表字段?>
           <label><?php echo $column['comment']?></label>
 <?php   if ($column['type'] === 'input'): ?>
@@ -71,9 +72,13 @@
 <?php     endforeach ?>
           </div>
 <?php   elseif ($column['type'] === 'select' && is_string($column['select_conf'])): ?>
-
+<?php     $init_form_s_m_col[] = $column?>
+          <select name="<?php echo $column['field'] ?>" class="form-control">
+          </select>
 <?php   elseif ($column['type'] === 'multichoice' && is_string($column['multichoice_conf'])): ?>
-
+<?php     $init_form_s_m_col[] = $column?>
+          <div class="row js-multichoice-<?php echo $column['field'] ?>">
+          </div>
 <?php   elseif ($column['type'] === 'datetime'): ?>
           <div class="input-group date">
             <div class="input-group-addon">
@@ -601,38 +606,38 @@
     });
   }
 
-<?php /*----------初始化添加，修改表单（对在表单中选择用的外链表数据初始化）----------*/?>
-<?php if ($bean['join'] != null): ?>
-  function init_add_form(){
+<?php /*----------初始化添加，修改的select和mutichoice（使用其他表字段作为select和mutichoice值）----------*/?>
+<?php if ($init_form_s_m_col): ?>
+  function init_form_s_m(){
     $.post("<?php echo "<?=site_url('back/{$bean_name}/get_form_data')?>"?>", {}, function(data,status){
       if (data['status'] == true) {
-<?php   foreach ($bean['join'] as $join_table_name => $join_table): ?>
-<?php     foreach ($join_table['manipulation_col'] as $join_table_mani_col): ?>
-<?php       if ($join_table_mani_col['formtype'] == 'multichoice'): ?>
-          var $<?php echo $join_table_name?> = $('.js-checkbox-<?php echo $join_table_name?>');
-          $(data.<?php echo $join_table_name?>).each(function(){
-            var checkbox_str = '<div class="col-md-4"><input name="<?php echo $join_table['pri_field'] ?>[]" type="checkbox" value="'+this.<?php echo $join_table['join_field'] ?>+'" />'+'<label>'+this.<?php echo $join_table['join_show_field'] ?>+'</label></div>';
-            $<?php echo $join_table_name?>.append(checkbox_str);
+<?php   foreach ($init_form_s_m_col as $column): ?>
+<?php     if ($column['type'] == 'select'): ?>
+<?php     $table_col_s = explode('-', $column['select_conf'])?>
+          var $<?php echo $column['field'] ?> = $("#js-add-form select[name='<?php echo $column['field'] ?>']");
+          $(data.<?php echo $table_col_s[0] ?>).each(function(){
+            var option_str = '<option value="'+this.<?php echo $table_col_s[1] ?>+'">'+this.<?php echo $table_col_s[1] ?>+'</option>'
+            $<?php echo $column['field'] ?>.append(option_str);
           });
-<?php       else: ?>
-          var $<?php echo $join_table_name?> = $('.js-select-<?php echo $join_table_name?>');
-          $(data.<?php echo $join_table_name ?>).each(function(){
-            var option_str = '<option value="'+this.<?php echo $join_table['join_field'] ?>+'">'+this.<?php echo $join_table_mani_col['option_field'] ?>+'</option>'
-            $<?php echo $join_table_name?>.append(option_str);
+<?php     elseif ($column['type'] == 'multichoice'): ?>
+<?php     $table_col_m = explode('-', $column['multichoice_conf'])?>
+          var $<?php echo $column['field'] ?> = $("#js-add-form .js-multichoice-<?php echo $column['field'] ?>");
+          $(data.<?php echo $table_col_m[0] ?>).each(function(){
+            var checkbox_str = '<div class="col-md-4"><input name="<?php echo $column['field'] ?>[]" type="checkbox" value="'+this.<?php echo $table_col_m[1] ?>+'" />'+'<label>'+this.<?php echo $table_col_m[1] ?>+'</label></div>';
+            $<?php echo $column['field'] ?>.append(checkbox_str);
           });
-<?php       endif ?> 
-<?php     endforeach ?>      
+<?php     endif ?>
 <?php   endforeach ?>
       }
     });
   }
 <?php endif ?>
-<?php /*----------/初始化添加，修改表单（对在表单中选择用的外链表数据初始化）----------*/?>
+<?php /*----------/初始化添加，修改的select和mutichoice（使用其他表字段作为select和mutichoice值）----------*/?>
 
   window.onload = function(){
     init_table();
-<?php if ($bean['join'] != null): ?>
-    init_add_form();
+<?php if ($init_form_s_m_col): ?>
+    init_form_s_m();
 <?php endif ?>
   }
 </script>

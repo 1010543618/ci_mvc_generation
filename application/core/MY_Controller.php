@@ -69,6 +69,14 @@ class MY_Controller extends CI_Controller {
         $this->returnResult($result);
     }
 
+    public function get_form_data(){
+        foreach ($this->bean['tablecolumn_s_m'] as $table_name => $table_col) {
+            $result[$table_name] = $this->{$table_name.'_model'}->getAll($table_col);
+        }
+        $result['status'] = true;
+        $this->returnResult($result);
+    }
+
     public function delete()
     {
         // 获取id

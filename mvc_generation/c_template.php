@@ -10,12 +10,26 @@ class <?php echo $controller_name ?> extends MY_Controller {
 <?php //生成表单需要的字段
 	$form_fields = array();
 	$files = array();
+	$multichoice = array();
+	$tablecolumn_s_m = array();
+	// 在加载模型时找表用的数组
+	$table_s_m = array();
 	foreach ($bean['col'] as $key => $column) {
 		$form_fields[] = "'{$column['field']}'";
 		if ($column['type'] == 'file') {
 			$files[] = "'{$column['field']}'";
 		}elseif($column['type'] == 'multichoice'){
 			$multichoice[] = "'{$column['field']}'";
+		}
+
+		if ($column['type'] == 'select' && is_string($column['select_conf'])) {
+			$table_col_conf = explode('-', $column['select_conf']);
+			$table_s_m[] = $table_col_conf[0];
+			$tablecolumn_s_m[] = "'{$table_col_conf[0]}' => '{$table_col_conf[1]}'";
+		}elseif($column['type'] == 'multichoice' && is_string($column['multichoice_conf'])){
+			$table_col_conf = explode('-', $column['multichoice_conf']);
+			$table_s_m[] = $table_col_conf[0];
+			$tablecolumn_s_m[] = "'{$table_col_conf[0]}' => '{$table_col_conf[1]}'";
 		}
 	}
 	if (isset($bean['join'])) {
@@ -27,7 +41,11 @@ class <?php echo $controller_name ?> extends MY_Controller {
 			'form_fields' => array(<?php echo implode(', ', $form_fields) ?>),
 			'files' => array(<?php echo implode(', ', $files) ?>),
 			'multichoice' => array(<?php echo implode(', ', $multichoice) ?>),
+			'tablecolumn_s_m' => array(<?php echo implode(', ', $tablecolumn_s_m) ?>)
 			);
+<?php foreach ($table_s_m as $table_s_m_name): //为获取select或multichoice的值加载模型?>
+		$this->load->model('<?php echo $table_s_m_name.'_model' ?>');
+<?php endforeach ?>
 <?php if (isset($bean['join'])): //引入join的表的模型?>
 <?php	foreach ($bean['join'] as $join_table_name => $join_table): ?>
 		$this->load->model('<?php echo $join_table_name.'_model' ?>');
@@ -39,20 +57,36 @@ class <?php echo $controller_name ?> extends MY_Controller {
 	{
 		$this->loadViewhf('<?php echo "back/{$bean_name}.html" ?>');
 	}
-
-<?php if ($bean['join'] != null): //为add，edie表单查找外链接的表的数据?>
-	public function get_form_data(){
-<?php 	foreach ($bean['join'] as $join_table_name => $join_table): ?>
-<?php 		foreach ($join_table['col'] as $join_table_col): ?>
-		$field = array('<?php echo $join_table_col['field'] ?>');
-		$result['<?php echo $join_table_name ?>'] = $this-><?php echo $join_table_name.'_model' ?>->getAll($field);
-<?php 		endforeach ?>
-<?php 	endforeach ?>
-		$result['status'] = true;
-		$this->returnResult($result);
+<?php /*----------col的type=file上传文件处理----------*/?>
+<?php foreach ($bean['col'] as $key => $column): ?>
+<?php   if ($column['type'] == 'file'): ?>
+    public function upload_<?php echo $column['field']?>(){
+        // header("Content-type: application/json");
+    	$config['upload_path']      = './uploads/<?php echo $column['file_path'] ?>/'.date("Ym");
+        $config['allowed_types']    = 'gif|jpg|png';
+        $config['max_size']     = 100;
+        $config['max_width']        = 1024;
+        $config['max_height']       = 768;
+        $config['encrypt_name']     = true;
+        $this->load->library('upload', $config);
+        if (!is_dir($config['upload_path'])) {
+            if (!mkdir($config['upload_path'],0777,true)) {
+                echo json_encode(array('error'=>array('创建文件夹失败')));die();
+            }
+        }
+        if (!$this->upload->do_upload('<?php echo $column['field']?>-file'))
+        {
+			echo json_encode(array('error'=>array($this->upload->display_errors())));
+            die();
+        }else{
+            $file_path = strstr($config['upload_path'],'uploads').'/'.$this->upload->data()['file_name'];
+            echo json_encode(array('error'=>array(),'file_path'=>$file_path));
+            die();
+        }
 	}
-<?php endif ?>
-
+<?php   endif ?>
+<?php endforeach ?>
+<?php /*----------/col的type=file上传文件处理----------*/?>
 <?php /*----------为multichoice重写insert，update*/?>
 <?php
 	$multichoice = null;
@@ -103,34 +137,17 @@ class <?php echo $controller_name ?> extends MY_Controller {
 <?php endif ?>
 <?php /*----------/为multichoice重写insert，update*/?>
 
-<?php foreach ($bean['col'] as $key => $column): ?>
-<?php   if ($column['type'] == 'file'): ?>
-    public function upload_<?php echo $column['field']?>(){
-        // header("Content-type: application/json");
-    	$config['upload_path']      = './uploads/<?php echo $column['file_path'] ?>/'.date("Ym");
-        $config['allowed_types']    = 'gif|jpg|png';
-        $config['max_size']     = 100;
-        $config['max_width']        = 1024;
-        $config['max_height']       = 768;
-        $config['encrypt_name']     = true;
-        $this->load->library('upload', $config);
-        if (!is_dir($config['upload_path'])) {
-            if (!mkdir($config['upload_path'],0777,true)) {
-                echo json_encode(array('error'=>array('创建文件夹失败')));die();
-            }
-        }
-        if (!$this->upload->do_upload('<?php echo $column['field']?>-file'))
-        {
-			echo json_encode(array('error'=>array($this->upload->display_errors())));
-            die();
-        }else{
-            $file_path = strstr($config['upload_path'],'uploads').'/'.$this->upload->data()['file_name'];
-            echo json_encode(array('error'=>array(),'file_path'=>$file_path));
-            die();
-        }
+<?php if ($bean['join'] != null): //为add，edie表单查找外链接的表的数据?>
+	public function get_form_data(){
+<?php 	foreach ($bean['join'] as $join_table_name => $join_table): ?>
+<?php 		foreach ($join_table['col'] as $join_table_col): ?>
+		$field = array('<?php echo $join_table_col['field'] ?>');
+		$result['<?php echo $join_table_name ?>'] = $this-><?php echo $join_table_name.'_model' ?>->getAll($field);
+<?php 		endforeach ?>
+<?php 	endforeach ?>
+		$result['status'] = true;
+		$this->returnResult($result);
 	}
-<?php   endif ?>
-<?php endforeach ?>
-	
+<?php endif ?>
 
 }
