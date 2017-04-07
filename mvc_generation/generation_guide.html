@@ -34,7 +34,8 @@
     <div class="container body">
         <!-- page content -->
         <div class="row">
-          <div class="col-md-12 col-sm-12 col-xs-12 padding-0">
+          <!-- 自动生成向导 -->
+          <div id="generation-wizard" class="col-md-12 col-sm-12 col-xs-12 padding-0">
             <div class="x_panel">
               <div class="x_title">
                 <h2>自动生成向导<small>CI+Gentelella,写了一半的坑</small></h2>
@@ -42,6 +43,7 @@
               </div>
               <div class="x_content">
                 <p>根据自己的环境进行配置.</p>
+                <!-- SmartWizard Content -->
                 <div id="wizard" class="form_wizard wizard_horizontal">
                   <ul class="wizard_steps">
                     <li>
@@ -163,9 +165,10 @@
                       <input name="step" type="text" value="2" style="display: none;">
                     </form>
                   </div>
-                  <form id="step-3-4-form" action="" class="form-horizontal form-label-left">
-                    <div id="step-3">
-                      <h2 class="StepTitle text-center">选择生成位置</h2>
+                  <!--  -->
+                  <div id="step-3">
+                    <h2 class="StepTitle text-center">选择生成位置</h2>
+                    <form id="step-3-form" action="" class="form-horizontal form-label-left">
                       <div class="form-group">
                         <label class="control-label col-md-3 col-sm-3 col-xs-12" for="first-name">model文件夹<span class="required">*</span>
                         </label>
@@ -204,11 +207,13 @@
                         <label class="col-md-3 col-sm-3 col-xs-12 text-left text-danger" for="last-name">*会替换掉文件夹中的同名文件</label>
                       </div>
                       <input name="step" type="text" value="3_4" style="display: none;">
-                    </div>
-                    <div id="step-4">
-                      <div class="col-md-offset-2 col-md-8">
-                        <h2 class="StepTitle text-center">修改配置文件</h2>
-                        <div class="col-md-6">
+                    </form>
+                  </div>
+                  <div id="step-4">
+                    <div class="col-md-offset-2 col-md-8">
+                      <h2 class="StepTitle text-center">修改配置文件</h2>
+                      <div class="col-md-6">
+                        <form id="step-4-form" action="" class="form-horizontal form-label-left">
                           <div class="checkbox">
                             <input name="is_save_config" type="checkbox" value="true" checked="checked" id="is-save-generation-config">
                             <label>
@@ -216,90 +221,93 @@
                             </label>
                           </div>
                           <textarea name="generation_config" id="config-textarea"></textarea>
-                        </div>
-                        <div class="col-md-6">
-                          <ul>
-                            <li>
-                              <h1>【表名】(<*>map):</h1>
-                              <ul>
-                                <li>
-                                  <h2>tbl_comment(<*>string):【表显示的名字】,</h2>
-                                </li>
-                                <li>
-                                  <h2>id(<*>map，表主键（删除修改时用，默认自增长添加时不会显示）):</h2>
-                                  <ul>
-                                    <li>field(<*>string):【id的字段名】,</li>
-                                    <li>comment(<*>string):【id显示的名字】,</li>
-                                  </ul>
-                                </li>
-                                <li>
-                                  <h2>col(list，表需要的列（添加查询用）):</h2>
-                                  <ul>
-                                    <li>
-                                      <h3>(map，需要的每一列):</h3>
-                                      <ul>
-                                        <li>field(<*>string):【列的字段名】,</li>
-                                        <li>comment(<*>string):【列显示的名字】,</li>
-                                        <li>validation(string):【列的验证规则（parsley.js验证规则）】,</li>
-                                        <li>type(string):【列的类型input(默认)/text/file/select/multichoice/datetime/timestamp/date/time/year】（input使用文本框，text将使用富文本编辑器，file将保存图片的位置，select将使用select，multichoice将使用checkbox，datetime/timestamp/date/time/year将使用不同配置的日期或时间选择器）,</li>
-                                        <li>file_path(string):【文件保存的路径，type为file时可设置】（不设置将保存到“跟目录/upload/当前表名/当前字段名”文件夹),</li>
-                                        <li>select_conf(array/string):【select的选项，type为select时可设置，array会自定义选项，string将其他表的字段作为选项（用于多对一）】（默认是空数组([])，字符串格式：“表名-字段名”）,</li>
-                                        <li>multichoice_conf(array/string):【checkbox的选项，type为multichoice时可设置，array会自定义选项，string将其他表的字段作为选项（用于多对多）】（默认是空数组([])，字符串格式：“表名-字段名”),</li>
-                                      </ul>
-                                    </li>
-                                  </ul>
-                                </li>
-                                <li>
-                                  <h2>join(map，外连接的表):</h2>
-                                  <ul>
-                                    <li>
-                                      <h3>【表名】(map):</h3>
-                                      <ul>
-                                        <li>pri_field(<*>string):【左表字段名称（默认是主表的字段，如果是其他表的字段要使用表名.字段名）】,</li>
-                                        <li>join_field(<*>string):【右表字段名称】,</li>
-                                        <li>
-                                          <h4>col(list，连接表要查询的列):</h4>
-                                          <ul>
-                                            <li>
-                                              <h5>(map，连接表要查询的每一列):</h5>
-                                              <ul>
-                                                <li>field(<*>string):【列的字段名】,</li>
-                                                <li>comment(<*>string):【列显示的名字】,</li>
-                                                <li>is_group_concat(string):【false（默认）/true是否将该字段合并（一对多，多对多设置为true时将多个结果合并）】,</li>
-                                              </ul>
-                                            </li>
-                                          </ul>
-                                        </li>
-                                        <li>
-                                          <h4>manipulation_col(list，连接要操作的列):</h4>
-                                          <ul>
-                                            <li>
-                                              <h5>(map，连接的每一列):</h5>
-                                              <ul>
-                                                <li>field(<*>string):【列的字段名】,</li>
-                                                <li>comment(<*>string):【列显示的名字】,</li>
-                                                <li>type(string):【表单中选择的形式，select（默认）/multichoice/input（select将使用select单选，multichoice使用checkbox复选）】,</li>
-                                                <li>option_field(string):【formtype为select或multichoice时显示的选项内容字段（默认是当前表的字段，如果是其他表的字段要使用表名.字段名）】,</li>
-                                              </ul>
-                                            </li>
-                                          </ul>
-                                        </li>
-                                      </ul>
-                                    </li>
-                                  </ul>
-                                </li>
-                              </ul>
-                            </li>
-                          </ul>
-                        </div>
+                        </form>
                       </div>
                     </div>
-                  </form>
+                  </div>
                 </div>
-                <!-- End SmartWizard Content -->
+                <!-- /SmartWizard Content -->
               </div>
             </div>
           </div>
+          <!-- /自动生成向导 -->
+          <!-- 配置手册 -->
+          <div id="generation-manuals" class="col-md-12 col-sm-12 col-xs-12 padding-0">
+            <ul>
+              <li>
+                <h1>【表名】(<*>map):</h1>
+                <ul>
+                  <li>
+                    <h2>tbl_comment(<*>string):【表显示的名字】,</h2>
+                  </li>
+                  <li>
+                    <h2>id(<*>map，表主键（删除修改时用，默认自增长添加时不会显示）):</h2>
+                    <ul>
+                      <li>field(<*>string):【id的字段名】,</li>
+                      <li>comment(<*>string):【id显示的名字】,</li>
+                    </ul>
+                  </li>
+                  <li>
+                    <h2>col(list，表需要的列（添加查询用）):</h2>
+                    <ul>
+                      <li>
+                        <h3>(map，需要的每一列):</h3>
+                        <ul>
+                          <li>field(<*>string):【列的字段名】,</li>
+                          <li>comment(<*>string):【列显示的名字】,</li>
+                          <li>validation(string):【列的验证规则（parsley.js验证规则）】,</li>
+                          <li>type(string):【列的类型input(默认)/text/file/select/multichoice/datetime/timestamp/date/time/year】（input使用文本框，text将使用富文本编辑器，file将保存图片的位置，select将使用select，multichoice将使用checkbox，datetime/timestamp/date/time/year将使用不同配置的日期或时间选择器）,</li>
+                          <li>file_path(string):【文件保存的路径，type为file时可设置】（不设置将保存到“跟目录/upload/当前表名/当前字段名”文件夹),</li>
+                          <li>select_conf(array/string):【select的选项，type为select时可设置，array会自定义选项，string将其他表的字段作为选项（用于多对一）】（默认是空数组([])，字符串格式：“表名-字段名”）,</li>
+                          <li>multichoice_conf(array/string):【checkbox的选项，type为multichoice时可设置，array会自定义选项，string将其他表的字段作为选项（用于多对多）】（默认是空数组([])，字符串格式：“表名-字段名”),</li>
+                        </ul>
+                      </li>
+                    </ul>
+                  </li>
+                  <li>
+                    <h2>join(map，外连接的表):</h2>
+                    <ul>
+                      <li>
+                        <h3>【表名】(map):</h3>
+                        <ul>
+                          <li>pri_field(<*>string):【左表字段名称（默认是主表的字段，如果是其他表的字段要使用表名.字段名）】,</li>
+                          <li>join_field(<*>string):【右表字段名称】,</li>
+                          <li>
+                            <h4>col(list，连接表要查询的列):</h4>
+                            <ul>
+                              <li>
+                                <h5>(map，连接表要查询的每一列):</h5>
+                                <ul>
+                                  <li>field(<*>string):【列的字段名】,</li>
+                                  <li>comment(<*>string):【列显示的名字】,</li>
+                                  <li>is_group_concat(string):【false（默认）/true是否将该字段合并（一对多，多对多设置为true时将多个结果合并）】,</li>
+                                </ul>
+                              </li>
+                            </ul>
+                          </li>
+                          <li>
+                            <h4>manipulation_col(list，连接要操作的列):</h4>
+                            <ul>
+                              <li>
+                                <h5>(map，连接的每一列):</h5>
+                                <ul>
+                                  <li>field(<*>string):【列的字段名】,</li>
+                                  <li>comment(<*>string):【列显示的名字】,</li>
+                                  <li>type(string):【表单中选择的形式，select（默认）/multichoice/input（select将使用select单选，multichoice使用checkbox复选）】,</li>
+                                  <li>option_field(string):【formtype为select或multichoice时显示的选项内容字段（默认是当前表的字段，如果是其他表的字段要使用表名.字段名）】,</li>
+                                </ul>
+                              </li>
+                            </ul>
+                          </li>
+                        </ul>
+                      </li>
+                    </ul>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          </div>
+          <!-- /配置手册 -->
         </div>
         <!-- /page content -->
     </div>
@@ -316,23 +324,61 @@
 
     <script src="http://cdn.bootcss.com/iCheck/1.0.2/icheck.min.js"></script>
     <script>
+      function init_window() {
+        $("#generation-wizard").css("minHeight",$(window).height());
+        $(window).resize(function(){
+          $("#generation-wizard").css("minHeight",$(window).height());
+        });
+      }
       function init_SmartWizard() {
         if( typeof ($.fn.smartWizard) === 'undefined'){ return; }
-        console.log('init_SmartWizard');
+        // 先初始化表单        
         $('#wizard').smartWizard({
           labelNext: '下一步',
           labelPrevious: '上一步',
           labelFinish: '完成',
-          onLeaveStep: leaveStep,
+          onLeaveStep: wizard_leaveStep,
+          keyNavigation: false,
+          onShowStep : wizard_showStep
         });
         $('.buttonNext').addClass('btn btn-success');
         $('.buttonPrevious').addClass('btn btn-primary');
         $('.buttonFinish').addClass('btn btn-default');
       };
-      init_SmartWizard();
+      
+      function init_iCheck() {
+        // 第二步的select-all-tables
+        $('#select-all-tables').each(function(){
+          var self = $(this),
+              label = self.next(),
+              label_text = label.text();
+          label.remove();
+          self.iCheck({
+            checkboxClass: 'icheckbox_line-green',
+            insert: '<div class="icheck_line-icon"></div>' + label_text
+          }).on('ifChecked', function(){
+            $('#tables-checkbox .icheckbox_line-green').addClass('checked');
+            $('#tables-checkbox input').prop('checked', true);
+          }).on('ifUnchecked', function(){
+            $('#tables-checkbox .icheckbox_line-green').removeClass('checked');
+            $('#tables-checkbox input').prop('checked', false)
+          });
+        });
+        // 第三步的is-save-generation-config
+        $('#is-save-generation-config').each(function(){
+          var self = $(this),
+              label = self.next(),
+              label_text = label.text();
+          label.remove();
+          self.iCheck({
+            checkboxClass: 'icheckbox_line-green',
+            insert: '<div class="icheck_line-icon"></div>' + label_text
+          });
+        });
+      }
 
-      function leaveStep(obj, context){
-        console.log(obj, context);
+      function wizard_leaveStep(obj, context){
+        // console.log(obj, context);
         // 点击上一步
         if (context.fromStep > context.toStep) {
           return true;
@@ -369,7 +415,6 @@
                       });
                     });
                   }
-                  
                   $("#step-2-form [name='host']").val($("#step-1-form [name='host']").val());
                   $("#step-2-form [name='user']").val($("#step-1-form [name='user']").val());
                   $("#step-2-form [name='pwd']").val($("#step-1-form [name='pwd']").val());
@@ -424,11 +469,13 @@
             });
             break;
           case '4':
+            var data_obj = $('#step-3-form').serializeArray();
+            data_obj = $.merge(data_obj, $("#step-4-form").serializeArray());
             $.ajax({
               'type': 'GET',
               'async': false,
               'dataType': 'json',
-              'data': $('#step-3-4-form').serialize(),
+              'data': data_obj,
               'url': './ci_mvc_create.php'
             }).done(
               function(data,status){
@@ -448,36 +495,16 @@
         return isStepValid;
       }
 
-      function init_iCheck() {
-        // 第二步的select-all-tables
-        $('#select-all-tables').each(function(){
-          var self = $(this),
-              label = self.next(),
-              label_text = label.text();
-          label.remove();
-          self.iCheck({
-            checkboxClass: 'icheckbox_line-green',
-            insert: '<div class="icheck_line-icon"></div>' + label_text
-          }).on('ifChecked', function(){
-            $('#tables-checkbox .icheckbox_line-green').addClass('checked');
-            $('#tables-checkbox input').prop('checked', true);
-          }).on('ifUnchecked', function(){
-            $('#tables-checkbox .icheckbox_line-green').removeClass('checked');
-            $('#tables-checkbox input').prop('checked', false)
-          });
-        });
-        // 第三步的is-save-generation-config
-        $('#is-save-generation-config').each(function(){
-          var self = $(this),
-              label = self.next(),
-              label_text = label.text();
-          label.remove();
-          self.iCheck({
-            checkboxClass: 'icheckbox_line-green',
-            insert: '<div class="icheck_line-icon"></div>' + label_text
-          });
-        });
+      function wizard_showStep(obj, context){
+        var wizard_stepContainer_height = $(window).height() - $('#wizard .stepContainer').offset().top - 70
+        $('#wizard .stepContainer').height(wizard_stepContainer_height);
+        // 第四步文本框高度动态定义
+        if (obj[0].rel == 4) {
+          $("#config-textarea").height($('#wizard .stepContainer').height() - 120);
+        }
       }
+      init_window();
+      init_SmartWizard();
       init_iCheck();
     </script>
   </body>

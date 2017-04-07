@@ -73,12 +73,10 @@
           </div>
 <?php   elseif ($column['type'] === 'select' && is_string($column['select_conf'])): ?>
 <?php     $init_form_s_m_col[] = $column?>
-          <select name="<?php echo $column['field'] ?>" class="form-control">
-          </select>
+          <select name="<?php echo $column['field'] ?>" class="form-control"></select>
 <?php   elseif ($column['type'] === 'multichoice' && is_string($column['multichoice_conf'])): ?>
 <?php     $init_form_s_m_col[] = $column?>
-          <div class="row js-multichoice-<?php echo $column['field'] ?>">
-          </div>
+          <div class="row js-multichoice-<?php echo $column['field'] ?>"></div>
 <?php   elseif ($column['type'] === 'datetime'): ?>
           <div class="input-group date">
             <div class="input-group-addon">
@@ -159,9 +157,9 @@
 <?php     endforeach ?>
           </div>
 <?php   elseif ($column['type'] === 'select' && is_string($column['select_conf'])): ?>
-
+          <select name="<?php echo $column['field'] ?>" class="form-control"></select>
 <?php   elseif ($column['type'] === 'multichoice' && is_string($column['multichoice_conf'])): ?>
-
+          <div class="row js-multichoice-<?php echo $column['field'] ?>"></div>
 <?php   elseif ($column['type'] === 'datetime'): ?>
           <div class="input-group date">
             <div class="input-group-addon">
@@ -614,17 +612,21 @@
 <?php   foreach ($init_form_s_m_col as $column): ?>
 <?php     if ($column['type'] == 'select'): ?>
 <?php     $table_col_s = explode('-', $column['select_conf'])?>
-          var $<?php echo $column['field'] ?> = $("#js-add-form select[name='<?php echo $column['field'] ?>']");
+          var $add_<?php echo $column['field'] ?> = $("#js-add-form select[name='<?php echo $column['field'] ?>']");
+          var $edit_<?php echo $column['field'] ?> = $("#js-edit-form select[name='<?php echo $column['field'] ?>']");
           $(data.<?php echo $table_col_s[0] ?>).each(function(){
             var option_str = '<option value="'+this.<?php echo $table_col_s[1] ?>+'">'+this.<?php echo $table_col_s[1] ?>+'</option>'
-            $<?php echo $column['field'] ?>.append(option_str);
+            $add_<?php echo $column['field'] ?>.append(option_str);
+            $edit_<?php echo $column['field'] ?>.append(option_str);
           });
 <?php     elseif ($column['type'] == 'multichoice'): ?>
 <?php     $table_col_m = explode('-', $column['multichoice_conf'])?>
-          var $<?php echo $column['field'] ?> = $("#js-add-form .js-multichoice-<?php echo $column['field'] ?>");
+          var $add_<?php echo $column['field'] ?> = $("#js-add-form .js-multichoice-<?php echo $column['field'] ?>");
+          var $edit_<?php echo $column['field'] ?> = $("#js-edit-form .js-multichoice-<?php echo $column['field'] ?>");
           $(data.<?php echo $table_col_m[0] ?>).each(function(){
             var checkbox_str = '<div class="col-md-4"><input name="<?php echo $column['field'] ?>[]" type="checkbox" value="'+this.<?php echo $table_col_m[1] ?>+'" />'+'<label>'+this.<?php echo $table_col_m[1] ?>+'</label></div>';
-            $<?php echo $column['field'] ?>.append(checkbox_str);
+            $add_<?php echo $column['field'] ?>.append(checkbox_str);
+            $edit_<?php echo $column['field'] ?>.append(checkbox_str);
           });
 <?php     endif ?>
 <?php   endforeach ?>
