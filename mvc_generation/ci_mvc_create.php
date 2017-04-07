@@ -406,14 +406,21 @@ function handle_beans(&$beans){
 			if ($column['type'] == 'file' && !isset($column['file_path'])) {
 				$column['file_path'] = "$bean_name/{$column['field']}";
 			}
+			if ($column['type'] == 'select' && !isset($column['select_options'])) {
+				$column['select_options'] = array();
+			}
+			if ($column['type'] == 'multichoice' && !isset($column['multichoice_options'])) {
+				$column['multichoice_options'] = array();
+			}
 			if ($column['type'] == 'select' && !isset($column['select_conf'])) {
-				$column['select_conf'] = "[]";
+				$column['select_conf'] = null;
 			}
 			if ($column['type'] == 'multichoice' && !isset($column['multichoice_conf'])) {
-				$column['multichoice_conf'] = "[]";
+				$column['multichoice_conf'] = null;
 			}
 		}
-		
+
+		unset($column);// 不unset($column);的话extras去循环$bean['col']会将第一个元素重复
 		//join
 		if (!isset($bean['join']) || !is_array($bean['join'])) {
 			$bean['join'] = array();
@@ -476,6 +483,46 @@ function handle_beans(&$beans){
 				}
 			}
 		}
+
+		// extras：生成时需要的信息
+		$form_fields = array();
+		$files = array();
+		$multichoice = array();
+		$tablecolumn_s_m = array();
+		$table_s_m = array();
+		$model_form_fields = array("$bean_name.{$bean['id']['field']}");
+		$model_join = array();
+		foreach ($bean['col'] as $key => $column) {
+			$form_fields[] = "'{$column['field']}'";
+			$model_form_fields[] = "$bean_name.{$column['field']}";
+			if ($column['type'] == 'file') {
+				$files[] = "'{$column['field']}'";
+			}elseif($column['type'] == 'multichoice'){
+				$multichoice[] = "'{$column['field']}'";
+			}
+			if ($column['type'] == 'select' && $column['select_conf'] != null) {
+				$tablecolumn_s_m[] = "array('".implode("', '", $column['select_conf'])."')";
+				$table_s_m[] = $column['select_conf'] + array('type' => 'select', 'field' => $column['field']);
+				$model_form_fields[] = "{$column['select_conf'][0]}.{$column['select_conf'][1]}";
+				$model_join[] = "JOIN('{$column['select_conf'][0]}', '$bean_name.{$column['field']}={$column['select_conf'][0]}.{$column['field']}', 'left')";
+			}elseif($column['type'] == 'multichoice' && $column['multichoice_conf'] != null){
+				$tablecolumn_s_m[] = "array('".implode("', '", $column['multichoice_conf'])."')";
+				$table_s_m[] = $column['multichoice_conf'] + array('type' => 'multichoice', 'field' => $column['field']);
+				$model_form_fields[] = "{$column['multichoice_conf'][0]}.{$column['multichoice_conf'][2]}";
+
+
+				$child_join_table = "'(SELECT {$bean['id']['field']}, GROUP_CONCAT({$column['multichoice_conf'][0]}.{$column['multichoice_conf'][2]} AS {$column['multichoice_conf'][2]} FROM $bean_name left join {$column['multichoice_conf'][0]} ON FIND_IN_SET({$column['multichoice_conf'][0]}.{$column['multichoice_conf'][1]},$bean_name.{$column['field']}) != 0 GROUP BY {$bean['id']['field']}) AS {$column['multichoice_conf'][0]}'";
+				$model_join[] = "JOIN($child_join_table, '$bean_name.{$bean['id']['field']}={$column['multichoice_conf'][0]}.{$bean['id']['field']}', 'left')";
+			}
+		}
+		$bean['extras']['form_fields'] = $form_fields;//用于生成c文件form_fields
+		$bean['extras']['files'] = $files;//用于生成c文件files
+		$bean['extras']['multichoice'] = $multichoice;//用于生成c文件multichoice
+		$bean['extras']['tablecolumn_s_m'] = $tablecolumn_s_m;//用于生成c文件tablecolumn_s_m
+		$bean['extras']['table_s_m'] = $table_s_m;//用于生成v文件的init_form_s_m，c文件加载模型，m判断是否生成新selectPage
+		$bean['extras']['model_form_fields'] = $model_form_fields;//用于m文件生成selectPage
+		$bean['extras']['model_join'] = $model_join;
+		
 	}
 }
 

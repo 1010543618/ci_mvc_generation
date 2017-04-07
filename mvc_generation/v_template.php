@@ -45,11 +45,9 @@
 
         </table>
         <!-- /table -->
-
         <!-- add -->
         <form id="js-add-form" data-parsley-validate style="display: none">
 <?php /*----------生成添加表单----------*/?>
-<?php $init_form_s_m_col = array() //需要初始化select和mutichoice时保存数据用?>
 <?php foreach ($bean['col'] as $column): //主表字段?>
           <label><?php echo $column['comment']?></label>
 <?php   if ($column['type'] === 'input'): ?>
@@ -59,24 +57,18 @@
 <?php   elseif ($column['type'] === 'file'): ?>
           <input name="<?php echo $column['field'] ?>-file" type="file" data-show-upload="false" data-show-preview="false" data-language="zh" data-upload-async="true" data-upload-url="<?php echo "<?=site_url('back/{$bean_name}/upload_{$column['field']}')?>" ?>" />
           <input name="<?php echo $column['field'] ?>" type="text" style="display: none" />
-<?php   elseif ($column['type'] === 'select' && is_array($column['select_conf'])): ?>
+<?php   elseif ($column['type'] === 'select'): ?>
           <select name="<?php echo $column['field'] ?>" class="form-control">
-<?php     foreach ($column['select_conf'] as $select_option): ?>
+<?php     foreach ($column['select_options'] as $select_option): ?>
             <option value="<?php echo $select_option?>"><?php echo $select_option?></option>
 <?php     endforeach ?>
           </select>
-<?php   elseif ($column['type'] === 'multichoice' && is_array($column['multichoice_conf'])): ?>
+<?php   elseif ($column['type'] === 'multichoice'): ?>
           <div class="row js-multichoice-<?php echo $column['field'] ?>">
-<?php     foreach ($column['multichoice_conf'] as $checkbox): ?>
+<?php     foreach ($column['multichoice_options'] as $checkbox): ?>
             <div class="col-md-4"><input name="<?php echo $column['field'] ?>[]" type="checkbox" value="<?php echo $checkbox ?>" /><label><?php echo $checkbox ?></label></div>
 <?php     endforeach ?>
           </div>
-<?php   elseif ($column['type'] === 'select' && is_string($column['select_conf'])): ?>
-<?php     $init_form_s_m_col[] = $column?>
-          <select name="<?php echo $column['field'] ?>" class="form-control"></select>
-<?php   elseif ($column['type'] === 'multichoice' && is_string($column['multichoice_conf'])): ?>
-<?php     $init_form_s_m_col[] = $column?>
-          <div class="row js-multichoice-<?php echo $column['field'] ?>"></div>
 <?php   elseif ($column['type'] === 'datetime'): ?>
           <div class="input-group date">
             <div class="input-group-addon">
@@ -144,22 +136,18 @@
 <?php   elseif ($column['type'] === 'file'): ?>
           <input name="<?php echo $column['field'] ?>-file" type="file" data-show-upload="false" data-show-preview="false" data-language="zh" data-upload-async="true" data-upload-url="<?php echo "<?=site_url('back/{$bean_name}/upload_{$column['field']}')?>" ?>" />
           <input name="<?php echo $column['field'] ?>" type="text" style="display: none" />
-<?php   elseif ($column['type'] === 'select' && is_array($column['select_conf'])): ?>
+<?php   elseif ($column['type'] === 'select'): ?>
           <select name="<?php echo $column['field'] ?>" class="form-control">
-<?php     foreach ($column['select_conf'] as $select_option): ?>
+<?php     foreach ($column['select_options'] as $select_option): ?>
             <option value="<?php echo $select_option?>"><?php echo $select_option?></option>
 <?php     endforeach ?>
           </select>
-<?php   elseif ($column['type'] === 'multichoice' && is_array($column['multichoice_conf'])): ?>
+<?php   elseif ($column['type'] === 'multichoice'): ?>
           <div class="row js-multichoice-<?php echo $column['field'] ?>">
-<?php     foreach ($column['multichoice_conf'] as $checkbox): ?>
+<?php     foreach ($column['multichoice_options'] as $checkbox): ?>
             <div class="col-md-4"><input name="<?php echo $column['field'] ?>[]" type="checkbox" value="<?php echo $checkbox ?>" /><label><?php echo $checkbox ?></label></div>
 <?php     endforeach ?>
           </div>
-<?php   elseif ($column['type'] === 'select' && is_string($column['select_conf'])): ?>
-          <select name="<?php echo $column['field'] ?>" class="form-control"></select>
-<?php   elseif ($column['type'] === 'multichoice' && is_string($column['multichoice_conf'])): ?>
-          <div class="row js-multichoice-<?php echo $column['field'] ?>"></div>
 <?php   elseif ($column['type'] === 'datetime'): ?>
           <div class="input-group date">
             <div class="input-group-addon">
@@ -605,28 +593,26 @@
   }
 
 <?php /*----------初始化添加，修改的select和mutichoice（使用其他表字段作为select和mutichoice值）----------*/?>
-<?php if ($init_form_s_m_col): ?>
+<?php if ($bean["extras"]['table_s_m']): ?>
   function init_form_s_m(){
     $.post("<?php echo "<?=site_url('back/{$bean_name}/get_form_data')?>"?>", {}, function(data,status){
       if (data['status'] == true) {
-<?php   foreach ($init_form_s_m_col as $column): ?>
-<?php     if ($column['type'] == 'select'): ?>
-<?php     $table_col_s = explode('-', $column['select_conf'])?>
-          var $add_<?php echo $column['field'] ?> = $("#js-add-form select[name='<?php echo $column['field'] ?>']");
-          var $edit_<?php echo $column['field'] ?> = $("#js-edit-form select[name='<?php echo $column['field'] ?>']");
-          $(data.<?php echo $table_col_s[0] ?>).each(function(){
-            var option_str = '<option value="'+this.<?php echo $table_col_s[1] ?>+'">'+this.<?php echo $table_col_s[1] ?>+'</option>'
+<?php   foreach ($bean["extras"]['table_s_m'] as $table_s_m): ?>
+<?php     if ($table_s_m['type'] == 'select'): ?>
+          var $add_<?php echo $table_s_m['field'] ?> = $("#js-add-form select[name='<?php echo $table_s_m['field'] ?>']");
+          var $edit_<?php echo $table_s_m['field'] ?> = $("#js-edit-form select[name='<?php echo $table_s_m['field'] ?>']");
+          $(data.<?php echo $table_s_m[0] ?>).each(function(){
+            var option_str = '<option value="'+this.<?php echo $table_s_m[1] ?>+'">'+this.<?php echo $table_s_m[2] ?>+'</option>'
             $add_<?php echo $column['field'] ?>.append(option_str);
             $edit_<?php echo $column['field'] ?>.append(option_str);
           });
-<?php     elseif ($column['type'] == 'multichoice'): ?>
-<?php     $table_col_m = explode('-', $column['multichoice_conf'])?>
-          var $add_<?php echo $column['field'] ?> = $("#js-add-form .js-multichoice-<?php echo $column['field'] ?>");
-          var $edit_<?php echo $column['field'] ?> = $("#js-edit-form .js-multichoice-<?php echo $column['field'] ?>");
+<?php     elseif ($table_s_m['type'] == 'multichoice'): ?>
+          var $add_<?php echo $table_s_m['field'] ?> = $("#js-add-form .js-multichoice-<?php echo $table_s_m['field'] ?>");
+          var $edit_<?php echo $table_s_m['field'] ?> = $("#js-edit-form .js-multichoice-<?php echo $table_s_m['field'] ?>");
           $(data.<?php echo $table_col_m[0] ?>).each(function(){
-            var checkbox_str = '<div class="col-md-4"><input name="<?php echo $column['field'] ?>[]" type="checkbox" value="'+this.<?php echo $table_col_m[1] ?>+'" />'+'<label>'+this.<?php echo $table_col_m[1] ?>+'</label></div>';
-            $add_<?php echo $column['field'] ?>.append(checkbox_str);
-            $edit_<?php echo $column['field'] ?>.append(checkbox_str);
+            var checkbox_str = '<div class="col-md-4"><input name="<?php echo $table_s_m['field'] ?>[]" type="checkbox" value="'+this.<?php echo $table_s_m[1] ?>+'" />'+'<label>'+this.<?php echo $table_s_m[2] ?>+'</label></div>';
+            $add_<?php echo $table_s_m['field'] ?>.append(checkbox_str);
+            $edit_<?php echo $table_s_m['field'] ?>.append(checkbox_str);
           });
 <?php     endif ?>
 <?php   endforeach ?>
@@ -638,7 +624,7 @@
 
   window.onload = function(){
     init_table();
-<?php if ($init_form_s_m_col): ?>
+<?php if ($bean["extras"]['table_s_m']): ?>
     init_form_s_m();
 <?php endif ?>
   }

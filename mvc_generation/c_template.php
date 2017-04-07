@@ -7,44 +7,13 @@ class <?php echo $controller_name ?> extends MY_Controller {
 		parent::__construct();
 		$this->bean = array(
 			'id' => '<?php echo $bean['id']['field'] ?>',
-<?php //生成表单需要的字段
-	$form_fields = array();
-	$files = array();
-	$multichoice = array();
-	$tablecolumn_s_m = array();
-	// 在加载模型时找表用的数组
-	$table_s_m = array();
-	foreach ($bean['col'] as $key => $column) {
-		$form_fields[] = "'{$column['field']}'";
-		if ($column['type'] == 'file') {
-			$files[] = "'{$column['field']}'";
-		}elseif($column['type'] == 'multichoice'){
-			$multichoice[] = "'{$column['field']}'";
-		}
-
-		if ($column['type'] == 'select' && is_string($column['select_conf'])) {
-			$table_col_conf = explode('-', $column['select_conf']);
-			$table_s_m[] = $table_col_conf[0];
-			$tablecolumn_s_m[] = "'{$table_col_conf[0]}' => '{$table_col_conf[1]}'";
-		}elseif($column['type'] == 'multichoice' && is_string($column['multichoice_conf'])){
-			$table_col_conf = explode('-', $column['multichoice_conf']);
-			$table_s_m[] = $table_col_conf[0];
-			$tablecolumn_s_m[] = "'{$table_col_conf[0]}' => '{$table_col_conf[1]}'";
-		}
-	}
-	if (isset($bean['join'])) {
-		foreach ($bean['join'] as $key => $join_table) {
-			$form_fields[] = "'{$join_table['pri_field']}'";
-		}
-	}
-?>
-			'form_fields' => array(<?php echo implode(', ', $form_fields) ?>),
-			'files' => array(<?php echo implode(', ', $files) ?>),
-			'multichoice' => array(<?php echo implode(', ', $multichoice) ?>),
-			'tablecolumn_s_m' => array(<?php echo implode(', ', $tablecolumn_s_m) ?>)
+			'form_fields' => array(<?php echo implode(', ', $bean["extras"]['form_fields']) ?>),
+			'files' => array(<?php echo implode(', ', $bean["extras"]['files']) ?>),
+			'multichoice' => array(<?php echo implode(', ', $bean["extras"]['multichoice']) ?>),
+			'tablecolumn_s_m' => array(<?php echo implode(', ', $bean["extras"]['tablecolumn_s_m']) ?>)
 			);
-<?php foreach ($table_s_m as $table_s_m_name): //为获取select或multichoice的值加载模型?>
-		$this->load->model('<?php echo $table_s_m_name.'_model' ?>');
+<?php foreach ($bean["extras"]['table_s_m'] as $table_s_m): //为获取select或multichoice的值加载模型?>
+		$this->load->model('<?php echo $table_s_m[0].'_model' ?>');
 <?php endforeach ?>
 <?php if (isset($bean['join'])): //引入join的表的模型?>
 <?php	foreach ($bean['join'] as $join_table_name => $join_table): ?>

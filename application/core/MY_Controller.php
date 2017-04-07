@@ -70,8 +70,8 @@ class MY_Controller extends CI_Controller {
     }
 
     public function get_form_data(){
-        foreach ($this->bean['tablecolumn_s_m'] as $table_name => $table_col) {
-            $result[$table_name] = $this->{$table_name.'_model'}->getAll($table_col);
+        foreach ($this->bean['tablecolumn_s_m'] as $table_col) {
+            $result[$table_col[0]] = $this->{$table_col[0].'_model'}->getAll(array($table_col[1],$table_col[2]));
         }
         $result['status'] = true;
         $this->returnResult($result);

@@ -258,8 +258,10 @@
                           <li>validation(string):【列的验证规则（parsley.js验证规则）】,</li>
                           <li>type(string):【列的类型input(默认)/text/file/select/multichoice/datetime/timestamp/date/time/year】（input使用文本框，text将使用富文本编辑器，file将保存图片的位置，select将使用select，multichoice将使用checkbox，datetime/timestamp/date/time/year将使用不同配置的日期或时间选择器）,</li>
                           <li>file_path(string):【文件保存的路径，type为file时可设置】（不设置将保存到“跟目录/upload/当前表名/当前字段名”文件夹),</li>
-                          <li>select_conf(array/string):【select的选项，type为select时可设置，array会自定义选项，string将其他表的字段作为选项（用于多对一）】（默认是空数组([])，字符串格式：“表名-字段名”）,</li>
-                          <li>multichoice_conf(array/string):【checkbox的选项，type为multichoice时可设置，array会自定义选项，string将其他表的字段作为选项（用于多对多）】（默认是空数组([])，字符串格式：“表名-字段名”),</li>
+                          <li>select_options(array):【select的选项，type为select时可设置】（默认是空数组([])，字符串格式：“表名-字段名”）,</li>
+                          <li>multichoice_options(array):【checkbox的选项，type为multichoice时可设置】（默认是空数组([])，字符串格式：“表名-字段名”),</li>
+                          <li>select_conf(array):【select的配置，type为select时可设置，[0]：表名，[1]：存储时用的字段名，[2]：展示用的字段名。将其他表的字段作为选项（用于多对一）】,</li>
+                          <li>multichoice_conf(array):【checkbox的选项，type为multichoice时可设置，[0]：表名，[1]：存储时用的字段名，[2]：展示用的字段名。将其他表的字段作为选项（用于多对多）】,</li>
                         </ul>
                       </li>
                     </ul>
