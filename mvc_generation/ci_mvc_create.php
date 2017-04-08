@@ -194,11 +194,11 @@ function create_tables_bean($config){
 					// enum和set
 					case 'enum':
 						$col['type'] = 'select';
-						$col['select_conf'] = explode(',', str_replace("'", '', $type_bracket));
+						$col['select_options'] = explode(',', str_replace("'", '', $type_bracket));
 						break;
 					case 'set':
 						$col['type'] = 'multichoice';
-						$col['multichoice_conf'] = explode(',', str_replace("'", '', $type_bracket));
+						$col['multichoice_options'] = explode(',', str_replace("'", '', $type_bracket));
 						break;
 					//日期和时间
 					case 'datetime':
