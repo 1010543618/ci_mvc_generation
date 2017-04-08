@@ -216,11 +216,16 @@
       "searching": false,
       "serverSide": true,
       "ajax": "<?php echo "<?=site_url('back/{$bean_name}/selectPage')?>"?>",
-        
-        "columns": [
+      "columns": [
           {"data":"<?php echo $bean['id']['field']?>" },
 <?php foreach ($bean['col'] as $key => $column): ?>
+<?php   if ($column['type'] == 'select' && $column['select_conf'] != null): ?>
+          {"data":"<?php echo $column['select_conf'][2]?>" },
+<?php   elseif ($column['type'] == 'multichoice' && $column['multichoice_conf'] != null): ?> 
+          {"data":"<?php echo $column['multichoice_conf'][2]?>" },
+<?php   else: ?>
           {"data":"<?php echo $column['field']?>" },
+<?php   endif ?>  
 <?php endforeach ?>
 <?php foreach ($bean['join'] as $join_table): ?>
 <?php   foreach ($join_table['col'] as $join_table_col): ?>
@@ -609,7 +614,7 @@
 <?php     elseif ($table_s_m['type'] == 'multichoice'): ?>
           var $add_<?php echo $table_s_m['field'] ?> = $("#js-add-form .js-multichoice-<?php echo $table_s_m['field'] ?>");
           var $edit_<?php echo $table_s_m['field'] ?> = $("#js-edit-form .js-multichoice-<?php echo $table_s_m['field'] ?>");
-          $(data.<?php echo $table_col_m[0] ?>).each(function(){
+          $(data.<?php echo $table_s_m[0] ?>).each(function(){
             var checkbox_str = '<div class="col-md-4"><input name="<?php echo $table_s_m['field'] ?>[]" type="checkbox" value="'+this.<?php echo $table_s_m[1] ?>+'" />'+'<label>'+this.<?php echo $table_s_m[2] ?>+'</label></div>';
             $add_<?php echo $table_s_m['field'] ?>.append(checkbox_str);
             $edit_<?php echo $table_s_m['field'] ?>.append(checkbox_str);
