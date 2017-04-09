@@ -6,6 +6,8 @@
 !/views/back/js/
 !/views/back/vendors/
 !/views/back/home.html
+!/views/back/header.html
+!/views/back/footer.html
 #controller
 /application/controllers/*
 !/application/controllers/Index.php
