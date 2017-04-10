@@ -24,33 +24,56 @@
 			”分隔）",
 			"type":"input",
 			"validation":""
-		}],
-		"join":{
-			"admin_game":{
-			"pri_field":"admin_id",
-			"join_field":"admin_id",
-			"manipulation_col":[{
-				"field":"game_id",
-				"comment":"管理员id",
-				"type":"multichoice",
-				"option_field":
-			}]
-		}}
+		}]
 	},
 	"admin_game":{
 		"tbl_comment":"管理员_游戏",
-		"col":[{
+		"id":{
 			"field":"admin_id",
-			"comment":"管理员ID",
-			"type":"input",
-			"validation":"required "
+			"comment":"管理员ID"
 		},
-		{
+		"col":[{
 			"field":"game_id",
-			"comment":"游戏ID",
+			"comment":"game_id",
 			"type":"input",
 			"validation":"required "
-		}]
+		}],
+		"join":{
+			"admin":{
+				"pri_field":"admin.admin_id",
+				"join_field":"admin_game.admin_id",
+				"col":[{
+					"field":"admin_id",
+					"comment":"管理员ID"
+				},
+				{
+					"field":"admin_name",
+					"comment":"管理员名"
+				},
+				{
+					"field":"role_id",
+					"comment":"角色ID（用“,
+					”分隔）"
+				},
+				{
+					"field":"perm_id",
+					"comment":"权限ID（用“,
+					”分隔）"
+				}]
+			},
+			"game":{
+				"pri_field":"game.game_id",
+				"join_field":"admin_game.game_id",
+				"col":[{
+					"field":"game_id",
+					"comment":"游戏ID"
+				},
+				{
+					"field":"game_name",
+					"comment":"游戏名"
+				}]
+			}
+		}
 	},
 	"game":{
 		"tbl_comment":"游戏",
@@ -115,6 +138,27 @@
 			"comment":"用户名",
 			"type":"input",
 			"validation":"required "
+		},
+		{
+			"field":"user_sex",
+			"comment":"用户性别",
+			"type":"select",
+			"select_options":["male",
+			"female",
+			"unclear"],
+			"validation":""
+		},
+		{
+			"field":"user_label",
+			"comment":"用户标签",
+			"type":"multichoice",
+			"multichoice_options":["label1",
+			"label2",
+			"label3",
+			"label4",
+			"label5",
+			"label6"],
+			"validation":""
 		},
 		{
 			"field":"info",

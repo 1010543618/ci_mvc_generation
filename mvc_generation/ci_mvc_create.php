@@ -1,16 +1,15 @@
 <?php
 $config = array();
-
 header("Content-type:text/html;Charset=utf-8");
-if ($_GET) {
-	switch ($_GET['step']) {
+if ($_POST) {
+	switch ($_POST['step']) {
 		case '1':
+			// 通过配置找全部表
 			$config = array(
-				'host' => $_GET['host'],
-				'user' => $_GET['user'],
-				'password' => $_GET['pwd'],
-				'db' => $_GET['db']
-				// 'tables' => $_GET['tables']
+				'host' => $_POST['host'],
+				'user' => $_POST['user'],
+				'password' => $_POST['pwd'],
+				'db' => $_POST['db']
 				);
 			if (has_null($config)) {
 				return_result('有必填项没填啊！', false);
@@ -20,12 +19,13 @@ if ($_GET) {
 			break;
 
 		case '2':
+			// 通过选择的表生成配置文件
 			$config = array(
-				'host' => $_GET['host'],
-				'user' => $_GET['user'],
-				'password' => $_GET['pwd'],
-				'db' => $_GET['db'],
-				'tables' => isset($_GET['tables']) ? $_GET['tables'] : null
+				'host' => $_POST['host'],
+				'user' => $_POST['user'],
+				'password' => $_POST['pwd'],
+				'db' => $_POST['db'],
+				'tables' => isset($_POST['tables']) ? $_POST['tables'] : null
 				);
 			if ($config['tables'] == null) {
 				return_result('请至少选择一张表', false);
@@ -43,18 +43,19 @@ if ($_GET) {
 			break;
 
 		case '3_4':
+			// 使用设置的配置和配置文件的配置生成mvc文件
 			$config = array(
-				'generation_config' => $_GET['generation_config'],
+				'generation_config' => $_POST['generation_config'],
 				//mvc相对于当前目录的路径
-				'm_folder' => $_GET['m_folder'],
+				'm_folder' => $_POST['m_folder'],
 				//给v_folder，c_folder添加上子路径
-				'v_folder' => $_GET['v_folder'] . ($_GET['v_child_folder'] ? '/'.$_GET['v_child_folder'] : ''),
-				'c_folder' => $_GET['c_folder'] . ($_GET['c_child_folder'] ? '/'.$_GET['c_child_folder'] : ''),
+				'v_folder' => $_POST['v_folder'] . ($_POST['v_child_folder'] ? '/'.$_POST['v_child_folder'] : ''),
+				'c_folder' => $_POST['c_folder'] . ($_POST['c_child_folder'] ? '/'.$_POST['c_child_folder'] : ''),
 				//给v_child_folder，c_child_folder添加"/"为了在ci的URL函数中使用
-				'v_child_folder' => $_GET['v_child_folder'] ? $_GET['v_child_folder'].'/' : '',
-				'c_child_folder' => $_GET['v_child_folder'] ? $_GET['c_child_folder'].'/' : ''
+				'v_child_folder' => $_POST['v_child_folder'] ? $_POST['v_child_folder'].'/' : '',
+				'c_child_folder' => $_POST['v_child_folder'] ? $_POST['c_child_folder'].'/' : ''
 				);
-			if (isset($_GET['is_save_config']) &&  $_GET['is_save_config'] == 'true') {
+			if (isset($_POST['is_save_config']) &&  $_POST['is_save_config'] == 'true') {
 				file_put_contents('./config.json', $config['generation_config']);
 			}
 			$info = output_mvc_file($config);
@@ -82,7 +83,6 @@ function output_mvc_file($config){
 	}
 	//处理beans（填入初始值）
 	handle_beans($beans);
-
 	// var_dump($beans);die();
 	//循环生成
 	foreach ($beans as $bean_name => $bean) {
@@ -162,6 +162,17 @@ function create_tables_bean($config){
 					$tables[$table_name]['id']['comment'] = $column['comment'];
 				}
 				$has_key = true;
+			}elseif($column['key'] == "MUL"){
+				// $matchs[1]：连接的表，$matchs[2]：连接的字段
+				preg_match("/FOREIGN KEY \(`{$column['field']}`\) REFERENCES `(.*?)` \(`(.*?)`\)/",$table_source['create_str'],$matchs);
+				$tables[$table_name]['join'][$matchs[1]]['pri_field'] = "{$matchs[1]}.{$matchs[2]}";
+				$tables[$table_name]['join'][$matchs[1]]['join_field'] = "$table_name.{$column['field']}";
+				foreach ($tables_source[$matchs[1]]['col'] as $column_for_join) {
+					$join_col = array();
+					$join_col['field'] = $column_for_join['field'];
+					$join_col['comment'] = $column_for_join['comment'];
+					$tables[$table_name]['join'][$matchs[1]]['col'][] = $join_col;
+				}
 			}else {
 				// 普通字段
 				$col['field'] = $column['field'];
@@ -278,8 +289,10 @@ function get_tables_info($config){
 	// 4.获取表中的字段信息，存入tables
 	foreach ($tables as $table_name => &$table) {
 		$result = mysqli_query($conn, "show full fields from $table_name");
+		$create_table_result = mysqli_query($conn, "show create table $table_name");
 		$fields = mysqli_fetch_fields($result);
 		// var_dump(mysqli_fetch_all($result));die();
+		// 表字段
 		foreach (mysqli_fetch_all($result) as $value) {
 
 			// $table[$value[0]]['type'] = $value[1];
@@ -297,6 +310,10 @@ function get_tables_info($config){
 			$col['comment'] = $value[8];
 
 			$table['col'][] = $col;
+		}
+		// 创建表的语句
+		foreach (mysqli_fetch_all($create_table_result) as $value) {
+			$table['create_str'] = $value[1];
 		}
 	}
 	mysqli_close($conn);
@@ -398,7 +415,7 @@ function handle_beans(&$beans){
 				return_result($bean_name.'的col中的字段的comment未设置或不是字符串',false);
 			}
 			if (!isset($column['type'])) {
-				$bean['column']['type'] = 'input';
+				$column['type'] = 'input';
 			}
 			if (!isset($column['validation'])) {
 				$column['validation'] = null;
@@ -482,6 +499,7 @@ function handle_beans(&$beans){
 					}
 				}
 			}
+			unset($join_table);
 		}
 
 		// extras：生成时需要的信息
@@ -492,6 +510,8 @@ function handle_beans(&$beans){
 		$table_s_m = array();
 		$model_select_fields = array("$bean_name.{$bean['id']['field']}");
 		$model_join = array();
+		$view_show_col = array();
+
 		foreach ($bean['col'] as $key => $column) {
 			$form_fields[] = "'{$column['field']}'";
 			// 所有本身的字段都查，因为会用在初始化表单上
@@ -506,22 +526,52 @@ function handle_beans(&$beans){
 				$table_s_m[] = $column['select_conf'] + array('type' => 'select', 'field' => $column['field']);
 				$model_select_fields[] = "{$column['select_conf'][0]}.{$column['select_conf'][2]}";
 				$model_join[] = "JOIN('{$column['select_conf'][0]}', '$bean_name.{$column['field']}={$column['select_conf'][0]}.{$column['select_conf'][1]}', 'left')";
+				$view_show_col[] = array(
+					"field" => $column['select_conf'][2],
+					"comment" => $column['comment']
+					);
 			}elseif($column['type'] == 'multichoice' && $column['multichoice_conf'] != null){
 				$tablecolumn_s_m[] = "array('".implode("', '", $column['multichoice_conf'])."')";
 				$table_s_m[] = $column['multichoice_conf'] + array('type' => 'multichoice', 'field' => $column['field']);
 				$model_select_fields[] = "{$column['multichoice_conf'][0]}.{$column['multichoice_conf'][2]}";
 				$child_join_table = "'(SELECT {$bean['id']['field']}, GROUP_CONCAT({$column['multichoice_conf'][0]}.{$column['multichoice_conf'][2]}) AS {$column['multichoice_conf'][2]} FROM $bean_name left join {$column['multichoice_conf'][0]} ON FIND_IN_SET({$column['multichoice_conf'][0]}.{$column['multichoice_conf'][1]},$bean_name.{$column['field']}) != 0 GROUP BY {$bean['id']['field']}) AS {$column['multichoice_conf'][0]}'";
 				$model_join[] = "JOIN($child_join_table, '$bean_name.{$bean['id']['field']}={$column['multichoice_conf'][0]}.{$bean['id']['field']}', 'left')";
+				$view_show_col[] = array(
+					"field" => $column['multichoice_conf'][2],
+					"comment" => $column['comment']
+					);
+			}else{
+				$view_show_col[] = array(
+					"field" => $column['field'],
+					"comment" => $column['comment']
+					);
 			}
+		}
+
+		foreach ($bean['join'] as $join_table_name => $join_table) {
+			foreach ($join_table['col'] as $column) {
+				$view_show_col[] = array(
+					"field" => "$join_table_name-{$column['field']}",
+					"comment" => $column['comment']
+					);
+				$model_select_fields[] = "$join_table_name.{$column['field']} AS $join_table_name-{$column['field']}";
+			}
+			foreach ($join_table['manipulation_col'] as $mani_col) {
+				$form_fields[] = "'$join_table_name-{$mani_col['field']}'";
+			}
+			$model_join[] = "JOIN('$join_table_name', '{$join_table['pri_field']}={$join_table['join_field']}', 'left')";
 		}
 		$bean['extras']['form_fields'] = $form_fields;//用于生成c文件form_fields
 		$bean['extras']['files'] = $files;//用于生成c文件files
 		$bean['extras']['multichoice'] = $multichoice;//用于生成c文件multichoice
+
 		$bean['extras']['tablecolumn_s_m'] = $tablecolumn_s_m;//用于生成c文件tablecolumn_s_m
-		$bean['extras']['table_s_m'] = $table_s_m;//用于生成v文件的init_form_s_m，c文件加载模型，m判断是否生成新selectPage
+		$bean['extras']['table_s_m'] = $table_s_m;//用于生成v文件的init_form_s_m，c文件加载模型
+
 		$bean['extras']['model_select_fields'] = $model_select_fields;//用于m文件生成selectPage
-		$bean['extras']['model_join'] = $model_join;
+		$bean['extras']['model_join'] = $model_join;//m生成JOIN和判断是否生成新selectPage
 		
+		$bean['extras']['view_show_col'] = $view_show_col;
 	}
 }
 

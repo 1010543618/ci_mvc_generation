@@ -5,7 +5,7 @@ class MY_Controller extends CI_Controller {
     public function __construct()
     {
         parent::__construct();
-        $this->model_name = strtolower(get_class($this)).'_model';
+        $this->model_name = isset($this->model_name) ? $this->model_name : strtolower(get_class($this)).'_model';
         $this->load->model($this->model_name);
     }
 
@@ -130,6 +130,11 @@ class MY_Controller extends CI_Controller {
         $cssjs = json_decode($cssjs_str, TRUE);
 
         // 获取找出当前cssjs
+        if (strrpos($path,'/') === false) {// 在视图根目录
+            $result['css'] = $cssjs['/']['css'];
+            $result['js'] = $cssjs['/']['js'];
+            return $result;
+        }
         while (strrpos($path,'/') !== false) {
             $path = str_replace(strrchr($path,'/'), '', $path);
             if (array_key_exists($path, $cssjs)) {

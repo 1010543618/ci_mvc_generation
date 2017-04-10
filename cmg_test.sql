@@ -26,7 +26,7 @@ insert into user (user_name, info, profile, birthday, get_up_time, gift_time) va
 ('administrator', '好人', null, '1000-01-01 00:00:00', '10:59:59', '2000-2-22 22:22:22');
 /*----------/测试没有join表----------*/
 
-/*----------测试有join表----------*/
+/*----------测试需要使用JOIN的情况（一对多，多对多）----------*/
 # 主表管理员表
 CREATE TABLE admin(
 	admin_id int UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '管理员ID',
@@ -88,4 +88,4 @@ insert into permission (controller, action) values
 ('Steam', 'discount'),
 ('TGP', 'kekeke'),
 ('Ubisoft', 'potato');
-/*----------/测试有join表----------*/
+/*----------/测试需要使用JOIN的情况（一对多，多对多）----------*/

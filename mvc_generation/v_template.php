@@ -29,14 +29,9 @@
             <tr>
               <th>序号</th>
 <?php /*----------生成表格头----------*/?>
-<?php foreach ($bean['col'] as $column): //主表字段?>
+<?php foreach ($bean['extras']['view_show_col'] as $column): ?>
               <th><?php echo $column['comment']?></th>
-<?php endforeach //end主表字段?>
-<?php foreach ($bean['join'] as $join_table): //连接表字段?>
-<?php   foreach ($join_table['col'] as $column): ?>
-              <th><?php echo $column['comment']?></th>
-<?php   endforeach ?>
-<?php endforeach //end连接表字段?>
+<?php endforeach ?>
 <?php /*----------/生成表格头----------*/?>
               <th>修改</th>
               <th>删除</th>
@@ -218,18 +213,11 @@
       "ajax": "<?php echo "<?=site_url('back/{$bean_name}/selectPage')?>"?>",
       "columns": [
           {"data":"<?php echo $bean['id']['field']?>" },
-<?php foreach ($bean['col'] as $key => $column): ?>
-<?php   if ($column['type'] == 'select' && $column['select_conf'] != null): ?>
-          {"data":"<?php echo $column['select_conf'][2]?>" },
-<?php   elseif ($column['type'] == 'multichoice' && $column['multichoice_conf'] != null): ?> 
-          {"data":"<?php echo $column['multichoice_conf'][2]?>" },
-<?php   else: ?>
+<?php foreach ($bean['extras']['view_show_col'] as $column): ?>
           {"data":"<?php echo $column['field']?>" },
-<?php   endif ?>  
 <?php endforeach ?>
-<?php foreach ($bean['join'] as $join_table): ?>
-<?php   foreach ($join_table['col'] as $join_table_col): ?>
-<?php     if ($join_table['is_group_concat'] == 'true'): //连接表字段类型是multichoice?>
+
+<?php if (0): //以后可能有用，先留着?>
           {
             "data":"<?php echo $join_table_mani_col['field']?>",
             "render": function(data) {
@@ -242,11 +230,7 @@
               return div;
             }
           },
-<?php     else: //连接表字段类型是其他?>
-          {"data":"<?php echo $join_table_mani_col['field']?>" },
-<?php     endif ?>
-<?php   endforeach ?>
-<?php endforeach ?>
+<?php endif ?>
           { 
             "data": null,
             "render": function(data) {
