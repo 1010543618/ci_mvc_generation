@@ -40,88 +40,10 @@
 
         </table>
         <!-- /table -->
-        <!-- add -->
-        <form id="js-add-form" data-parsley-validate style="display: none">
-<?php /*----------生成添加表单----------*/?>
-<?php foreach ($bean['col'] as $column): //主表字段?>
-          <label><?php echo $column['comment']?></label>
-<?php   if ($column['type'] === 'input'): ?>
-          <input name="<?php echo $column['field']?>" type="text" class="form-control" <?php echo $column['validation']?>/>
-<?php   elseif ($column['type'] === 'text'): ?>
-          <script name="<?php echo $column['field'] ?>" type="text/plain">请输入。。。</script>
-<?php   elseif ($column['type'] === 'file'): ?>
-          <input name="<?php echo $column['field'] ?>-file" type="file" data-show-upload="false" data-show-preview="false" data-language="zh" data-upload-async="true" data-upload-url="<?php echo "<?=site_url('back/{$bean_name}/upload_{$column['field']}')?>" ?>" />
-          <input name="<?php echo $column['field'] ?>" type="text" style="display: none" />
-<?php   elseif ($column['type'] === 'select'): ?>
-          <select name="<?php echo $column['field'] ?>" class="form-control">
-<?php     foreach ($column['select_options'] as $select_option): ?>
-            <option value="<?php echo $select_option?>"><?php echo $select_option?></option>
-<?php     endforeach ?>
-          </select>
-<?php   elseif ($column['type'] === 'multichoice'): ?>
-          <div class="row js-multichoice-<?php echo $column['field'] ?>">
-<?php     foreach ($column['multichoice_options'] as $checkbox): ?>
-            <div class="col-md-4"><input name="<?php echo $column['field'] ?>[]" type="checkbox" value="<?php echo $checkbox ?>" /><label><?php echo $checkbox ?></label></div>
-<?php     endforeach ?>
-          </div>
-<?php   elseif ($column['type'] === 'datetime'): ?>
-          <div class="input-group date">
-            <div class="input-group-addon">
-                <span class="glyphicon glyphicon-calendar fa fa-calendar"></span>
-            </div>
-            <input name="<?php echo $column['field']?>" type="text" class="form-control" data-date-language="zh-CN" data-date-min-view-mode="0" data-date-format="yyyy-mm-dd" <?php echo $column['validation']?>/>
-          </div>
-<?php   elseif ($column['type'] === 'timestamp'): ?>
-          <div class="input-group date">
-            <div class="input-group-addon">
-                <span class="glyphicon glyphicon-calendar fa fa-calendar"></span>
-            </div>
-            <input name="<?php echo $column['field']?>" type="text" class="form-control" data-date-language="zh-CN" data-date-min-view-mode="0" data-date-format="yyyy-mm-dd" <?php echo $column['validation']?>/>
-          </div>
-<?php   elseif ($column['type'] === 'date'): ?>
-          <div class="input-group date">
-            <div class="input-group-addon">
-                <span class="glyphicon glyphicon-calendar fa fa-calendar"></span>
-            </div>
-            <input name="<?php echo $column['field']?>" type="text" class="form-control" data-date-language="zh-CN" data-date-min-view-mode="0" data-date-format="yyyy-mm-dd"  <?php echo $column['validation']?>/>
-          </div>
-<?php   elseif ($column['type'] === 'time'): ?>
-          <div class="input-group">
-            <div class="input-group-addon">
-                <span class="glyphicon glyphicon-time"></span>
-            </div>
-            <input name="<?php echo $column['field']?>" type="text" class="form-control" <?php echo $column['validation']?>/>
-          </div>
-<?php   elseif ($column['type'] === 'year'): ?>
-          <div class="input-group date">
-            <div class="input-group-addon">
-                <span class="glyphicon glyphicon-calendar fa fa-calendar"></span>
-            </div>
-            <input name="<?php echo $column['field']?>" type="text" class="form-control" data-date-language="zh-CN" data-date-min-view-mode="2" data-date-format="yyyy" <?php echo $column['validation']?>/>
-          </div>
-<?php   endif; ?>
-<?php endforeach //end主表字段?>
-<?php foreach ($bean['join'] as $join_table_name => $join_table): //连接表字段?>
-<?php   foreach ($join_table['manipulation_col'] as $join_table_mani_col): ?>
-          <label><?php echo $join_table_mani_col['comment']?></label>
-<?php     if ($join_table_mani_col['formtype'] == 'select'): //连接表字段类型是select?>
-          <select name="<?php echo $join_table_name."[{$join_table_mani_col['field']}]" ?>" class="js-select-<?php echo $join_table_name."-".$join_table_mani_col['field'] ?> form-control"></select>
-<?php     elseif ($join_table_mani_col['formtype'] == 'multichoice'): //连接表字段类型是multichoice?>
-          <div class="row js-checkbox-<?php echo $join_table_name."-".$join_table_mani_col['field'] ?>"></div>
-<?php     elseif ($join_table_mani_col['formtype'] == 'input'): //连接表字段类型是input?>
-          <input name="<?php echo $join_table_name."[{$join_table_mani_col['field']}]" ?>" type="text">
-<?php     endif ?>
-<?php   endforeach ?>
-<?php endforeach //end连接表字段?>
-<?php /*----------/生成添加表单----------*/?>
-          <br/>
-          <span class="btn btn-primary">添加<?php echo $bean['tbl_comment']?></span>
-        </form>
-        <!-- /add -->
 
-        <!-- edit -->
-        <form id="js-edit-form" data-parsley-validate style="display: none">
-<?php /*----------生成修改表单----------*/?>
+        <!-- add&edit -->
+        <form id="js-add-edit-form" data-parsley-validate style="display: none">
+<?php /*----------生成表单----------*/?>
 <?php foreach ($bean['col'] as $column): //主表字段?>
           <label><?php echo $column['comment']?></label>
 <?php   if ($column['type'] === 'input'): ?>
@@ -183,21 +105,21 @@
 <?php foreach ($bean['join'] as $join_table_name => $join_table): //连接表字段?>
 <?php   foreach ($join_table['manipulation_col'] as $join_table_mani_col): ?>
           <label><?php echo $join_table_mani_col['comment']?></label>
-<?php     if ($join_table_mani_col['formtype'] == 'select'): //连接表字段类型是select?>
-          <select name="<?php echo $join_table_name."[{$join_table_mani_col['field']}]" ?>" class="js-select-<?php echo $join_table_name."-".$join_table_mani_col['field'] ?> form-control"></select>
-<?php     elseif ($join_table_mani_col['formtype'] == 'multichoice'): //连接表字段类型是multichoice?>
-          <div class="row js-checkbox-<?php echo $join_table_name."-".$join_table_mani_col['field'] ?>"></div>
-<?php     elseif ($join_table_mani_col['formtype'] == 'input'): //连接表字段类型是input?>
+<?php     if ($join_table_mani_col['type'] == 'select'): //连接表字段类型是select?>
+          <select name="<?php echo $join_table_name."[{$join_table_mani_col['field']}]" ?>" class="js-select-<?php echo "T{$join_table_name}C{$join_table_mani_col['field']}" ?> form-control"></select>
+<?php     elseif ($join_table_mani_col['type'] == 'multichoice'): //连接表字段类型是multichoice?>
+          <div class="row js-multichoice-<?php echo "T{$join_table_name}C{$join_table_mani_col['field']}" ?>"></div>
+<?php     elseif ($join_table_mani_col['type'] == 'input'): //连接表字段类型是input?>
           <input name="<?php echo $join_table_name."[{$join_table_mani_col['field']}]" ?>" type="text">
 <?php     endif ?>
 <?php   endforeach ?>
 <?php endforeach //end连接表字段?>
-<?php /*----------生成修改表单----------*/?>
+<?php /*----------生成表单----------*/?>
           <input name="<?php echo $bean['id']['field']?>" type="text" style="display: none" />
           <br/>
-          <span class="btn btn-primary">修改<?php echo $bean['tbl_comment']?></span>
+          <span class="btn btn-primary"><?php echo $bean['tbl_comment']?></span>
         </form>
-        <!-- /edit -->   
+        <!-- /add&edit -->   
       </div>
     </div>
   </div>
@@ -296,7 +218,7 @@
     var add_dialog = $.dialog({
         title: '添加<?php echo $bean['tbl_comment']?>',
         content: function(){
-          return '<form id="add-form" data-parsley-validate>' + $('#js-add-form').html() + '</form>';
+          return '<form id="add-form" data-parsley-validate>' + $('#js-add-edit-form').html() + '</form>';
         },
         onContentReady: function(){
           init_dialog(add_dialog.$content);
@@ -314,7 +236,7 @@
       $/*.listen*/('parsley:field:validate', function() {
         validate_form();
       });
-      $form.find('.btn').on('click', function() {
+      $form.find('.btn').text("添加"+$(this).text()).on('click', function() {
         //parsley()和serialize()不能用$form（是div节点）必须用$('#add-form')
         if ($('#add-form').parsley().validate()) {
 <?php foreach ($bean['col'] as $key => $column): ?>
@@ -364,10 +286,11 @@
 <?php   endif ?>
 <?php endforeach ?>
 <?php /*----------/初始化type不是input的字段----------*/?>
+<?php /*----------初始化join操作的字段----------*/?>
 <?php foreach ($bean['join'] as $join_table_name => $join_table): ?>
 <?php   foreach ($join_table['manipulation_col'] as $join_table_mani_col): ?>
-<?php     if ($join_table_mani_col['formtype'] == 'multichoice'): ?>
-      $form.find('.js-checkbox-<?php echo $join_table_name?> input').each(function(){
+<?php     if ($join_table_mani_col['type'] == 'multichoice'): ?>
+      $form.find('.js-multichoice-<?php echo "T{$join_table_name}C{$join_table_mani_col['field']}" ?> input').each(function(){
         var self = $(this),
           label = self.next(),
           label_text = label.text();
@@ -380,6 +303,7 @@
 <?php     endif ?>
 <?php   endforeach ?>
 <?php endforeach ?>
+<?php /*----------/初始化join操作的字段----------*/?>
     }
     var validate_form = function() {
       if (true === $('#add-form').parsley().isValid()) {
@@ -414,7 +338,7 @@
     var edit_dialog = $.dialog({
       title: '修改<?php echo $bean['tbl_comment']?>',
       content: function(){
-        return '<form id="edit-form" data-parsley-validate>' + $('#js-edit-form').html() + '</form>';
+        return '<form id="edit-form" data-parsley-validate>' + $('#js-add-edit-form').html() + '</form>';
       },
       onContentReady: function(){
         init_dialog(edit_dialog.$content);
@@ -453,7 +377,7 @@
       $/*.listen*/('parsley:field:validate', function() {
         validate_form();
       });
-      $form.find(".btn").on('click', function() {
+      $form.find(".btn").text("修改"+$(this).text()).on('click', function() {
         //parsley()和serialize()不能用$form（是div节点）必须用$('#edit-form')
         if ($('#edit-form').parsley().validate()) {
 <?php foreach ($bean['col'] as $key => $column): ?>
@@ -504,17 +428,16 @@
 <?php   endif ?>
 <?php endforeach ?>
 <?php /*----------/初始化type不是input的字段----------*/?>
-
-<?php /*----------初始化manipulation_col----------*/?>
+<?php /*----------初始化join操作的字段----------*/?>
 <?php foreach ($bean['join'] as $join_table_name => $join_table): ?>
 <?php   foreach ($join_table['manipulation_col'] as $join_table_mani_col): ?>
-<?php     if ($join_table_mani_col['formtype'] == 'multichoice'): ?>
-      var checked_<?php echo $join_table_mani_col['field']?>_array = data['<?php echo $join_table_mani_col['field']?>'].split(',');
-      $form.find('.js-checkbox-<?php echo $join_table_name?> input').each(function(){
+<?php     if ($join_table_mani_col['type'] == 'multichoice'): ?>
+      var checked_<?php echo "T{$join_table_name}C{$join_table_mani_col['field']}" ?>_array = data['<?php echo "T{$join_table_name}C{$join_table_mani_col['field']}" ?>'].split(',');
+      $form.find('.js-multichoice-<?php echo "T{$join_table_name}C{$join_table_mani_col['field']}" ?> input').each(function(){
         var self = $(this),
             label = self.next(),
             label_text = label.text();
-        if ($.inArray(self.val(), checked_<?php echo $join_table_mani_col['field']?>_array) != -1) {
+        if ($.inArray(self.val(), checked_<?php echo "T{$join_table_name}C{$join_table_mani_col['field']}" ?>_array) != -1) {
           self.prop('checked',true);
         };
         label.remove();
@@ -526,7 +449,7 @@
 <?php     endif ?>
 <?php   endforeach ?>
 <?php endforeach ?>
-<?php /*----------/初始化manipulation_col----------*/?>
+<?php /*----------/初始化join操作的字段----------*/?>
     }
 
     var validate_form = function() {
@@ -582,26 +505,22 @@
   }
 
 <?php /*----------初始化添加，修改的select和mutichoice（使用其他表字段作为select和mutichoice值）----------*/?>
-<?php if ($bean["extras"]['table_s_m']): ?>
+<?php if ($bean["extras"]['init_form_s_m']): ?>
   function init_form_s_m(){
     $.post("<?php echo "<?=site_url('back/{$bean_name}/get_form_data')?>"?>", {}, function(data,status){
       if (data['status'] == true) {
-<?php   foreach ($bean["extras"]['table_s_m'] as $table_s_m): ?>
-<?php     if ($table_s_m['type'] == 'select'): ?>
-          var $add_<?php echo $table_s_m['field'] ?> = $("#js-add-form select[name='<?php echo $table_s_m['field'] ?>']");
-          var $edit_<?php echo $table_s_m['field'] ?> = $("#js-edit-form select[name='<?php echo $table_s_m['field'] ?>']");
-          $(data.<?php echo $table_s_m[0] ?>).each(function(){
-            var option_str = '<option value="'+this.<?php echo $table_s_m[1] ?>+'">'+this.<?php echo $table_s_m[2] ?>+'</option>'
-            $add_<?php echo $column['field'] ?>.append(option_str);
-            $edit_<?php echo $column['field'] ?>.append(option_str);
+<?php   foreach ($bean["extras"]['init_form_s_m'] as $init_form_s_m): ?>
+<?php     if ($init_form_s_m['type'] == 'select'): ?>
+          var $container = $("#js-add-edit-form select[name='<?php echo $init_form_s_m['field'] ?>']");
+          $(data.<?php echo $init_form_s_m[0] ?>).each(function(){
+            var option_str = '<option value="'+this.<?php echo $init_form_s_m[1] ?>+'">'+this.<?php echo $init_form_s_m[2] ?>+'</option>'
+            $container.append(option_str);
           });
-<?php     elseif ($table_s_m['type'] == 'multichoice'): ?>
-          var $add_<?php echo $table_s_m['field'] ?> = $("#js-add-form .js-multichoice-<?php echo $table_s_m['field'] ?>");
-          var $edit_<?php echo $table_s_m['field'] ?> = $("#js-edit-form .js-multichoice-<?php echo $table_s_m['field'] ?>");
-          $(data.<?php echo $table_s_m[0] ?>).each(function(){
-            var checkbox_str = '<div class="col-md-4"><input name="<?php echo $table_s_m['field'] ?>[]" type="checkbox" value="'+this.<?php echo $table_s_m[1] ?>+'" />'+'<label>'+this.<?php echo $table_s_m[2] ?>+'</label></div>';
-            $add_<?php echo $table_s_m['field'] ?>.append(checkbox_str);
-            $edit_<?php echo $table_s_m['field'] ?>.append(checkbox_str);
+<?php     elseif ($init_form_s_m['type'] == 'multichoice'): ?>
+          var $container = $("#js-add-edit-form .js-multichoice-<?php echo $init_form_s_m['field'] ?>");
+          $(data.<?php echo $init_form_s_m[0] ?>).each(function(){
+            var checkbox_str = '<div class="col-md-4"><input name="<?php echo isset($init_form_s_m['name']) ? $init_form_s_m['name'] : $init_form_s_m['field'] ?>[]" type="checkbox" value="'+this.<?php echo $init_form_s_m[1] ?>+'" />'+'<label>'+this.<?php echo $init_form_s_m[2] ?>+'</label></div>';
+            $container.append(checkbox_str);
           });
 <?php     endif ?>
 <?php   endforeach ?>
@@ -613,7 +532,7 @@
 
   window.onload = function(){
     init_table();
-<?php if ($bean["extras"]['table_s_m']): ?>
+<?php if ($bean["extras"]['init_form_s_m']): ?>
     init_form_s_m();
 <?php endif ?>
   }

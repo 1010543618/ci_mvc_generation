@@ -484,18 +484,21 @@ function handle_beans(&$beans){
 						if (!is_array($join_table['manipulation_col'][$join_mani_col_name])) {
 							return_result('连接表'.$join_table_name.'的manipulation_col中的字段不是数组',false);
 						}
-						if (!isset($join_mani_col['field']) || !is_string($join_col['field'])) {
+						if (!isset($join_mani_col['field']) || !is_string($join_mani_col['field'])) {
 							return_result('连接表'.$join_table_name.'中的manipulation_col中的field未设置或不是字符串',false);
 						}
-						if (!isset($join_mani_col['comment']) || !is_string($join_col['comment'])) {
+						if (!isset($join_mani_col['comment']) || !is_string($join_mani_col['comment'])) {
 							return_result('连接表'.$join_table_name.'中的manipulation_col中的comment未设置或不是字符串',false);
+						}
+						if (!isset($join_mani_col['option_field_conf']) || !is_array($join_mani_col['option_field_conf'])) {
+							return_result('连接表'.$join_table_name.'中的manipulation_col中的option_field_conf未设置或不是数组',false);
 						}
 						if (!isset($join_mani_col['type'])) {
 							$join_mani_col['type'] = 'select';
 						}
- 						if (!isset($join_mani_col['option_field']) || !is_string($join_mani_col['option_field'])) {
-							return_result('连接表'.$join_table_name.'中的manipulation_col中的option_field未设置或不是字符串',false);
-						}
+					}
+					if (!isset($join_table['manipulation_pri'])) {
+						$join_table['manipulation_pri'] = $bean['id']['field'];
 					}
 				}
 			}
@@ -503,14 +506,20 @@ function handle_beans(&$beans){
 		}
 
 		// extras：生成时需要的信息
-		$form_fields = array();
-		$files = array();
-		$multichoice = array();
-		$tablecolumn_s_m = array();
-		$table_s_m = array();
-		$model_select_fields = array("$bean_name.{$bean['id']['field']}");
-		$model_join = array();
-		$view_show_col = array();
+		$form_fields = array();// c接受的字段 array("'col1'","'col2'");
+		$join_manipulation = array();// c需要操作的join信息 array('table1'=>'prifield','table2'=>'prifield')
+		$files = array();// c处理格式是文件的字段 array("'col1'","'col2'");
+		$multichoice = array();// c处理格式是多选的字段 array("'col1'","'col2'");
+		$get_form_data = array();// c生成get_form_data array("array('tablename1','optioncol','showcol')", "array('tablename2','optioncol','showcol')")
+		$jointable = array();// c生成jointable array('tablename1','tablename2')
+
+
+		$model_select_fields = array("$bean_name.{$bean['id']['field']}");// m查询的字段 array("col1","col2");
+		$model_join = array();// m连接的字段 array("JOIN('table1', 'col1=col2', 'left')", "JOIN('table2', 'col1=col2', 'left')");
+
+		
+		$view_show_col = array();// v显示的字段
+		$init_form_s_m = array();// v判断是否有select和mutilchoice的字段，并初始化
 
 		foreach ($bean['col'] as $key => $column) {
 			$form_fields[] = "'{$column['field']}'";
@@ -522,17 +531,19 @@ function handle_beans(&$beans){
 				$multichoice[] = "'{$column['field']}'";
 			}
 			if ($column['type'] == 'select' && $column['select_conf'] != null) {
-				$tablecolumn_s_m[] = "array('".implode("', '", $column['select_conf'])."')";
-				$table_s_m[] = $column['select_conf'] + array('type' => 'select', 'field' => $column['field']);
-				$model_select_fields[] = "{$column['select_conf'][0]}.{$column['select_conf'][2]}";
+				$jointable[] = $column['select_conf'][0];
+				$get_form_data[] = "array('".implode("', '", $column['select_conf'])."')";
+				$init_form_s_m[] = $column['select_conf'] + array('type' => 'select', 'field' => $column['field']);
+				$model_select_fields[] = "{$column['select_conf'][0]}.{$column['select_conf'][2]} AS {$column['select_conf'][2]}";
 				$model_join[] = "JOIN('{$column['select_conf'][0]}', '$bean_name.{$column['field']}={$column['select_conf'][0]}.{$column['select_conf'][1]}', 'left')";
 				$view_show_col[] = array(
 					"field" => $column['select_conf'][2],
 					"comment" => $column['comment']
 					);
 			}elseif($column['type'] == 'multichoice' && $column['multichoice_conf'] != null){
-				$tablecolumn_s_m[] = "array('".implode("', '", $column['multichoice_conf'])."')";
-				$table_s_m[] = $column['multichoice_conf'] + array('type' => 'multichoice', 'field' => $column['field']);
+				$jointable[] = $column['multichoice_conf'][0];
+				$get_form_data[] = "array('".implode("', '", $column['multichoice_conf'])."')";
+				$init_form_s_m[] = $column['multichoice_conf'] + array('type' => 'multichoice', 'field' => $column['field']);
 				$model_select_fields[] = "{$column['multichoice_conf'][0]}.{$column['multichoice_conf'][2]}";
 				$child_join_table = "'(SELECT {$bean['id']['field']}, GROUP_CONCAT({$column['multichoice_conf'][0]}.{$column['multichoice_conf'][2]}) AS {$column['multichoice_conf'][2]} FROM $bean_name left join {$column['multichoice_conf'][0]} ON FIND_IN_SET({$column['multichoice_conf'][0]}.{$column['multichoice_conf'][1]},$bean_name.{$column['field']}) != 0 GROUP BY {$bean['id']['field']}) AS {$column['multichoice_conf'][0]}'";
 				$model_join[] = "JOIN($child_join_table, '$bean_name.{$bean['id']['field']}={$column['multichoice_conf'][0]}.{$bean['id']['field']}', 'left')";
@@ -551,26 +562,48 @@ function handle_beans(&$beans){
 		foreach ($bean['join'] as $join_table_name => $join_table) {
 			foreach ($join_table['col'] as $column) {
 				$view_show_col[] = array(
-					"field" => "$join_table_name-{$column['field']}",
+					"field" => "T{$join_table_name}C{$column['field']}",
 					"comment" => $column['comment']
 					);
-				$model_select_fields[] = "$join_table_name.{$column['field']} AS $join_table_name-{$column['field']}";
+				if ($column['is_group_concat']) {
+					$model_select_fields[] = "GROUP_CONCAT($join_table_name.{$column['field']}) AS T{$join_table_name}C{$column['field']}";
+				}else{
+					$model_select_fields[] = "$join_table_name.{$column['field']} AS T{$join_table_name}C{$column['field']}";
+				}
+				
 			}
 			foreach ($join_table['manipulation_col'] as $mani_col) {
-				$form_fields[] = "'$join_table_name-{$mani_col['field']}'";
+				$form_fields[] = "'$join_table_name'";
+				$model_select_fields[] = "GROUP_CONCAT($join_table_name.{$mani_col['field']}) AS T{$join_table_name}C{$mani_col['field']}";
+				if ($mani_col['type']=="select") {
+					
+					$jointable[] = $mani_col['option_field_conf'][0];
+					$get_form_data[] = "array('".implode("', '", $mani_col['option_field_conf'])."')";
+					$init_form_s_m[] = $mani_col['option_field_conf'] + array('type' => 'select', 'field' => "T$join_table_nameC{$mani_col['field']}", 'name' => "{$join_table_name}[{$mani_col['field']}]");
+				}elseif ($mani_col['type']=="multichoice") {
+					$jointable[] = $mani_col['option_field_conf'][0];
+					$get_form_data[] = "array('".implode("', '", $mani_col['option_field_conf'])."')";
+					$init_form_s_m[] = $mani_col['option_field_conf'] + array('type' => 'multichoice', 'field' => "T{$join_table_name}C{$mani_col['field']}", 'name' => "{$join_table_name}[{$mani_col['field']}]");
+				}
+			}
+			if ($join_table['manipulation_col']) {
+				$join_manipulation[] = "array('$join_table_name', '{$join_table['manipulation_pri']}')";
 			}
 			$model_join[] = "JOIN('$join_table_name', '{$join_table['pri_field']}={$join_table['join_field']}', 'left')";
 		}
-		$bean['extras']['form_fields'] = $form_fields;//用于生成c文件form_fields
-		$bean['extras']['files'] = $files;//用于生成c文件files
-		$bean['extras']['multichoice'] = $multichoice;//用于生成c文件multichoice
 
-		$bean['extras']['tablecolumn_s_m'] = $tablecolumn_s_m;//用于生成c文件tablecolumn_s_m
-		$bean['extras']['table_s_m'] = $table_s_m;//用于生成v文件的init_form_s_m，c文件加载模型
+		$bean['extras']['form_fields'] = $form_fields;
+		$bean['extras']['files'] = $files;
+		$bean['extras']['multichoice'] = $multichoice;
+		$bean['extras']['join_manipulation'] = $join_manipulation;
+		$bean['extras']['get_form_data'] = $get_form_data;
+		$bean['extras']['jointable'] = array_unique($jointable);
 
-		$bean['extras']['model_select_fields'] = $model_select_fields;//用于m文件生成selectPage
-		$bean['extras']['model_join'] = $model_join;//m生成JOIN和判断是否生成新selectPage
-		
+		$bean['extras']['model_select_fields'] = $model_select_fields;
+		$bean['extras']['model_join'] = $model_join;
+
+		$bean['extras']['init_form_s_m'] = $init_form_s_m;
+
 		$bean['extras']['view_show_col'] = $view_show_col;
 	}
 }

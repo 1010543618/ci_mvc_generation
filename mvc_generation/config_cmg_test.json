@@ -15,62 +15,38 @@
 			"field":"role_id",
 			"comment":"角色ID（用“,
 			”分隔）",
-			"type":"input",
+			"type":"select",
+			"select_conf":["role","role_id","role_name"],
 			"validation":""
 		},
 		{
 			"field":"perm_id",
 			"comment":"权限ID（用“,
 			”分隔）",
-			"type":"input",
+			"type":"multichoice",
+			"multichoice_conf":["permission","perm_id","controller"],
 			"validation":""
-		}]
-	},
-	"admin_game":{
-		"tbl_comment":"管理员_游戏",
-		"id":{
-			"field":"admin_id",
-			"comment":"管理员ID"
-		},
-		"col":[{
-			"field":"game_id",
-			"comment":"game_id",
-			"type":"input",
-			"validation":"required "
 		}],
 		"join":{
-			"admin":{
+			"admin_game":{
 				"pri_field":"admin.admin_id",
 				"join_field":"admin_game.admin_id",
-				"col":[{
-					"field":"admin_id",
-					"comment":"管理员ID"
-				},
-				{
-					"field":"admin_name",
-					"comment":"管理员名"
-				},
-				{
-					"field":"role_id",
-					"comment":"角色ID（用“,
-					”分隔）"
-				},
-				{
-					"field":"perm_id",
-					"comment":"权限ID（用“,
-					”分隔）"
-				}]
+				"manipulation_col":[{
+					"field":"game_id",
+					"comment":"游戏",
+					"type":"multichoice",
+					"option_field_conf":["game","game_id","game_name"]
+				}],
+				"manipulation_pri":"admin_id"
 			},
 			"game":{
-				"pri_field":"game.game_id",
-				"join_field":"admin_game.game_id",
-				"col":[{
-					"field":"game_id",
-					"comment":"游戏ID"
-				},
+				"pri_field":"admin_game.game_id",
+				"join_field":"game.game_id",
+				"col":[
 				{
 					"field":"game_name",
-					"comment":"游戏名"
+					"comment":"游戏名",
+					"is_group_concat":"true"
 				}]
 			}
 		}
@@ -121,9 +97,9 @@
 		},
 		{
 			"field":"perm_id",
-			"comment":"权限ID（用“,
-			”分隔）",
-			"type":"input",
+			"comment":"权限",
+			"type":"multichoice",
+			"multichoice_conf":["permission","perm_id","controller"],
 			"validation":"required "
 		}]
 	},

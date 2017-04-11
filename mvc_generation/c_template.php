@@ -10,10 +10,11 @@ class <?php echo $controller_name ?> extends MY_Controller {
 			'form_fields' => array(<?php echo implode(', ', $bean["extras"]['form_fields']) ?>),
 			'files' => array(<?php echo implode(', ', $bean["extras"]['files']) ?>),
 			'multichoice' => array(<?php echo implode(', ', $bean["extras"]['multichoice']) ?>),
-			'tablecolumn_s_m' => array(<?php echo implode(', ', $bean["extras"]['tablecolumn_s_m']) ?>)
+			'get_form_data' => array(<?php echo implode(', ', $bean["extras"]['get_form_data']) ?>),
+            'join_manipulation' => array(<?php echo implode(', ', $bean["extras"]['join_manipulation']) ?>)
 			);
-<?php foreach ($bean["extras"]['table_s_m'] as $table_s_m): //为获取select或multichoice的值加载模型?>
-		$this->load->model('<?php echo $table_s_m[0].'_model' ?>');
+<?php foreach ($bean["extras"]['jointable'] as $jointable): //为获取select或multichoice的值加载模型?>
+		$this->load->model('<?php echo $jointable.'_model' ?>');
 <?php endforeach ?>
 <?php if (isset($bean['join'])): //引入join的表的模型?>
 <?php	foreach ($bean['join'] as $join_table_name => $join_table): ?>
@@ -106,7 +107,7 @@ class <?php echo $controller_name ?> extends MY_Controller {
 <?php endif ?>
 <?php /*----------/为multichoice重写insert，update*/?>
 
-<?php if ($bean['join'] != null): //为add，edie表单查找外链接的表的数据?>
+<?php if (0): //$bean['join'] != null为add，edie表单查找外链接的表的数据?>
 	public function get_form_data(){
 <?php 	foreach ($bean['join'] as $join_table_name => $join_table): ?>
 <?php 		foreach ($join_table['col'] as $join_table_col): ?>

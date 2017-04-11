@@ -25,6 +25,10 @@ class MY_Model extends CI_Model {
 		return $this->db->insert($this->model_table, $form_data);
 	}
 
+	public function insert_batch($form_data){
+		return $this->db->insert_batch($this->model_table, $form_data);
+	}
+
 	public function update($form_data, $id){
 		// update：TRUE on success, FALSE on failure
 		return $this->db->update($this->model_table, $form_data, $id);
