@@ -9,10 +9,10 @@ class MY_Model extends CI_Model {
 		$this->model_table = str_replace('_model', '', strtolower(get_class($this)));
 	}
 
-	public function selectPage($start, $length)
+	public function selectPage($start, $length, $where = null)
 	{
 		// get(表, 取多少, 开始)
-		return $this->db->get($this->model_table, $length, $start)->result_array();
+		return $this->db->where($where)->get($this->model_table, $length, $start)->result_array();
 	}
 
 	public function countAll(){
@@ -58,7 +58,7 @@ class MY_Model extends CI_Model {
 	 * @param    string     $field 查找的字段的字符串
 	 * @return   array             查找的结果
 	 */
-	public function getByIdAndField($id,$field){
+	public function getByIdAndField($id,$field = '*'){
 		return $this->db->select($field)->get_where($this->model_table, $id)->row_array();
 	}
 	

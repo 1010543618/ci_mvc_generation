@@ -5,7 +5,8 @@ class MY_Controller extends CI_Controller {
     public function __construct()
     {
         parent::__construct();
-        $this->model_name = isset($this->model_name) ? $this->model_name : strtolower(get_class($this)).'_model';
+        $this->table_name = strtolower(get_class($this));
+        $this->model_name = isset($this->model_name) ? $this->model_name : $this->table_name.'_model';
         $this->load->model($this->model_name);
     }
 
@@ -13,9 +14,14 @@ class MY_Controller extends CI_Controller {
         
         $start = $this->input->get('start', true);
         $length = $this->input->get('length', true);
-
+        $where_source = $this->input->get('custom_search', true) ? $this->input->get('custom_search', true) : array();
+        $where = null;
+        foreach ($where_source as $key => $value) {
+            $where["{$this->table_name}.$key"] = $value;
+        }
         $result['draw'] = $this->input->get('draw', true);
-        $result['data'] = $this->{$this->model_name}->selectPage($start, $length);
+        $result['data'] = $this->{$this->model_name}->selectPage($start, $length, $where);
+        // echo $this->db->last_query();die();
         $result['recordsTotal'] = $this->{$this->model_name}->countAll();
         $result['recordsFiltered'] = $result['recordsTotal'];
         
@@ -160,7 +166,8 @@ class MY_Controller extends CI_Controller {
         $this->returnResult($result);
     }
 
-    protected function loadViewhf($view){
+    protected function loadViewhf($view, $response_data = array()){
+        $data = $response_data;
         if ($cj = $this->_getViewCssjs($view)) {
             $data['css'] = $cj['css'];
             $data['js'] = $cj['js'];

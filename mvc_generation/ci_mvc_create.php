@@ -200,7 +200,6 @@ function create_tables_bean($config){
 						break;
 					case 'text':
 						$col['type'] = 'text';
-						$col['validation'] = 'maxlength="'.$type_bracket.'" ';
 						break;
 					// enum和set
 					case 'enum':
@@ -236,6 +235,7 @@ function create_tables_bean($config){
 				$tables[$table_name]['col'][] = $col;
 			}
 		}
+		// die();
 	}
 
 	// 2。将tables数组转换为json字符串（不自动转换为unicode编码）
