@@ -15,9 +15,12 @@ class MY_Model extends CI_Model {
 		return $this->db->where($where)->get($this->model_table, $length, $start)->result_array();
 	}
 
-	public function countAll(){
+	public function countAll($where = null){
 		// count_all：获取记录总数
-		return $this->db->count_all($this->model_table);
+		if ($where) {
+			return $this->db->select('count(1) as count')->where($where)->get($this->model_table)->row()->count;
+		}else
+			return $this->db->count_all($this->model_table);
 	}
 
 	public function insert($form_data){

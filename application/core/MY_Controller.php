@@ -22,7 +22,7 @@ class MY_Controller extends CI_Controller {
         $result['draw'] = $this->input->get('draw', true);
         $result['data'] = $this->{$this->model_name}->selectPage($start, $length, $where);
         // echo $this->db->last_query();die();
-        $result['recordsTotal'] = $this->{$this->model_name}->countAll();
+        $result['recordsTotal'] = $this->{$this->model_name}->countAll($where);
         $result['recordsFiltered'] = $result['recordsTotal'];
         
         $this->returnResult($result);
@@ -181,9 +181,9 @@ class MY_Controller extends CI_Controller {
     }
 
     protected function returnResult($result){
-    	header("Content-type: application/json");
-    	echo json_encode($result);
-    	die();
+        header("Content-type: application/json");
+        echo json_encode($result);
+        die();
     }
 
 
