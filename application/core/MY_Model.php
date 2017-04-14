@@ -9,13 +9,13 @@ class MY_Model extends CI_Model {
 		$this->model_table = str_replace('_model', '', strtolower(get_class($this)));
 	}
 
-	public function selectPage($start, $length, $where = null)
+	public function selectPage($start, $length, $where = true)
 	{
 		// get(表, 取多少, 开始)
 		return $this->db->where($where)->get($this->model_table, $length, $start)->result_array();
 	}
 
-	public function countAll($where = null){
+	public function countAll($where = true){
 		// count_all：获取记录总数
 		if ($where) {
 			return $this->db->select('count(1) as count')->where($where)->get($this->model_table)->row()->count;

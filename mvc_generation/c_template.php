@@ -14,11 +14,11 @@ class <?php echo $controller_name ?> extends MY_Controller {
             'join_manipulation' => array(<?php echo implode(', ', $bean["extras"]['join_manipulation']) ?>)
 			);
 <?php foreach ($bean["extras"]['jointable'] as $jointable): //为获取select或multichoice的值加载模型?>
-		$this->load->model('<?php echo $jointable.'_model' ?>');
+		$this->load->model('<?php echo ucmodel($jointable, "_") ?>');
 <?php endforeach ?>
 <?php if (isset($bean['join'])): //引入join的表的模型?>
 <?php	foreach ($bean['join'] as $join_table_name => $join_table): ?>
-		$this->load->model('<?php echo $join_table_name.'_model' ?>');
+		$this->load->model('<?php echo ucmodel($join_table_name, "_") ?>');
 <?php 	endforeach ?>
 <?php endif ?>
 	}
@@ -112,7 +112,7 @@ class <?php echo $controller_name ?> extends MY_Controller {
 <?php 	foreach ($bean['join'] as $join_table_name => $join_table): ?>
 <?php 		foreach ($join_table['col'] as $join_table_col): ?>
 		$field = array('<?php echo $join_table_col['field'] ?>');
-		$result['<?php echo $join_table_name ?>'] = $this-><?php echo $join_table_name.'_model' ?>->getAll($field);
+		$result['<?php echo $join_table_name ?>'] = $this-><?php echo $join_table_name.'_modle' ?>->getAll($field);
 <?php 		endforeach ?>
 <?php 	endforeach ?>
 		$result['status'] = true;

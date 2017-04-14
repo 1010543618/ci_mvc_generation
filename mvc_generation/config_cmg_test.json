@@ -145,7 +145,7 @@
 		{
 			"field":"profile",
 			"comment":"用户头像",
-			"type":"input",
+			"type":"file",
 			"validation":""
 		},
 		{
@@ -164,6 +164,19 @@
 			"field":"gift_time",
 			"comment":"收礼物的时间",
 			"type":"timestamp",
+			"validation":"required "
+		}]
+	},
+	"admin_game":{
+		"tbl_comment":"管理员_游戏",
+		"id":{
+			"field":"admin_id",
+			"comment":"用户id"
+		},
+		"col":[{
+			"field":"admin_id",
+			"comment":"用户id",
+			"type":"input",
 			"validation":"required "
 		}]
 	}

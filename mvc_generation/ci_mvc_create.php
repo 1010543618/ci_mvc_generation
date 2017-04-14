@@ -88,7 +88,7 @@ function output_mvc_file($config){
 	foreach ($beans as $bean_name => $bean) {
 		
 		//models
-		$model_name = ucfirst($bean_name).'_Model';
+		$model_name = ucmodel($bean_name, "_");
 		ob_start();
         require('./m_template.php');
         $model = ob_get_contents();
@@ -105,7 +105,7 @@ function output_mvc_file($config){
   		file_put_contents("{$config['v_folder']}/$bean_name.html", $view);
 
   		//controllers
-  		$controller_name = ucfirst($bean_name);
+  		$controller_name = implode('_', array_map('ucfirst', explode('_', $bean_name)));
   		ob_start();
         require('./c_template.php');
         $view = ob_get_contents();
@@ -167,12 +167,12 @@ function create_tables_bean($config){
 				preg_match("/FOREIGN KEY \(`{$column['field']}`\) REFERENCES `(.*?)` \(`(.*?)`\)/",$table_source['create_str'],$matchs);
 				$tables[$table_name]['join'][$matchs[1]]['pri_field'] = "{$matchs[1]}.{$matchs[2]}";
 				$tables[$table_name]['join'][$matchs[1]]['join_field'] = "$table_name.{$column['field']}";
-				foreach ($tables_source[$matchs[1]]['col'] as $column_for_join) {
-					$join_col = array();
-					$join_col['field'] = $column_for_join['field'];
-					$join_col['comment'] = $column_for_join['comment'];
-					$tables[$table_name]['join'][$matchs[1]]['col'][] = $join_col;
-				}
+				// foreach ($tables_source[$matchs[1]]['col'] as $column_for_join) {
+				// 	$join_col = array();
+				// 	$join_col['field'] = $column_for_join['field'];
+				// 	$join_col['comment'] = $column_for_join['comment'];
+				// 	$tables[$table_name]['join'][$matchs[1]]['col'][] = $join_col;
+				// }
 			}else {
 				// 普通字段
 				$col['field'] = $column['field'];
@@ -627,4 +627,17 @@ function return_result($info, $status){
 	echo json_encode($result);
 	die();
 }
+
+/**
+ * 通过表名创建模型名（将单词大写，加上_Model）
+ * @Author   zjf
+ * @DateTime 2017-04-14
+ * @param    string     $str        表名
+ * @return   string                 模型名
+ */
+function ucmodel($str){
+	return implode('_', array_map('ucfirst', explode('_', $str))).'_Model';
+}
+
+
 
