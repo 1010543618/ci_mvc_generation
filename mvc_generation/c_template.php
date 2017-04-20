@@ -6,21 +6,16 @@ class <?php echo $controller_name ?> extends MY_Controller {
 	public function __construct(){
 		parent::__construct();
 		$this->bean = array(
-			'id' => '<?php echo $bean['id']['field'] ?>',
+			'id' => '<?php echo implode(', ', $bean["extras"]['id']) ?>',
 			'form_fields' => array(<?php echo implode(', ', $bean["extras"]['form_fields']) ?>),
 			'files' => array(<?php echo implode(', ', $bean["extras"]['files']) ?>),
 			'multichoice' => array(<?php echo implode(', ', $bean["extras"]['multichoice']) ?>),
 			'get_form_data' => array(<?php echo implode(', ', $bean["extras"]['get_form_data']) ?>),
             'join_manipulation' => array(<?php echo implode(', ', $bean["extras"]['join_manipulation']) ?>)
 			);
-<?php foreach ($bean["extras"]['jointable'] as $jointable): //为获取select或multichoice的值加载模型?>
+<?php foreach ($bean["extras"]['jointable'] as $jointable): // 引入所有要操作的表模型?>
 		$this->load->model('<?php echo ucmodel($jointable, "_") ?>');
 <?php endforeach ?>
-<?php if (isset($bean['join'])): //引入join的表的模型?>
-<?php	foreach ($bean['join'] as $join_table_name => $join_table): ?>
-		$this->load->model('<?php echo ucmodel($join_table_name, "_") ?>');
-<?php 	endforeach ?>
-<?php endif ?>
 	}
 
 	public function index()
@@ -57,6 +52,8 @@ class <?php echo $controller_name ?> extends MY_Controller {
 <?php   endif ?>
 <?php endforeach ?>
 <?php /*----------/col的type=file上传文件处理----------*/?>
+
+<?php if (0): //废弃了不执行拉！！！?>
 <?php /*----------为multichoice重写insert，update*/?>
 <?php
 	$multichoice = null;
@@ -107,7 +104,6 @@ class <?php echo $controller_name ?> extends MY_Controller {
 <?php endif ?>
 <?php /*----------/为multichoice重写insert，update*/?>
 
-<?php if (0): //$bean['join'] != null为add，edie表单查找外链接的表的数据?>
 	public function get_form_data(){
 <?php 	foreach ($bean['join'] as $join_table_name => $join_table): ?>
 <?php 		foreach ($join_table['col'] as $join_table_col): ?>
@@ -118,6 +114,6 @@ class <?php echo $controller_name ?> extends MY_Controller {
 		$result['status'] = true;
 		$this->returnResult($result);
 	}
-<?php endif ?>
+<?php endif //废弃了不执行拉！！！?>
 
 }
