@@ -27,14 +27,20 @@
         <table id="responsived-atatable" class="table table-striped table-bordered dt-responsive nowrap" cellspacing="0" width="100%">
           <thead>
             <tr>
-              <th>序号</th>
+<?php if ($bean['extras']['judge']['has_id']):?>
+<?php   foreach ($bean['id'] as $key => $id): ?>
+              <th><?php echo $id['comment']?></th>
+<?php   endforeach ?>
+<?php endif?>
 <?php /*----------生成表格头----------*/?>
 <?php foreach ($bean['extras']['view_show_col'] as $column): ?>
               <th><?php echo $column['comment']?></th>
 <?php endforeach ?>
 <?php /*----------/生成表格头----------*/?>
+<?php if ($bean['extras']['judge']['has_id']): //有id才能删除和修改?>
               <th>修改</th>
               <th>删除</th>
+<?php endif //有id才能删除和修改?>
             </tr>
           </thead>
 
@@ -102,20 +108,26 @@
           </div>
 <?php   endif; ?>
 <?php endforeach //end主表字段?>
-<?php foreach ($bean['join'] as $join_table_name => $join_table): //连接表字段?>
-<?php   foreach ($join_table['manipulation_col'] as $join_table_mani_col): ?>
+<?php if ($bean['extras']['judge']['has_join']): ?>
+<?php   foreach ($bean['join'] as $join_table_name => $join_table): //连接表字段?>
+<?php     foreach ($join_table['manipulation_col'] as $join_table_mani_col): ?>
           <label><?php echo $join_table_mani_col['comment']?></label>
-<?php     if ($join_table_mani_col['type'] == 'select'): //连接表字段类型是select?>
+<?php       if ($join_table_mani_col['type'] == 'select'): //连接表字段类型是select?>
           <select name="<?php echo $join_table_name."[{$join_table_mani_col['field']}]" ?>" class="js-select-<?php echo "T{$join_table_name}C{$join_table_mani_col['field']}" ?> form-control"></select>
-<?php     elseif ($join_table_mani_col['type'] == 'multichoice'): //连接表字段类型是multichoice?>
+<?php       elseif ($join_table_mani_col['type'] == 'multichoice'): //连接表字段类型是multichoice?>
           <div class="row js-multichoice-<?php echo "T{$join_table_name}C{$join_table_mani_col['field']}" ?>"></div>
-<?php     elseif ($join_table_mani_col['type'] == 'input'): //连接表字段类型是input?>
+<?php       elseif ($join_table_mani_col['type'] == 'input'): //连接表字段类型是input?>
           <input name="<?php echo $join_table_name."[{$join_table_mani_col['field']}]" ?>" type="text">
 <?php     endif ?>
-<?php   endforeach ?>
-<?php endforeach //end连接表字段?>
+<?php     endforeach ?>
+<?php   endforeach //end连接表字段?>
+<?php endif ?>
 <?php /*----------生成表单----------*/?>
-          <input name="<?php echo $bean['id']['field']?>" type="text" style="display: none" />
+<?php if ($bean['extras']['judge']['has_id']):?>
+<?php   foreach ($bean['id'] as $key => $id): ?>
+          <input name="<?php echo $id['field']?>" type="text" style="display: none" />
+<?php   endforeach ?>
+<?php endif?>
           <br/>
           <span class="btn btn-primary"><?php echo $bean['tbl_comment']?></span>
         </form>
@@ -134,25 +146,15 @@
       "serverSide": true,
       "ajax": "<?php echo "<?=site_url('back/{$bean_name}/selectPage')?>"?>",
       "columns": [
-          {"data":"<?php echo $bean['id']['field']?>" },
+<?php if ($bean['extras']['judge']['has_id']):?>
+<?php   foreach ($bean['id'] as $key => $id): ?>
+          {"data":"<?php echo $id['field']?>" },  
+<?php   endforeach ?>
+<?php endif?>
 <?php foreach ($bean['extras']['view_show_col'] as $column): ?>
           {"data":"<?php echo $column['field']?>" },
 <?php endforeach ?>
-
-<?php if (0): //以后可能有用，先留着?>
-          {
-            "data":"<?php echo $join_table_mani_col['field']?>",
-            "render": function(data) {
-              var data = data ? data.split(',') : '';
-              var div = '';
-              $(data).each(function(){
-                div += '<span class="label label-primary">'+this+'</span>';
-              });
-              
-              return div;
-            }
-          },
-<?php endif ?>
+<?php if ($bean['extras']['judge']['has_id']): //有id才能删除和修改?>
           { 
             "data": null,
             "render": function(data) {
@@ -167,12 +169,33 @@
             }
           },
           { 
-            "data": "<?php echo "{$bean['id']['field']}"?>",
+            "data": null,
             "render": function(data) {
+              //data的数据中有"要处理一下
+              $.each(data, function(index, value){
+                if(value != null) data[index] = value.replace(/"/g, '\\"');
+              });
+              data = JSON.stringify(data);
+              data = data.replace(/"/g, '&quot;');
               var deldiv = '<a class="del red" onClick="del_confirm('+data+')"><i class="fa fa-trash bigger-130"></i>删除</a>';
               return '<div class="action-buttons">'+ deldiv +'</div>';
             }
           }
+<?php endif //end有id才能删除和修改?>
+<?php if (0): //以后可能有用，先留着?>
+          {
+            "data":"<?php echo $join_table_mani_col['field']?>",
+            "render": function(data) {
+              var data = data ? data.split(',') : '';
+              var div = '';
+              $(data).each(function(){
+                div += '<span class="label label-primary">'+this+'</span>';
+              });
+              
+              return div;
+            }
+          },
+<?php endif ?>
         ],
       
       
@@ -287,9 +310,10 @@
 <?php endforeach ?>
 <?php /*----------/初始化type不是input的字段----------*/?>
 <?php /*----------初始化join操作的字段----------*/?>
-<?php foreach ($bean['join'] as $join_table_name => $join_table): ?>
-<?php   foreach ($join_table['manipulation_col'] as $join_table_mani_col): ?>
-<?php     if ($join_table_mani_col['type'] == 'multichoice'): ?>
+<?php if ($bean['extras']['judge']['has_join']): ?>
+<?php   foreach ($bean['join'] as $join_table_name => $join_table): ?>
+<?php     foreach ($join_table['manipulation_col'] as $join_table_mani_col): ?>
+<?php       if ($join_table_mani_col['type'] == 'multichoice'): ?>
       $form.find('.js-multichoice-<?php echo "T{$join_table_name}C{$join_table_mani_col['field']}" ?> input').each(function(){
         var self = $(this),
           label = self.next(),
@@ -300,9 +324,10 @@
           insert: '<div class="icheck_line-icon"></div>' + label_text
         });
       });
-<?php     endif ?>
+<?php       endif ?>
+<?php     endforeach ?>
 <?php   endforeach ?>
-<?php endforeach ?>
+<?php endif ?>
 <?php /*----------/初始化join操作的字段----------*/?>
     }
     var validate_form = function() {
@@ -331,7 +356,7 @@
     }
   }
   
-
+<?php if ($bean['extras']['judge']['has_id']):?>
   function edit_dialog(data){
     data = data.replace(/&quot;/g, '"');
     data = JSON.parse(data);
@@ -368,12 +393,16 @@
       $form.find(":input[name='<?php echo $column['field']?>']").val(data['<?php echo $column['field']?>']);
 <?php endif ?>
 <?php endforeach ?>
-<?php foreach ($bean['join'] as $join_table_name => $join_table): //初始化连接表默认值?>
-<?php   foreach ($join_table['manipulation_col'] as $join_table_mani_col): ?>
+<?php if ($bean['extras']['judge']['has_join']): ?>
+<?php   foreach ($bean['join'] as $join_table_name => $join_table): //初始化连接表默认值?>
+<?php     foreach ($join_table['manipulation_col'] as $join_table_mani_col): ?>
       $form.find(":input[name='<?php echo $join_table_name."[{$join_table_mani_col['field']}]"?>']").val(data['<?php echo $join_table_mani_col['field'] ?>']);  
+<?php     endforeach ?>
 <?php   endforeach ?>
+<?php endif ?>
+<?php foreach ($bean['id'] as $key => $id): ?>
+        $form.find(":input[name='<?php echo $id['field']?>']").val(data['<?php echo $id['field']?>']);
 <?php endforeach ?>
-      $form.find(":input[name='<?php echo $bean['id']['field']?>']").val(data['<?php echo $bean['id']['field']?>']);
       $/*.listen*/('parsley:field:validate', function() {
         validate_form();
       });
@@ -429,9 +458,10 @@
 <?php endforeach ?>
 <?php /*----------/初始化type不是input的字段----------*/?>
 <?php /*----------初始化join操作的字段----------*/?>
-<?php foreach ($bean['join'] as $join_table_name => $join_table): ?>
-<?php   foreach ($join_table['manipulation_col'] as $join_table_mani_col): ?>
-<?php     if ($join_table_mani_col['type'] == 'multichoice'): ?>
+<?php if ($bean['extras']['judge']['has_join']): ?>
+<?php   foreach ($bean['join'] as $join_table_name => $join_table): ?>
+<?php     foreach ($join_table['manipulation_col'] as $join_table_mani_col): ?>
+<?php       if ($join_table_mani_col['type'] == 'multichoice'): ?>
       var checked_<?php echo "T{$join_table_name}C{$join_table_mani_col['field']}" ?>_array = data['<?php echo "T{$join_table_name}C{$join_table_mani_col['field']}" ?>'].split(',');
       $form.find('.js-multichoice-<?php echo "T{$join_table_name}C{$join_table_mani_col['field']}" ?> input').each(function(){
         var self = $(this),
@@ -446,9 +476,10 @@
           insert: '<div class="icheck_line-icon"></div>' + label_text
         });
       });
-<?php     endif ?>
+<?php       endif ?>
+<?php     endforeach ?>
 <?php   endforeach ?>
-<?php endforeach ?>
+<?php endif ?>
 <?php /*----------/初始化join操作的字段----------*/?>
     }
 
@@ -480,15 +511,24 @@
 
 
   function del_confirm(data){
+    var data = JSON.parse(data.replace(/&quot;/g, '"'));
+    var content = '';
+<?php foreach ($bean['id'] as $key => $id): ?>
+    content += "<?php echo $id['comment']?>："+<?php echo data.$id['field']?>;
+<?php endforeach ?>
     var del_confirm = $.confirm({
         title: '删除',
-        content: '是否删除该数据，序号'+data,
+        content: content,
         buttons: {
           confirm: {
             text: '确认',
             btnClass : 'btn-danger',
             action : function(){
-              $.post("<?php echo "<?=site_url('back/{$bean_name}/delete')?>"?>", {<?php echo $bean['id']['field']?> : data}, function(data,status){
+              var post_data = Object();
+<?php foreach ($bean['id'] as $key => $id): ?>
+              post_data.<?php echo $id['field']?> = <?php echo data.$id['field']?>;
+<?php endforeach ?>
+              $.post("<?php echo "<?=site_url('back/{$bean_name}/delete')?>"?>", post_data, function(data,status){
                 if (data['status'] == true) {
                   DEP_TABLE.ajax.reload( null, false );
                   $.dialog('删除成功');
@@ -503,7 +543,7 @@
         }
     });
   }
-
+<?php endif?>
 <?php /*----------初始化添加，修改的select和mutichoice（使用其他表字段作为select和mutichoice值）----------*/?>
 <?php if ($bean["extras"]['init_form_s_m']): ?>
   function init_form_s_m(){

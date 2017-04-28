@@ -267,7 +267,7 @@ class Generation{
 			}elseif(!is_array($bean['id'])){
 				return_json($bean_name.'的id不是数组',false);
 			}else{
-				$this->_check_bean_id($bean['id']);
+				$this->_check_bean_id($bean['id'], $bean_name);
 				
 			}
 			// col
@@ -276,7 +276,7 @@ class Generation{
 			}elseif(!is_array($bean['col'])){
 				return_json($bean_name.'的col不是数组',false);
 			}else{
-				$this->_check_and_handle_bean_col($bean['col']);
+				$this->_check_and_handle_bean_col($bean['col'], $bean_name);
 			}
 			
 			//join
@@ -367,18 +367,20 @@ class Generation{
 		}
 	}
 
-	private function _check_bean_id($ids){
+	private function _check_bean_id($ids, $bean_name){
 		foreach ($ids as $key => $id) {
 			if (!isset($id['field']) || !is_string($id['field'])) {
-				return_json($bean_name.'的第{$key + 1}个id的field未设置或不是字符串',false);
+				$num = $key+1;
+				return_json($bean_name."的第{$num}个id的field未设置或不是字符串",false);
 			}
 			if (!isset($id['comment']) || !is_string($id['comment'])) {
-				return_json($bean_name.'的第{$key + 1}个id的comment未设置或不是字符串',false);
+				$num = $key+1;
+				return_json($bean_name."的第{$num}个id的comment未设置或不是字符串",false);
 			}
 		}
 	}
 
-	private function _check_and_handle_bean_col(&$cols){
+	private function _check_and_handle_bean_col(&$cols, $bean_name){
 		//col
 		foreach ($cols as $col_name => &$column) {
 			if (!is_array($cols[$col_name])) {
@@ -486,7 +488,7 @@ class Generation{
 
 	private function _create_bean_extras(&$bean, $bean_name){
 
-		$id = array();
+		$id = array();// c接受的id("'id1'","'id2'");
 		$form_fields = array();// c接受的字段 array("'col1'","'col2'");
 		$join_manipulation = array();// c需要操作的join信息 array('table1'=>'prifield','table2'=>'prifield')
 		$files = array();// c处理格式是文件的字段 array("'col1'","'col2'");
@@ -507,8 +509,8 @@ class Generation{
 			$judge['has_id'] = true;
 			foreach ($bean['id'] as $key => $id) {
 				$model_select_fields[] = "$bean_name.{$id['field']}";
+				$id[] = "'{$id['field']}'";
 			}
-			$id[] = "'{$id['field']}'";
 		}else{
 			$judge['has_id'] = false;
 		}

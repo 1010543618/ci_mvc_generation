@@ -199,18 +199,17 @@ class MY_Controller extends CI_Controller {
         $cssjs = json_decode($cssjs_str, TRUE);
 
         // 获取找出当前cssjs
-        if (strrpos($path, '/') === false) {// 在视图根目录
-            $result['css'] = $cssjs['/']['css'];
-            $result['js'] = $cssjs['/']['js'];
-            return $result;
-        }
-        while (strrpos($path, '/') !== false) {
-            $path = str_replace(strrchr($path, '/'), '', $path);
+        while (true) {
             if (array_key_exists($path, $cssjs)) {
                 $result['css'] = $cssjs[$path]['css'];
                 $result['js'] = $cssjs[$path]['js'];
                 return $result;
+            }elseif (strrchr($path, '/') === false) {
+                $result['css'] = $cssjs['/']['css'];
+                $result['js'] = $cssjs['/']['js'];
+                return $result;
             }
+            $path = str_replace(strrchr($path, '/'), '', $path);
         }
         return false;
     }
