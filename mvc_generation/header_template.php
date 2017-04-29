@@ -48,7 +48,7 @@ CODE;
 		                  <li><a><i class="fa fa-home"></i> 生成的结果 <span class="fa fa-chevron-down"></span></a>
 		                    <ul class="nav child_menu">
 <?php foreach ($beans as $table_name => $bean): ?>
-								<li><a href="<?php echo "<?=site_url('{$config['c_child_folder']}$table_name/index')?>"?>"><?php echo $bean['tbl_comment']?></a></li>
+								<li><a href="<?php echo "<?=site_url('{$this->folder['c_child']}$table_name/index')?>"?>"><?php echo $bean['tbl_comment']?></a></li>
 <?php endforeach ?>
 		                    </ul>
 		                  </li>

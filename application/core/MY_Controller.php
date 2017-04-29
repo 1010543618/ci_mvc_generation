@@ -75,12 +75,19 @@ class MY_Controller extends CI_Controller {
     }
 
     public function update() {
+        if (!isset($this->bean['ids'])) {
+            $result['status'] = false;
+            $result['msg'] = '没有id无法更新';
+            $this->returnResult($result);
+        }
         // 获取form_fields的字段
         foreach ($this->bean['form_fields'] as $form_field) {
             $form_data[$form_field] = $this->input->post($form_field, TRUE);
         }
         // 获取id
-        $id = array($this->bean['id'] => $this->input->post($this->bean['id'], TRUE));
+        foreach ($this->bean['ids'] as $key => $id) {
+            $ids = array($id => $this->input->post($id, TRUE));
+        }
         // 处理mutilchoice字段
         foreach ($this->bean['multichoice'] as $multichoice) {
             $form_data[$multichoice] = $form_data[$multichoice] ? implode(',', $form_data[$multichoice]) : '';
@@ -96,7 +103,7 @@ class MY_Controller extends CI_Controller {
             unset($form_data[$join_manipulation[0]]);
         }
         // 更新数据
-        if ($this->{$this->model_name}->update($form_data, $id)) {
+        if ($this->{$this->model_name}->update($form_data, $ids)) {
             $result['status'] = true;
         } else {
             $result['status'] = false;
@@ -140,8 +147,15 @@ class MY_Controller extends CI_Controller {
     }
 
     public function delete() {
+        if (!isset($this->bean['ids'])) {
+            $result['status'] = false;
+            $result['msg'] = '没有id无法更新';
+            $this->returnResult($result);
+        }
         // 获取id
-        $id = array($this->bean['id'] => $this->input->post($this->bean['id'], TRUE));
+        foreach ($this->bean['ids'] as $key => $id) {
+            $ids = array($id => $this->input->post($id, TRUE));
+        }
         // 若有文件delete前将文件位置保存
         if ($this->bean['files']) {
             $files = $this->{$this->model_name}->getByIdAndField($id, implode(',', $this->bean['files']));
@@ -156,7 +170,7 @@ class MY_Controller extends CI_Controller {
             }
         }
         // 删除数据
-        if ($this->{$this->model_name}->delete($id)) {
+        if ($this->{$this->model_name}->delete($ids)) {
             $result['status'] = true;
         } else {
             $result['status'] = false;

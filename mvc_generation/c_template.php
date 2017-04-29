@@ -6,7 +6,9 @@ class <?php echo $controller_name ?> extends MY_Controller {
 	public function __construct(){
 		parent::__construct();
 		$this->bean = array(
-			'id' => '<?php echo implode(', ', $bean["extras"]['id']) ?>',
+<?php if ($bean["extras"]['judge']['has_id']): ?>
+            'ids' => array(<?php echo implode(', ', $bean["extras"]['ids']) ?>),
+<?php endif ?>
 			'form_fields' => array(<?php echo implode(', ', $bean["extras"]['form_fields']) ?>),
 			'files' => array(<?php echo implode(', ', $bean["extras"]['files']) ?>),
 			'multichoice' => array(<?php echo implode(', ', $bean["extras"]['multichoice']) ?>),

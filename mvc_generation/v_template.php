@@ -358,8 +358,9 @@
   
 <?php if ($bean['extras']['judge']['has_id']):?>
   function edit_dialog(data){
-    data = data.replace(/&quot;/g, '"');
-    data = JSON.parse(data);
+    if (typeof data == 'string') {
+      var data = JSON.parse(data.replace(/&quot;/g, '"'));
+    }
     var edit_dialog = $.dialog({
       title: '修改<?php echo $bean['tbl_comment']?>',
       content: function(){
@@ -511,10 +512,12 @@
 
 
   function del_confirm(data){
-    var data = JSON.parse(data.replace(/&quot;/g, '"'));
+    if (typeof data == 'string') {
+      var data = JSON.parse(data.replace(/&quot;/g, '"'));
+    }
     var content = '';
 <?php foreach ($bean['id'] as $key => $id): ?>
-    content += "<?php echo $id['comment']?>："+<?php echo data.$id['field']?>;
+    content += "<?php echo $id['comment']?>："+data.<?php echo $id['field']?>;
 <?php endforeach ?>
     var del_confirm = $.confirm({
         title: '删除',
@@ -526,7 +529,7 @@
             action : function(){
               var post_data = Object();
 <?php foreach ($bean['id'] as $key => $id): ?>
-              post_data.<?php echo $id['field']?> = <?php echo data.$id['field']?>;
+              post_data.<?php echo $id['field']?> = data.<?php echo $id['field']?>;
 <?php endforeach ?>
               $.post("<?php echo "<?=site_url('back/{$bean_name}/delete')?>"?>", post_data, function(data,status){
                 if (data['status'] == true) {

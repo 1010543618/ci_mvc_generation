@@ -488,7 +488,7 @@ class Generation{
 
 	private function _create_bean_extras(&$bean, $bean_name){
 
-		$id = array();// c接受的id("'id1'","'id2'");
+		$ids = array();// c接受的id("'id1'","'id2'");
 		$form_fields = array();// c接受的字段 array("'col1'","'col2'");
 		$join_manipulation = array();// c需要操作的join信息 array('table1'=>'prifield','table2'=>'prifield')
 		$files = array();// c处理格式是文件的字段 array("'col1'","'col2'");
@@ -499,7 +499,7 @@ class Generation{
 
 		$model_select_fields = array();// m查询的字段 array("col1","col2");
 		$model_join = array();// m连接的字段 array("JOIN('table1', 'col1=col2', 'left')", "JOIN('table2', 'col1=col2', 'left')");
-
+		$model_id = array();// m id的字段 array("id1","id2");
 		
 		$view_show_col = array();// v显示的字段
 		$init_form_s_m = array();// v判断是否有select和mutilchoice的字段，并初始化
@@ -509,7 +509,8 @@ class Generation{
 			$judge['has_id'] = true;
 			foreach ($bean['id'] as $key => $id) {
 				$model_select_fields[] = "$bean_name.{$id['field']}";
-				$id[] = "'{$id['field']}'";
+				$ids[] = "'{$id['field']}'";
+				$model_id[] = "{$bean_name}.{$id['field']}";
 			}
 		}else{
 			$judge['has_id'] = false;
@@ -599,7 +600,7 @@ class Generation{
 			$judge['has_join'] = false;
 		}
 		
-
+		$bean['extras']['ids'] = $ids;
 		$bean['extras']['form_fields'] = $form_fields;
 		$bean['extras']['files'] = $files;
 		$bean['extras']['multichoice'] = $multichoice;
@@ -609,7 +610,7 @@ class Generation{
 
 		$bean['extras']['model_select_fields'] = $model_select_fields;
 		$bean['extras']['model_join'] = $model_join;
-
+		$bean['extras']['model_id'] = $model_id;
 		$bean['extras']['init_form_s_m'] = $init_form_s_m;
 
 		$bean['extras']['view_show_col'] = $view_show_col;

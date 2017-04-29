@@ -5,7 +5,7 @@ class <?php echo $model_name?> extends MY_Model {
 	public function selectPage($start, $length, $where = true)
 	{
 		// get(表, 取多少, 开始)
-		return $this->db->select('<?php echo implode(", ", $bean['extras']['model_select_fields']) ?>')-><?php echo implode('->', $bean['extras']['model_join']) ?>->where($where)->group_by('<?php echo "$bean_name.{$bean['id']['field']}" ?>')->get('<?php echo $bean_name?>', $length, $start)->result_array();
+		return $this->db->select('<?php echo implode(", ", $bean['extras']['model_select_fields']) ?>')-><?php echo implode('->', $bean['extras']['model_join']) ?>->where($where)->group_by('<?php echo implode(", ", $bean['extras']['model_id']) ?>')->get('<?php echo $bean_name?>', $length, $start)->result_array();
 	}
 	
 	public function countAll($where = true){
