@@ -61,7 +61,7 @@ class MY_Model extends CI_Model {
 	 * @param    string     $field 查找的字段的字符串
 	 * @return   array             查找的结果
 	 */
-	public function getByIdAndField($id,$field = '*'){
+	public function getFieldsById($id,$field = '*'){
 		return $this->db->select($field)->get_where($this->model_table, $id)->row_array();
 	}
 	

@@ -7,10 +7,9 @@ set names utf8;
 use cmg_test;
 /*----------测试没有join表----------*/
 # 表中的col有input/text/file/time四种类型
-drop table if exists `user`;
 create table user(
 	user_id int not null auto_increment comment '用户id',
-	user_name varchar(10) not null comment '用户名',
+	user_name varchar(64) not null comment '用户名',
 	user_sex enum('male', 'female', 'unclear') comment '用户性别',
 	user_label set('label1', 'label2', 'label3', 'label4', 'label5', 'label6') comment '用户标签',
 	info text not null comment '用户信息',
@@ -89,3 +88,28 @@ insert into permission (controller, action) values
 ('TGP', 'kekeke'),
 ('Ubisoft', 'potato');
 /*----------/测试需要使用JOIN的情况（一对多，多对多）----------*/
+
+/*----------测试联合主键和联合外键----------*/
+# 主表管理员表
+CREATE TABLE admin_composite_key(
+	admin_id int UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '管理员ID',
+	admin_name varchar(64) NOT NULL COMMENT '管理员名',
+	PRIMARY KEY (admin_id, admin_name)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT '管理员（联合主键）';
+insert into admin_composite_key (admin_name) values 
+('admin'),
+('root'),
+('administrator');
+# 连接表管理员_游戏表
+CREATE TABLE admin_composite_key_game(
+	admin_id int UNSIGNED NOT NULL COMMENT '管理员ID',-- admin
+	admin_name varchar(64) NOT NULL COMMENT '管理员名',
+	game_id int UNSIGNED NOT NULL COMMENT '游戏ID',-- game
+	foreign key(admin_id, admin_name) references admin_composite_key(admin_id, admin_name),
+	foreign key(game_id) references game(game_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT '管理员_游戏（联合外键）';
+insert into admin_composite_key_game (admin_id, admin_name, game_id) values 
+(1,'admin',1),(1,'admin',2),(1,'admin',3),(1,'admin',4),(1,'admin',5),(1,'admin',6),
+(2,'root',1),(2,'root',2),(2,'root',6),
+(3,'administrator',1),(3,'administrator',2),(3,'administrator',3);
+/*----------测试联合主键----------*/

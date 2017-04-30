@@ -241,11 +241,14 @@
                     <h2>tbl_comment(<*>string):【表显示的名字】,</h2>
                   </li>
                   <li>
-                    <h2>id(<*>map，表主键（删除修改时用，默认自增长添加时不会显示）):</h2>
-                    <ul>
-                      <li>field(<*>string):【id的字段名】,</li>
-                      <li>comment(<*>string):【id显示的名字】,</li>
-                    </ul>
+                    <h2>id(list，表主键（删除修改时用，没有主键将不会有添加修改功能）):</h2>
+                    <li>
+                      <h3>(map，每一个主键):</h3>
+                      <ul>
+                        <li>field(<*>string):【id的字段名】,</li>
+                        <li>comment(<*>string):【id显示的名字】,</li>
+                      </ul>
+                    </li>
                   </li>
                   <li>
                     <h2>col(list，表需要的列（添加查询用）):</h2>
@@ -288,20 +291,34 @@
                             </ul>
                           </li>
                           <li>
-                            <h4>manipulation_col(list，连接要操作的列):</h4>
-                            <ul>
-                              <li>
-                                <h5>(map，连接的每一列):</h5>
-                                <ul>
-                                  <li>field(<*>string):【列的字段名】,</li>
-                                  <li>comment(<*>string):【列显示的名字】,</li>
-                                  <li>option_field_conf(<*>string):【作为选项的字段，[0]：表名，[1]：存储时用的字段名，[2]：展示用的字段名。将其他表的字段作为选项】,</li>
-                                  <li>type(string):【表单中选择的形式，multichoice（默认）/select（select将使用select单选，multichoice使用checkbox复选）】,</li>
-                                </ul>
-                              </li>
-                            </ul>
+                            <h4>manipulation_col(map，连接要操作的从其他表选数据的列):</h4>
+                            <li>
+                              <h5>pri_col(list，连接表与主表对应的列):</h5>
+                              <ul>
+                                <li>
+                                  <h6>(map，连接表与主表对应的每一列):</h6>
+                                  <ul>
+                                    <li>field(<*>string):【列的字段名】,</li>
+                                    <li>pri_field(<*>string):【列对应的主表的字段名】,</li>
+                                  </ul>
+                                </li>
+                              </ul>
+                            </li>
+                            <li>
+                              <h5>input_col(map，连接表要输入数据的列):</h5>
+                              <ul>
+                                <li>
+                                  <h6>(map，连接表要输入数据的每一列):</h6>
+                                  <ul>
+                                    <li>field(<*>string):【列的字段名】,</li>
+                                    <li>comment(<*>string):【列显示的名字】,</li>
+                                    <li>option_field_conf(<*>string):【作为选项的字段，[0]：表名，[1]：存储时用的字段名，[2]：展示用的字段名。将其他表的字段作为选项】,</li>
+                                    <li>type(string):【表单中选择的形式，multichoice（默认）/select（select将使用select单选，multichoice使用checkbox复选）】,</li>
+                                  </ul>
+                                </li>
+                              </ul>
+                            </li>
                           </li>
-                          <li>manipulation_pri(string):【为了定位要操作的连接表中的数据，而使用的主表的字段（默认是主表的id）】</li>
                         </ul>
                       </li>
                     </ul>

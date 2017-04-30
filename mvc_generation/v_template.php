@@ -110,22 +110,24 @@
 <?php endforeach //end主表字段?>
 <?php if ($bean['extras']['judge']['has_join']): ?>
 <?php   foreach ($bean['join'] as $join_table_name => $join_table): //连接表字段?>
-<?php     foreach ($join_table['manipulation_col'] as $join_table_mani_col): ?>
-          <label><?php echo $join_table_mani_col['comment']?></label>
-<?php       if ($join_table_mani_col['type'] == 'select'): //连接表字段类型是select?>
-          <select name="<?php echo $join_table_name."[{$join_table_mani_col['field']}]" ?>" class="js-select-<?php echo "T{$join_table_name}C{$join_table_mani_col['field']}" ?> form-control"></select>
-<?php       elseif ($join_table_mani_col['type'] == 'multichoice'): //连接表字段类型是multichoice?>
-          <div class="row js-multichoice-<?php echo "T{$join_table_name}C{$join_table_mani_col['field']}" ?>"></div>
-<?php       elseif ($join_table_mani_col['type'] == 'input'): //连接表字段类型是input?>
-          <input name="<?php echo $join_table_name."[{$join_table_mani_col['field']}]" ?>" type="text">
+<?php     if ($join_table['has_manipulation_col']): ?>
+<?php       foreach ($join_table['manipulation_col']['input_col'] as $input_col): ?>
+          <label><?php echo $input_col['comment']?></label>
+<?php         if ($input_col['type'] == 'select'): //连接表字段类型是select?>
+          <select name="<?php echo $join_table_name."[{$input_col['field']}]" ?>" class="js-select-<?php echo "T{$join_table_name}C{$input_col['field']}" ?> form-control"></select>
+<?php         elseif ($input_col['type'] == 'multichoice'): //连接表字段类型是multichoice?>
+          <div class="row js-multichoice-<?php echo "T{$join_table_name}C{$input_col['field']}" ?>"></div>
+<?php         elseif ($input_col['type'] == 'input'): //连接表字段类型是input?>
+          <input name="<?php echo $join_table_name."[{$input_col['field']}]" ?>" type="text">
+<?php         endif ?>
+<?php       endforeach ?>
 <?php     endif ?>
-<?php     endforeach ?>
 <?php   endforeach //end连接表字段?>
 <?php endif ?>
 <?php /*----------生成表单----------*/?>
 <?php if ($bean['extras']['judge']['has_id']):?>
 <?php   foreach ($bean['id'] as $key => $id): ?>
-          <input name="<?php echo $id['field']?>" type="text" style="display: none" />
+          <input name="ids[<?php echo $id['field']?>]" type="text" style="display: none" />
 <?php   endforeach ?>
 <?php endif?>
           <br/>
@@ -184,7 +186,7 @@
 <?php endif //end有id才能删除和修改?>
 <?php if (0): //以后可能有用，先留着?>
           {
-            "data":"<?php echo $join_table_mani_col['field']?>",
+            "data":"<?php echo $input_col['field']?>",
             "render": function(data) {
               var data = data ? data.split(',') : '';
               var div = '';
@@ -312,9 +314,10 @@
 <?php /*----------初始化join操作的字段----------*/?>
 <?php if ($bean['extras']['judge']['has_join']): ?>
 <?php   foreach ($bean['join'] as $join_table_name => $join_table): ?>
-<?php     foreach ($join_table['manipulation_col'] as $join_table_mani_col): ?>
-<?php       if ($join_table_mani_col['type'] == 'multichoice'): ?>
-      $form.find('.js-multichoice-<?php echo "T{$join_table_name}C{$join_table_mani_col['field']}" ?> input').each(function(){
+<?php     if ($join_table['has_manipulation_col']): ?>
+<?php       foreach ($join_table['manipulation_col']['input_col'] as $input_col): ?>
+<?php         if ($input_col['type'] == 'multichoice'): ?>
+      $form.find('.js-multichoice-<?php echo "T{$join_table_name}C{$input_col['field']}" ?> input').each(function(){
         var self = $(this),
           label = self.next(),
           label_text = label.text();
@@ -324,8 +327,9 @@
           insert: '<div class="icheck_line-icon"></div>' + label_text
         });
       });
-<?php       endif ?>
-<?php     endforeach ?>
+<?php         endif ?>
+<?php       endforeach ?>
+<?php     endif ?>
 <?php   endforeach ?>
 <?php endif ?>
 <?php /*----------/初始化join操作的字段----------*/?>
@@ -396,13 +400,15 @@
 <?php endforeach ?>
 <?php if ($bean['extras']['judge']['has_join']): ?>
 <?php   foreach ($bean['join'] as $join_table_name => $join_table): //初始化连接表默认值?>
-<?php     foreach ($join_table['manipulation_col'] as $join_table_mani_col): ?>
-      $form.find(":input[name='<?php echo $join_table_name."[{$join_table_mani_col['field']}]"?>']").val(data['<?php echo $join_table_mani_col['field'] ?>']);  
-<?php     endforeach ?>
+<?php     if ($join_table['has_manipulation_col']): ?>
+<?php       foreach ($join_table['manipulation_col']['input_col'] as $input_col): ?>
+      $form.find(":input[name='<?php echo $join_table_name."[{$input_col['field']}]"?>']").val(data['<?php echo $input_col['field'] ?>']);  
+<?php       endforeach ?>
+<?php     endif ?>
 <?php   endforeach ?>
 <?php endif ?>
 <?php foreach ($bean['id'] as $key => $id): ?>
-        $form.find(":input[name='<?php echo $id['field']?>']").val(data['<?php echo $id['field']?>']);
+        $form.find(":input[name='ids[<?php echo $id['field']?>]']").val(data['<?php echo $id['field']?>']);
 <?php endforeach ?>
       $/*.listen*/('parsley:field:validate', function() {
         validate_form();
@@ -461,14 +467,15 @@
 <?php /*----------初始化join操作的字段----------*/?>
 <?php if ($bean['extras']['judge']['has_join']): ?>
 <?php   foreach ($bean['join'] as $join_table_name => $join_table): ?>
-<?php     foreach ($join_table['manipulation_col'] as $join_table_mani_col): ?>
-<?php       if ($join_table_mani_col['type'] == 'multichoice'): ?>
-      var checked_<?php echo "T{$join_table_name}C{$join_table_mani_col['field']}" ?>_array = data['<?php echo "T{$join_table_name}C{$join_table_mani_col['field']}" ?>'].split(',');
-      $form.find('.js-multichoice-<?php echo "T{$join_table_name}C{$join_table_mani_col['field']}" ?> input').each(function(){
+<?php     if ($join_table['has_manipulation_col']): ?>
+<?php       foreach ($join_table['manipulation_col']['input_col'] as $input_col): ?>
+<?php         if ($input_col['type'] == 'multichoice'): ?>
+      var checked_<?php echo "T{$join_table_name}C{$input_col['field']}" ?>_array = data['<?php echo "T{$join_table_name}C{$input_col['field']}" ?>'] ? data['<?php echo "T{$join_table_name}C{$input_col['field']}" ?>'].split(',') : new Array();
+      $form.find('.js-multichoice-<?php echo "T{$join_table_name}C{$input_col['field']}" ?> input').each(function(){
         var self = $(this),
             label = self.next(),
             label_text = label.text();
-        if ($.inArray(self.val(), checked_<?php echo "T{$join_table_name}C{$join_table_mani_col['field']}" ?>_array) != -1) {
+        if ($.inArray(self.val(), checked_<?php echo "T{$join_table_name}C{$input_col['field']}" ?>_array) != -1) {
           self.prop('checked',true);
         };
         label.remove();
@@ -477,8 +484,9 @@
           insert: '<div class="icheck_line-icon"></div>' + label_text
         });
       });
-<?php       endif ?>
-<?php     endforeach ?>
+<?php         endif ?>
+<?php       endforeach ?>
+<?php     endif ?>
 <?php   endforeach ?>
 <?php endif ?>
 <?php /*----------/初始化join操作的字段----------*/?>

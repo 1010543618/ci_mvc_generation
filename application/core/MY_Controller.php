@@ -44,9 +44,9 @@ class MY_Controller extends CI_Controller {
         }
         // 处理要操作的外链接表
         $join_data = array();
-        foreach ($this->bean['join_manipulation'] as $join_manipulation) {
-            $join_data[$join_manipulation[0]] = $form_data[$join_manipulation[0]];
-            unset($form_data[$join_manipulation[0]]);
+        foreach ($this->bean['join_manipulation_pri_col'] as $table_name => $fields) {
+            $join_data[$table_name] = $form_data[$table_name];
+            unset($form_data[$table_name]);
         }
         // 插入数据
         if (!$this->{$this->model_name}->insert($form_data)) {
@@ -54,17 +54,19 @@ class MY_Controller extends CI_Controller {
             $this->returnResult($result);
         }
         // 将操作的外链接表数据插入
-        foreach ($this->bean['join_manipulation'] as $join_manipulation) {
+        foreach ($this->bean['join_manipulation_pri_col'] as $table_name => $fields) {
             $insert_batch_data = array();
-            $pri_id = $this->db->insert_id();
-            foreach ($join_data[$join_manipulation[0]] as $col_name => $col_datas) {
+            foreach ($fields as $pri_field => $field) {
+                $pri_cols[$field] = isset($form_data[$pri_field]) ? $form_data[$pri_field] : $this->db->insert_id();
+            }
+            foreach ($join_data[$table_name] as $col_name => $col_datas) {
+                $data = $pri_cols;
                 foreach ($col_datas as $col_data) {
-                    $data[$join_manipulation[1]] = $pri_id;
                     $data[$col_name] = $col_data;
                     $insert_batch_data[] = $data;
                 }
             }
-            $model = "{$join_manipulation[0]}_model";
+            $model = "{$table_name}_model";
             if (!$this->$model->insert_batch($insert_batch_data)) {
                 $result['status'] = false;
                 $this->returnResult($result);
@@ -85,22 +87,20 @@ class MY_Controller extends CI_Controller {
             $form_data[$form_field] = $this->input->post($form_field, TRUE);
         }
         // 获取id
-        foreach ($this->bean['ids'] as $key => $id) {
-            $ids = array($id => $this->input->post($id, TRUE));
-        }
+        $ids = $this->input->post('ids', TRUE);
         // 处理mutilchoice字段
         foreach ($this->bean['multichoice'] as $multichoice) {
             $form_data[$multichoice] = $form_data[$multichoice] ? implode(',', $form_data[$multichoice]) : '';
         }
         // 若有文件update前将文件位置保存
         if ($this->bean['files']) {
-            $files = $this->{$this->model_name}->getByIdAndField($id, implode(',', $this->bean['files']));
+            $files = $this->{$this->model_name}->getFieldsById($ids, implode(',', $this->bean['files']));
         }
         // 处理要操作的外链接表
         $join_data = array();
-        foreach ($this->bean['join_manipulation'] as $join_manipulation) {
-            $join_data[$join_manipulation[0]] = $form_data[$join_manipulation[0]];
-            unset($form_data[$join_manipulation[0]]);
+        foreach ($this->bean['join_manipulation_pri_col'] as $table_name => $fields) {
+            $join_data[$table_name] = $form_data[$table_name];
+            unset($form_data[$table_name]);
         }
         // 更新数据
         if ($this->{$this->model_name}->update($form_data, $ids)) {
@@ -115,18 +115,22 @@ class MY_Controller extends CI_Controller {
             }
         }
         // 修改后删除要操作的外链接表的数据再重新插入
-        foreach ($this->bean['join_manipulation'] as $join_manipulation) {
+        foreach ($this->bean['join_manipulation_pri_col'] as $table_name => $fields) {
             $insert_batch_data = array();
-            $pri_id = $id[$this->bean['id']];
-            foreach ($join_data[$join_manipulation[0]] as $col_name => $col_datas) {
+            // var_dump($this->bean['join_manipulation_pri_col'],  $table_name, $fields);die();
+            foreach ($fields as $pri_field => $field) {
+                $pri_cols[$field] = $ids[$pri_field];
+            }
+            foreach ($join_data[$table_name] as $col_name => $col_datas) {
+                $data = $pri_cols;
                 foreach ($col_datas as $col_data) {
-                    $data[$join_manipulation[1]] = $pri_id;
                     $data[$col_name] = $col_data;
                     $insert_batch_data[] = $data;
                 }
             }
-            $model = "{$join_manipulation[0]}_model";
-            if (!$this->$model->delete($id)) {
+            
+            $model = "{$table_name}_model";
+            if (!$this->$model->delete($ids)) {
                 $result['status'] = false;
                 $this->returnResult($result);
             }
@@ -153,17 +157,15 @@ class MY_Controller extends CI_Controller {
             $this->returnResult($result);
         }
         // 获取id
-        foreach ($this->bean['ids'] as $key => $id) {
-            $ids = array($id => $this->input->post($id, TRUE));
-        }
+        $ids = $this->input->post('ids', TRUE);
         // 若有文件delete前将文件位置保存
         if ($this->bean['files']) {
-            $files = $this->{$this->model_name}->getByIdAndField($id, implode(',', $this->bean['files']));
+            $files = $this->{$this->model_name}->getFieldsById($id, implode(',', $this->bean['files']));
         }
         // 若有要操作的外链接表，应该在删除数据前删除外链表中的数据
-        foreach ($this->bean['join_manipulation'] as $join_manipulation) {
+        foreach ($this->bean['join_manipulation_pri_col'] as $join_manipulation_pri_col) {
             $insert_batch_data = array();
-            $model = "{$join_manipulation[0]}_model";
+            $model = "{$join_manipulation_pri_col[0]}_model";
             if (!$this->$model->delete($id)) {
                 $result['status'] = false;
                 $this->returnResult($result);

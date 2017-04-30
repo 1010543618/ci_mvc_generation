@@ -13,10 +13,10 @@ class <?php echo $controller_name ?> extends MY_Controller {
 			'files' => array(<?php echo implode(', ', $bean["extras"]['files']) ?>),
 			'multichoice' => array(<?php echo implode(', ', $bean["extras"]['multichoice']) ?>),
 			'get_form_data' => array(<?php echo implode(', ', $bean["extras"]['get_form_data']) ?>),
-            'join_manipulation' => array(<?php echo implode(', ', $bean["extras"]['join_manipulation']) ?>)
+            'join_manipulation_pri_col' => array(<?php echo implode(', ', $bean["extras"]['join_manipulation_pri_col']) ?>)
 			);
 <?php foreach ($bean["extras"]['jointable'] as $jointable): // 引入所有要操作的表模型?>
-		$this->load->model('<?php echo ucmodel($jointable, "_") ?>');
+		$this->load->model('<?php echo $jointable.'_model'?>');
 <?php endforeach ?>
 	}
 
