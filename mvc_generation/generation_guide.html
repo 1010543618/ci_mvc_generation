@@ -24,10 +24,16 @@
       .padding-0{
         padding: 0;
       }
-      #config-textarea{
+      .cmg-config-example-title{
+        margin: 8px 0 0;
+        border-radius: 3px;
+        height: 25px;
+      }
+      #config-textarea, #example-config-textarea{
         width: 100%;
         /*height: 500px;*/
       }
+
     </style>
   </head>
   <body class="nav-md">
@@ -223,7 +229,348 @@
                           <textarea name="generation_config" id="config-textarea"></textarea>
                         </form>
                       </div>
+                      <div class="col-md-6">
+                        <p class="cmg-config-example-title bg-primary">eg.</p>
+                        <textarea name="generation_config" id="example-config-textarea">
+{
+    "admin": {
+        "tbl_comment": "管理员",
+        "id": [
+            {
+                "field": "admin_id",
+                "comment": "管理员ID"
+            }
+        ],
+        "col": [
+            {
+                "field": "admin_name",
+                "comment": "管理员名",
+                "type": "input",
+                "validation": "required "
+            },
+            {
+                "field": "role_id",
+                "comment": "角色ID（用“,”分隔）",
+                "type": "select",
+                "select_conf": [
+                    "role",
+                    "role_id",
+                    "role_name"
+                ],
+                "validation": ""
+            },
+            {
+                "field": "perm_id",
+                "comment": "权限ID（用“,”分隔）",
+                "type": "multichoice",
+                "multichoice_conf": [
+                    "permission",
+                    "perm_id",
+                    "controller"
+                ],
+                "validation": ""
+            }
+        ],
+        "join": {
+            "admin_game": {
+                "pri_field": "admin.admin_id",
+                "join_field": "admin_game.admin_id",
+                "manipulation_col": {
+                    "pri_col": [
+                        {
+                            "field": "admin_id",
+                            "pri_field": "admin_id"
+                        }
+                    ],
+                    "input_col": [
+                        {
+                            "field": "game_id",
+                            "comment": "游戏",
+                            "type": "multichoice",
+                            "option_field_conf": [
+                                "game",
+                                "game_id",
+                                "game_name"
+                            ]
+                        }
+                    ]
+                }
+            },
+            "game": {
+                "pri_field": "admin_game.game_id",
+                "join_field": "game.game_id",
+                "col": [
+                    {
+                        "field": "game_name",
+                        "comment": "游戏名",
+                        "is_group_concat": "true"
+                    }
+                ]
+            }
+        }
+    },
+    "game": {
+        "tbl_comment": "游戏",
+        "id": [
+            {
+                "field": "game_id",
+                "comment": "游戏ID",
+                "type": "input",
+                "validation": "required "
+            }
+        ],
+        "col": [
+            {
+                "field": "game_name",
+                "comment": "游戏名",
+                "type": "input",
+                "validation": "required "
+            }
+        ]
+    },
+    "permission": {
+        "tbl_comment": "权限",
+        "id": [
+            {
+                "field": "perm_id",
+                "comment": "权限ID",
+                "type": "input",
+                "validation": "required "
+            }
+        ],
+        "col": [
+            {
+                "field": "controller",
+                "comment": "模块（控制器）",
+                "type": "input",
+                "validation": "required "
+            },
+            {
+                "field": "action",
+                "comment": "功能（方法）",
+                "type": "input",
+                "validation": "required "
+            }
+        ]
+    },
+    "role": {
+        "tbl_comment": "角色",
+        "id": [
+            {
+                "field": "role_id",
+                "comment": "角色ID",
+                "type": "input",
+                "validation": "required "
+            }
+        ],
+        "col": [
+            {
+                "field": "role_name",
+                "comment": "角色",
+                "type": "input",
+                "validation": "required "
+            },
+            {
+                "field": "perm_id",
+                "comment": "权限",
+                "type": "multichoice",
+                "multichoice_conf": [
+                    "permission",
+                    "perm_id",
+                    "controller"
+                ],
+                "validation": "required "
+            }
+        ]
+    },
+    "user": {
+        "tbl_comment": "用户",
+        "id": [
+            {
+                "field": "user_id",
+                "comment": "用户id",
+                "type": "input",
+                "validation": "required "
+            }
+        ],
+        "col": [
+            {
+                "field": "user_name",
+                "comment": "用户名",
+                "type": "input",
+                "validation": "required "
+            },
+            {
+                "field": "user_sex",
+                "comment": "用户性别",
+                "type": "select",
+                "select_options": [
+                    "male",
+                    "female",
+                    "unclear"
+                ],
+                "validation": ""
+            },
+            {
+                "field": "user_label",
+                "comment": "用户标签",
+                "type": "multichoice",
+                "multichoice_options": [
+                    "label1",
+                    "label2",
+                    "label3",
+                    "label4",
+                    "label5",
+                    "label6"
+                ],
+                "validation": ""
+            },
+            {
+                "field": "info",
+                "comment": "用户信息",
+                "type": "text",
+                "validation": "required "
+            },
+            {
+                "field": "profile",
+                "comment": "用户头像",
+                "type": "file",
+                "validation": ""
+            },
+            {
+                "field": "birthday",
+                "comment": "用户生日",
+                "type": "date",
+                "validation": "required "
+            },
+            {
+                "field": "get_up_time",
+                "comment": "起床时间",
+                "type": "time",
+                "validation": "required "
+            },
+            {
+                "field": "gift_time",
+                "comment": "收礼物的时间",
+                "type": "timestamp",
+                "validation": "required "
+            }
+        ]
+    },
+    "admin_game": {
+        "tbl_comment": "管理员_游戏",
+        "join": {
+            "admin": {
+                "pri_field": "admin.admin_id",
+                "join_field": "admin_game.admin_id"
+            },
+            "game": {
+                "pri_field": "game.game_id",
+                "join_field": "admin_game.game_id"
+            }
+        },
+        "col": [
+            {
+                "field": "admin_id",
+                "comment": "管理员ID",
+                "type": "input",
+                "validation": "required "
+            },
+            {
+                "field": "game_id",
+                "comment": "游戏ID",
+                "type": "input",
+                "validation": "required "
+            }
+        ]
+    },
+    "admin_composite_key":{
+        "tbl_comment":"管理员（联合主键）",
+        "id":[{
+            "field":"admin_id",
+            "comment":"管理员ID"
+        },
+        {
+            "field":"admin_name",
+            "comment":"管理员名"
+        }],
+        "col":[{
+            "field":"admin_name",
+            "comment":"管理员名",
+            "type":"input",
+            "validation":"required "
+        }],
+        "join": {
+            "admin_composite_key_game": {
+                "pri_field": "admin_composite_key.admin_id",
+                "join_field": "admin_composite_key_game.admin_id",
+                "manipulation_col": {
+                    "pri_col": [
+                        {
+                            "field": "admin_id",
+                            "pri_field": "admin_id"
+                        },
+                        {
+                            "field": "admin_name",
+                            "pri_field": "admin_name"
+                        }
+                    ],
+                    "input_col": [
+                        {
+                            "field": "game_id",
+                            "comment": "游戏",
+                            "type": "multichoice",
+                            "option_field_conf": [
+                                "game",
+                                "game_id",
+                                "game_name"
+                            ]
+                        }
+                    ]
+                }
+            },
+            "game": {
+                "pri_field": "admin_composite_key_game.game_id",
+                "join_field": "game.game_id",
+                "col": [
+                    {
+                        "field": "game_name",
+                        "comment": "游戏名",
+                        "is_group_concat": "true"
+                    }
+                ]
+            }
+        }
+    },
+    "admin_composite_key_game":{
+        "tbl_comment":"管理员_游戏（联合外键）",
+        "col":[{
+            "field":"admin_id",
+            "comment":"管理员ID",
+            "type":"input",
+            "validation":"required "
+        },
+        {
+            "field":"admin_name",
+            "comment":"管理员名",
+            "type":"input",
+            "validation":"required "
+        },
+        {
+            "field":"game_id",
+            "comment":"游戏ID",
+            "type":"input",
+            "validation":"required "
+        }]
+    }
+}
+                        </textarea>
+                      </div>
                     </div>
+                  </div>
+                  <div id="step-5">
+                    <h2 class="StepTitle text-center">生成成功</h2>
+                    <h3 class="text-center"><a href="javascript:window.location.href = window.location.href.split('#')[0].split('?')[0].split('/mvc_generation/generation_guide.html')[0];">查看生成结果</a></h3>
                   </div>
                 </div>
                 <!-- /SmartWizard Content -->
@@ -520,7 +867,7 @@
         $('#wizard .stepContainer').height(wizard_stepContainer_height);
         // 第四步文本框高度动态定义
         if (obj[0].rel == 4) {
-          $("#config-textarea").height($('#wizard .stepContainer').height() - 120);
+          $("#config-textarea, #example-config-textarea").height($('#wizard .stepContainer').height() - 120);
         }
       }
       init_window();

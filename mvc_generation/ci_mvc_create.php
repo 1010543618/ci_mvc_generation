@@ -66,7 +66,7 @@ if ($_POST) {
 			}
 			$generation = new Generation($config);
 			$info = $generation->output_mvc_file();
-			return_json($info, false);
+			return_json($info, true);
 		default:
 			break;
 	}

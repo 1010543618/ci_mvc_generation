@@ -108,10 +108,12 @@ class MY_Controller extends CI_Controller {
         } else {
             $result['status'] = false;
         }
-        // 若有文件update后删除删除原文件
+        // 若有文件进行了修改，update后删除删除原文件
         if ($this->bean['files']) {
-            foreach ($files as $file) {
-                @unlink('./' . $file);
+            foreach ($files as $file_col_name => $file_name) {
+                if ($file_name != $form_data[$file_col_name]) {
+                    @unlink('./' . $file);
+                }
             }
         }
         // 修改后删除要操作的外链接表的数据再重新插入

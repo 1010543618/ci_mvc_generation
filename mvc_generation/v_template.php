@@ -57,7 +57,7 @@
 <?php   elseif ($column['type'] === 'text'): ?>
           <script name="<?php echo $column['field'] ?>" type="text/plain"> </script>
 <?php   elseif ($column['type'] === 'file'): ?>
-          <input name="<?php echo $column['field'] ?>-file" type="file" data-show-upload="false" data-show-preview="false" data-language="zh" data-upload-async="true" data-upload-url="<?php echo "<?=site_url('back/{$bean_name}/upload_{$column['field']}')?>" ?>" />
+          <input name="<?php echo $column['field'] ?>-file" type="file" data-show-preview="false" data-language="zh" data-upload-async="true" data-upload-url="<?php echo "<?=site_url('back/{$bean_name}/upload_{$column['field']}')?>" ?>" />
           <input name="<?php echo $column['field'] ?>" type="text" style="display: none" />
 <?php   elseif ($column['type'] === 'select'): ?>
           <select name="<?php echo $column['field'] ?>" class="form-control">
@@ -264,14 +264,15 @@
       $form.find('.btn').text("添加"+$(this).text()).on('click', function() {
         //parsley()和serialize()不能用$form（是div节点）必须用$('#add-form')
         if ($('#add-form').parsley().validate()) {
-<?php foreach ($bean['col'] as $key => $column): ?>
-<?php   if ($column['type'] == 'file'): ?>
-          $fi_<?php echo $column['field'] ?>.fileinput('upload');
-          window.WAIT_UPLOAD = new Object();
-          window.WAIT_UPLOAD['<?php echo $column['field'] ?>'] = true;      
-<?php   endif ?>
-<?php endforeach ?>
-          window.POST_DATA();
+          var post_data = $('#add-form').serialize();
+          $.post("<?php echo "<?=site_url('back/{$bean_name}/insert')?>"?>", post_data, function(data){
+            if (data['status'] == true) {
+              DEP_TABLE.ajax.reload( null, false );
+              add_dialog.setContent('添加成功');
+            }else{
+              add_dialog.setContent(data['message']);
+            }
+          });
         }
       });
 <?php /*----------初始化type不是input的字段---------*/?>
@@ -284,7 +285,6 @@
       UE.getEditor('ue-<?php echo $column['field'] ?>',{initialFrameWidth:ue_width,zIndex:999999999,autoFloatEnabled:false});
 <?php   elseif ($column['type'] == 'file'): ?>
       var $fi_<?php echo $column['field'] ?> = $form.find(":input[name='<?php echo $column['field'] ?>-file']").fileinput().on("fileuploaded", function (event, data, previewId, index) {
-          delete(window.WAIT_UPLOAD['<?php echo $column['field'] ?>']);
           $form.find(":input[name='<?php echo $column['field'] ?>']").val(data.response.file_path);
       });
 <?php   elseif ($column['type'] == 'multichoice'): ?>
@@ -341,21 +341,6 @@
       } else {
         $('.bs-callout-info').addClass('hidden');
         $('.bs-callout-warning').removeClass('hidden');
-      }
-    }
-    window.POST_DATA = function(){
-      if (!$.isEmptyObject(window.WAIT_UPLOAD)) {
-        setTimeout(window.POST_DATA,2000);
-      }else{
-        var post_data = $('#add-form').serialize();
-        $.post("<?php echo "<?=site_url('back/{$bean_name}/insert')?>"?>", post_data, function(data){
-          if (data['status'] == true) {
-            DEP_TABLE.ajax.reload( null, false );
-            add_dialog.setContent('添加成功');
-          }else{
-            add_dialog.setContent(data['message']);
-          }
-        });
       }
     }
   }
@@ -416,14 +401,15 @@
       $form.find(".btn").text("修改"+$(this).text()).on('click', function() {
         //parsley()和serialize()不能用$form（是div节点）必须用$('#edit-form')
         if ($('#edit-form').parsley().validate()) {
-<?php foreach ($bean['col'] as $key => $column): ?>
-<?php   if ($column['type'] == 'file'): ?>
-          $fi_<?php echo $column['field'] ?>.fileinput('upload');
-          window.WAIT_UPLOAD = new Object();
-          window.WAIT_UPLOAD['<?php echo $column['field'] ?>'] = true;
-<?php   endif ?>
-<?php endforeach ?>
-          window.POST_DATA();
+          var post_data = $('#edit-form').serialize();
+          $.post("<?php echo "<?=site_url('back/{$bean_name}/update')?>"?>", post_data, function(data){
+            if (data['status'] == true) {
+              DEP_TABLE.ajax.reload( null, false );
+              edit_dialog.setContent('修改成功');
+            }else{
+              edit_dialog.setContent(data['message']);
+            }
+          });
         }       
         validate_form();
       });
@@ -437,7 +423,6 @@
       UE.getEditor('ue-<?php echo $column['field'] ?>',{initialFrameWidth:ue_width,zIndex:999999999,autoFloatEnabled:false});
 <?php   elseif ($column['type'] == 'file'): ?>
       var $fi_<?php echo $column['field'] ?> = $form.find(":input[name='<?php echo $column['field'] ?>-file']").fileinput().on("fileuploaded", function (event, data, previewId, index) {
-          delete(window.WAIT_UPLOAD['<?php echo $column['field'] ?>']);
           $form.find(":input[name='<?php echo $column['field'] ?>']").val(data.response.file_path);
       });
 <?php   elseif ($column['type'] == 'multichoice'): ?>
@@ -499,21 +484,6 @@
       } else {
         $('.bs-callout-info').addClass('hidden');
         $('.bs-callout-warning').removeClass('hidden');
-      }
-    }
-    window.POST_DATA = function(){
-      if (!$.isEmptyObject(window.WAIT_UPLOAD)) {
-        setTimeout(window.POST_DATA,2000);
-      }else{
-        var post_data = $('#edit-form').serialize();
-        $.post("<?php echo "<?=site_url('back/{$bean_name}/update')?>"?>", post_data, function(data){
-          if (data['status'] == true) {
-            DEP_TABLE.ajax.reload( null, false );
-            edit_dialog.setContent('修改成功');
-          }else{
-            edit_dialog.setContent(data['message']);
-          }
-        });
       }
     }
   }
