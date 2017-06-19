@@ -126,6 +126,8 @@ class Generation{
 			// 普通字段
 			foreach ($table_source['col'] as $column) {
 				if ($column['extra'] != 'auto_increment') {
+					// 重置col。不然可能给字段加上多余的信息
+					$col = array();
 					$col['field'] = $column['field'];
 					$col['comment'] = $column['comment'];
 					// type和validation
@@ -155,6 +157,7 @@ class Generation{
 						case 'enum':
 							$col['type'] = 'select';
 							$col['select_options'] = explode(',', str_replace("'", '', $type_bracket));
+							var_dump($column);
 							break;
 						case 'set':
 							$col['type'] = 'multichoice';
@@ -196,6 +199,7 @@ class Generation{
 		// var_dump($tables);die();
 
 		// 将tables数组转换为json字符串（不自动转换为unicode编码），调整缩进并返回
+		var_dump($tables);
 		return add_json_indent(json_unescaped_unicode_encode($tables));
 	}
 
