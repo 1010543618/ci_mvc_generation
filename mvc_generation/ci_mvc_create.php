@@ -2,7 +2,34 @@
 require_once('./helpers/json_helper.php');
 require_once('./helpers/common_helper.php');
 require_once('./libraries/Generation.php');
-
+if ($_GET) {
+	switch ($_GET['action']) {
+		case 'clean_mvc':
+			// 没有确认将不清除
+			if ($_GET['confirm'] === 'false') {
+				die('没有确认无法清除');
+			}
+			$config = array(
+				'folder' => array(
+						'm' => $_GET['m_folder'],
+						'v' => $_GET['v_folder'],
+						'c' => $_GET['c_folder']
+					)
+				);
+			if (has_null($config)) {
+				return_json('有必填项没填啊！', false);
+			}
+			$generation = new Generation($config);
+			if ($generation->clean_generated_mvc() === true) {
+				header("content-type:text/html;charset=utf8");
+				echo "删除成功！";
+			}
+			break;
+		default:
+			# code...
+			break;
+	}
+}
 if ($_POST) {
 	switch ($_POST['step']) {
 		case '1':
@@ -37,13 +64,14 @@ if ($_POST) {
 			
 			$generation = new Generation($config);
 			$tables_bean = $generation->create_tables_bean();
-
+			if ($tables_bean === false) {
+				return_json('创建配置文件失败（错误消息：写入文件失败）', false);
+			}
 			// 将tables_bean输出到config
 			if (!file_put_contents('./config.json', $tables_bean))
-				return_json('创建配置文件失败', true);
+				return_json('创建配置文件失败（错误消息：写入文件失败）', false);
 			return_json($tables_bean, true);
 			break;
-
 		case '3_4':
 			// 使用设置的配置和配置文件的配置生成mvc文件
 			$config = array(
@@ -71,6 +99,3 @@ if ($_POST) {
 			break;
 	}
 }
-
-
-

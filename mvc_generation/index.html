@@ -14,6 +14,10 @@
 		text-align: center;
 		padding: 50px 0;
 	}
+	a{
+		text-decoration: none;
+		color: #000;
+	}
 	.container{
 		margin: 0 auto;
 		width: 960px;
@@ -25,21 +29,57 @@
 		width: 33.333%;
 		padding: 10px;
 	}
-	.container .col a{
+	.container .col .gray_block{
 		height: 150px;
 		background: #888;
 		display: block;
-		text-decoration: none;
-		color: #000;
 	}
-	
+	.container .col .confirm-button{
+		margin-top: 12px;
+		width: 100%;
+		height: 30px;
+		border: 0;
+		background: #333;
+		color: #ccc;
+		cursor: pointer;
+	}
+	#clean-mvc-form{
+		font-size: 14px;
+		text-align: center;
+	}
+	#clean-mvc-form input{
+		width: 200px;
+		height: 14px;
+		padding: 0;
+	}
 </style>
 <body>
 <h1>CI_MVC_GENERATION</h1>
 <div class="container">
-	<div class="col"><a href="generation_guide.html">进入自动生成向导</a></div>
-	<div class="col"><a href="">通过配置文件生成</a></div>
-	<div class="col"><a href="">说明</a></div>
+	<div class="col"><a href="generation_guide.html" class="gray_block">进入自动生成向导</a></div>
+	<div class="col">
+		<div class="gray_block">
+			<form id="clean-mvc-form" method="get" action="ci_mvc_create.php">
+				<label for="">model生成的文件夹</label><input name="m_folder" type="text" value="../application/models"><br>
+				<label for="">view生成的文件夹</label><input name="v_folder" type="text" value="../views/back"><br>
+				<label for="">controller生成的文件夹</label><input name="c_folder" type="text" value="../application/controllers/back"><br>
+				<input name="action" type="text" value="clean_mvc" style="display: none">
+				<input name="confirm" type="text" value="false" style="display: none">
+			</form>
+			<button onclick="clean_mvc_confirm()" class="confirm-button">清空已生成的mvc</button>
+		</div>
+	</div>
+	<div class="col"><a href="" class="gray_block">通过配置文件生成</a></div>
+	<div class="col"><a href="" class="gray_block">说明</a></div>
 </div>
+<script>
+	function clean_mvc_confirm(){
+		if(true || confirm('是否清除全部已经生成的mvc文件？')){
+			var clean_mvc_form = document.querySelector('#clean-mvc-form');
+			clean_mvc_form.querySelector('input[name="confirm"]').value = 'true';
+			clean_mvc_form.submit();
+		}
+	}
+</script>
 </body>
 </html>

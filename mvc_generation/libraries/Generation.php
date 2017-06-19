@@ -30,13 +30,22 @@ class Generation{
 		foreach ($beans as $bean_name => $bean) {
 			
 			//models
-			$model_name = $this->_ucmodel($bean_name, "_");
+			/**
+			 * Loader：public function model($model, $name = '', $db_conn = FALSE)
+			 * $model是模型的名字
+			 * $name是模型使用的名字（未设置会$name = $model）
+			 * 加载模型文件前会先》：$model = ucfirst($model)
+			 * eg：
+			 * $this->load('xxx_xxx_model');，用$this->xxx_xxx_model使用，找Xxx_xxx_model.php加载
+			 * $this->load('xxx_Xxx_Model');，用$this->xxx_Xxx_Model使用，找Xxx_Xxx_Model.php加载
+			 */
+			$model_name = ucfirst($bean_name);
 			ob_start();
 	        require('./m_template.php');
 	        $model = ob_get_contents();
 	        @ob_end_clean();
 	        if (!is_dir($this->folder['m'])) mkdir($this->folder['m']);
-	  		file_put_contents("{$this->folder['m']}/$model_name.php", $model);
+	  		file_put_contents("{$this->folder['m']}/{$model_name}_model.php", $model);
 			
 			//views
 			ob_start();
@@ -47,7 +56,12 @@ class Generation{
 	  		file_put_contents("{$this->folder['v']}/$bean_name.html", $view);
 
 	  		//controllers
-	  		$controller_name = implode('_', array_map('ucfirst', explode('_', $bean_name)));
+	  		/**
+	  		 * （$RTR是路由类的单例的引用：$RTR =& load_class('Router', 'core', isset($routing) ? $routing : NULL);
+	  		 * 加载控制器前会进行：$class = ucfirst($RTR->class);
+	  		 * $method = $RTR->method;
+	  		 */
+	  		$controller_name = ucfirst($bean_name);
 	  		ob_start();
 	        require('./c_template.php');
 	        $view = ob_get_contents();
@@ -82,6 +96,9 @@ class Generation{
 	public function create_tables_bean(){
 		// 1。获取tables数组并处理成规定格式
 		$tables_source = $this->_get_tables_info();
+		if (json_encode($tables_source) === false) {
+			return_json("读取数据库“{$this->db}”中表的信息发生错误（错误原因：创建表的语句中的中文不是utf8编码）", false);
+		}
 		$tables = array();
 		// var_dump($tables_source);die();
 		foreach ($tables_source as $table_name => $table_source) {
@@ -105,7 +122,6 @@ class Generation{
 				$tables[$table_name]['join'][$join_table_name]['pri_field'] = "{$matchs[2][$key]}.{$matchs[3][$key]}";
 				$tables[$table_name]['join'][$join_table_name]['join_field'] = "$table_name.{$matchs[1][$key]}";
 			}
-			
 
 			// 普通字段
 			foreach ($table_source['col'] as $column) {
@@ -225,24 +241,47 @@ class Generation{
 	 * @DateTime 2017-03-10
 	 * @return   string     配置文件字符串
 	 */
-	function read_config_file(){
+	public function read_config_file(){
 
+	}
+
+	/**
+	 * 清除已经生成的mvc文件
+	 * @Author   zjf
+	 * @DateTime 2017-06-19
+	 * @return   bool     是否清除成功
+	 */
+	public function clean_generated_mvc(){
+        if (!is_dir($this->folder['m'])) die($this->folder['m'].'不存在');
+        if (!is_dir($this->folder['v'])) die($this->folder['v'].'不存在');
+        if (!is_dir($this->folder['c'])) die($this->folder['c'].'不存在');
+        //m
+        $dir_path = $this->folder['m'];
+        $dir_handle = opendir($dir_path);
+		while(false !== $file = readdir($dir_handle)){
+			if ($file == '.' || $file == '..') continue;
+			@unlink($dir_path .'/'. $file);
+		}
+		//v
+		$dir_path = $this->folder['v'];
+		$dir_handle = opendir($dir_path);
+		while(false !== $file = readdir($dir_handle)){
+			if ($file == '.' || $file == '..' || is_dir($dir_path .'/'. $file) || $file == 'home.html') continue;
+			@unlink($dir_path .'/'. $file);
+		}
+		//c
+		$dir_path = $this->folder['c'];
+		$dir_handle = opendir($dir_path);
+		while(false !== $file = readdir($dir_handle)){
+			if ($file == '.' || $file == '..') continue;
+			@unlink($dir_path .'/'. $file);
+		}
+		return true;
 	}
 
 
 
 	
-
-	/**
-	 * 通过表名创建模型名（将单词大写，加上_Model）
-	 * @Author   zjf
-	 * @DateTime 2017-04-14
-	 * @param    string     $str        表名
-	 * @return   string                 模型名
-	 */
-	private function _ucmodel($str){
-		return implode('_', array_map('ucfirst', explode('_', $str))).'_Model';
-	}
 
 
 	/**

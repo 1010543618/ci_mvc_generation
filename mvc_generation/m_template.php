@@ -1,5 +1,5 @@
 <?php echo "<?php".PHP_EOL?>
-class <?php echo $model_name?> extends MY_Model {
+class <?php echo $model_name.'_Model'?> extends MY_Model {
 <?php /*----------用外部表作为选项重写selectPage----------*/?>
 <?php if ($bean['extras']['model_join']): ?>
 	public function selectPage($start, $length, $where = true)
