@@ -677,7 +677,7 @@ class Generation{
 		$bean['extras']['jointable'] = array_unique($jointable);
 
 		$bean['extras']['model_select_fields'] = $model_select_fields;
-		$bean['extras']['model_join'] = $model_join;
+		$bean['extras']['model_join'] = array_unique($model_join);
 		$bean['extras']['model_id'] = $model_id;
 		$bean['extras']['init_form_s_m'] = $init_form_s_m;
 
